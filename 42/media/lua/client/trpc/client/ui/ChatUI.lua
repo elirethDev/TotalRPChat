@@ -1,4 +1,5 @@
 local ChatUI = {}
+local ChatState = require("trpc/client/ui/ChatState")
 ChatUI.tabPanel = {}
 ChatUI.textEntry = {}
 
@@ -8,7 +9,7 @@ function ChatUI:prerender()
 
     self:setDrawFrame(true)
 
-    if not ISChat.focused then
+    if not ChatState.isFocused() then
         self.fade:update()
     end
     self:makeFade(self.fade:fraction())

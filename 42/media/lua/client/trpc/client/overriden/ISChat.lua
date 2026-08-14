@@ -29,6 +29,7 @@ local Formatting = require("trpc/client/chat/Formatting")
 local BubbleFactory = require("trpc/client/ui/bubble/Factory")
 local Tabs = require("trpc/client/ui/Tabs")
 local RangeController = require("trpc/client/ui/RangeController")
+local ChatState = require("trpc/client/ui/ChatState")
 local Logger = require("trpc/core/Logger")
 
 ISChat.allChatStreams = Streams.allChatStreams
@@ -42,7 +43,7 @@ local GetTrpcCommandFromMessage = Streams.GetTrpcCommandFromMessage
 local UpdateTabStreams = Streams.UpdateTabStreams
 
 ISChat.onSwitchStream = function()
-    if ISChat.focused then
+    if ChatState.isFocused() then
         local t = ISChat.instance.textEntry
         local internalText = t:getInternalText()
         local data = luautils.split(internalText, " ")
@@ -67,7 +68,7 @@ ISChat.onSwitchStream = function()
         local chatStreams = curTxtPanel.chatStreams
         curTxtPanel.streamID = curTxtPanel.streamID % #chatStreams + 1
         local stream = chatStreams[curTxtPanel.streamID]
-        ISChat.lastTabStream[ISChat.instance.currentTabID] = stream
+        ISChat.lastTabStream[ChatState.getCurrentTabID()] = stream
         ISChat.instance.textEntry:setText(stream.command)
         RangeController.updateRangeIndicator(stream)
     end
@@ -95,13 +96,13 @@ ISChat.initChat = function()
         instance.chatText = nil
     elseif instance.tabCnt > 1 then
         instance.panel:setVisible(false)
-        for tabId, tab in pairs(instance.tabs) do
+        for tabId, tab in pairs(ChatState.getTabs()) do
             instance.panel:removeView(tab)
         end
     end
     instance.tabCnt = 0
-    instance.tabs = {}
-    instance.currentTabID = 0
+    ChatState.setTabs({})
+    ChatState.setCurrentTabID(0)
     instance.rangeButtonState = "hidden"
     instance.online = false
     instance.lastDiscordMessages = {}
@@ -183,7 +184,7 @@ end
 
 function ISChat:updateChatPrefixSettings()
     updateChatSettings(self.chatFont, self.showTimestamp, self.showTitle)
-    for tabNumber, chatText in pairs(self.tabs) do
+    for tabNumber, chatText in pairs(ChatState.getTabs()) do
         chatText.firstPrintableLine = 1
         chatText.text = ""
         local newText = ""
@@ -217,7 +218,7 @@ function ISChat:updateChatPrefixSettings()
 end
 
 function ISChat.onTypingPacket(author, type)
-    ISChat.instance.typingDots = ISChat.instance.typingDots or {}
+    ChatState.setTypingDots(ChatState.getTypingDots() or {})
     local onlineUsers = getOnlinePlayers()
     local authorObj = nil
     for i = 0, onlineUsers:size() - 1 do
@@ -230,10 +231,10 @@ function ISChat.onTypingPacket(author, type)
     if authorObj == nil then
         return
     end
-    if ISChat.instance.typingDots[author] then
-        ISChat.instance.typingDots[author]:refresh()
+    if ChatState.getTypingDots()[author] then
+        ChatState.getTypingDots()[author]:refresh()
     else
-        ISChat.instance.typingDots[author] = TypingDots:new(authorObj, 1)
+        ChatState.getTypingDots()[author] = TypingDots:new(authorObj, 1)
     end
 end
 
@@ -251,7 +252,7 @@ local function AddMessageToTab(tabID, language, time, formattedMessage, line, ch
         ISChat.instance.chatText = ISChat.instance.defaultTab
         ISChat.instance:onActivateView()
     end
-    local chatText = ISChat.instance.tabs[tabID]
+    local chatText = ChatState.getTabs()[tabID]
 
     chatText.chatTextRawLines = chatText.chatTextRawLines or {}
     table.insert(chatText.chatTextRawLines, {
@@ -701,10 +702,10 @@ function ISChat.sendInfoToCurrentTab(message)
         time,
         nil
     )
-    local tabID = ISChat.defaultTabStream[ISChat.instance.currentTabID]["tabID"]
+    local tabID = ISChat.defaultTabStream[ChatState.getCurrentTabID()]["tabID"]
     Logger.debug(
         "Chat",
-        "sendInfo currentTabID=" .. tostring(ISChat.instance.currentTabID) .. " tabID=" .. tostring(tabID)
+        "sendInfo currentTabID=" .. tostring(ChatState.getCurrentTabID()) .. " tabID=" .. tostring(tabID)
     )
     AddMessageToTab(tabID, nil, time, formattedMessage, line, nil)
 end
@@ -725,7 +726,7 @@ function ISChat.sendErrorToCurrentTab(message)
         time,
         nil
     )
-    local tabID = ISChat.defaultTabStream[ISChat.instance.currentTabID]["tabID"]
+    local tabID = ISChat.defaultTabStream[ChatState.getCurrentTabID()]["tabID"]
     AddMessageToTab(tabID, nil, time, formattedMessage, line, nil)
 end
 
@@ -747,11 +748,11 @@ function ISChat.onChatErrorPacket(type, message)
     )
     local stream
     if type == nil then
-        stream = ISChat.defaultTabStream[ISChat.instance.currentTabID]
+        stream = ISChat.defaultTabStream[ChatState.getCurrentTabID()]
     else
         stream = GetStreamFromType(type)
         if stream == nil then
-            stream = ISChat.defaultTabStream[ISChat.instance.currentTabID]
+            stream = ISChat.defaultTabStream[ChatState.getCurrentTabID()]
         end
     end
     AddMessageToTab(stream["tabID"], nil, time, formattedMessage, line)
@@ -950,7 +951,7 @@ function ISChat:prerender()
 
     if instance.rangeIndicator ~= nil then
         if instance.rangeButtonState == "visible" then
-            if ISChat.instance.focused then
+            if ChatState.isFocused() then
                 instance.rangeIndicator:subscribe()
             else
                 instance.rangeIndicator:unsubscribe()
@@ -967,7 +968,7 @@ function ISChat:prerender()
         instance.vehicleRadioBubble,
         instance.playerRadioBubble,
         instance.bubble,
-        instance.typingDots,
+        ChatState.getTypingDots(),
     }
     for _, bubbles in pairs(allBubbles) do
         local indexToDelete = {}
@@ -1012,7 +1013,7 @@ function ISChat.onTextChange()
     if
         internalText == "/r"
         and ISChat.instance.lastPrivateMessageAuthor ~= nil
-        and ISChat.instance.currentTabID == 3
+        and ChatState.getCurrentTabID() == 3
     then
         t:setText("/pm " .. ISChat.instance.lastPrivateMessageAuthor .. " ")
         return
@@ -1024,8 +1025,8 @@ function ISChat.onTextChange()
         end
         -- you are allowed to use a command from another tab but it wont be remembered for the next message
         -- /me* commands are also not remembered as they should be occasional
-        if ISChat.instance.currentTabID == stream["tabID"] and not stream["forget"] then
-            ISChat.lastTabStream[ISChat.instance.currentTabID] = stream
+        if ChatState.getCurrentTabID() == stream["tabID"] and not stream["forget"] then
+            ISChat.lastTabStream[ChatState.getCurrentTabID()] = stream
         end
         local streamName = stream["name"]
         ClientSend.sendTyping(getPlayer():getUsername(), streamName)
@@ -1093,7 +1094,7 @@ ISChat.onTabAdded = function(tabTitle, tabID)
     -- 0 is General
     -- 1 is Admin
     if tabID == 1 then
-        if TrpcServerSettings ~= nil and TrpcServerSettings["admin"]["enabled"] and ISChat.instance.tabs[4] == nil then
+        if TrpcServerSettings ~= nil and TrpcServerSettings["admin"]["enabled"] and ChatState.getTabs()[4] == nil then
             Tabs.addTab("Admin", 4)
         end
     end
@@ -1172,26 +1173,26 @@ ISChat.onRecvSandboxVars = function(messageTypeSettings)
 
     if HasAtLeastOneChanelEnabled(2) == true then
         Tabs.addTab("Out Of Character", 2)
-    elseif ISChat.instance.tabs[2] ~= nil then
+    elseif ChatState.getTabs()[2] ~= nil then
         Tabs.removeTab("Out Of Character", 2)
     end
     if HasAtLeastOneChanelEnabled(3) == true then
         Tabs.addTab("Private Message", 3)
-    elseif ISChat.instance.tabs[3] ~= nil then
+    elseif ChatState.getTabs()[3] ~= nil then
         Tabs.removeTab("Private Message", 3)
     end
     if getPlayer():getAccessLevel() == "Admin" and messageTypeSettings["admin"]["enabled"] then
         Tabs.addTab("Admin", 4)
-    elseif ISChat.instance.tabs[4] ~= nil then
+    elseif ChatState.getTabs()[4] ~= nil then
         Tabs.removeTab("Admin", 4)
     end
     if ISChat.instance.tabCnt > 1 and not HasAtLeastOneChanelEnabled(1) then
         Tabs.removeTab("General", 1)
     else
-        UpdateTabStreams(ISChat.instance.tabs[1], 1)
+        UpdateTabStreams(ChatState.getTabs()[1], 1)
     end
 
-    RangeController.updateRangeIndicator(ISChat.defaultTabStream[ISChat.instance.currentTabID])
+    RangeController.updateRangeIndicator(ISChat.defaultTabStream[ChatState.getCurrentTabID()])
     UpdateInfoWindow()
     if ISChat.instance.trpcModData == nil or ISChat.instance.trpcModData["isVoiceEnabled"] == nil then
         ISChat.instance.isVoiceEnabled = messageTypeSettings["options"]["isVoiceEnabled"]
@@ -1225,13 +1226,13 @@ ISChat.onToggleChatBox = function(key)
     end
     local chat = ISChat.instance
     if key == getCore():getKey("Switch chat stream") then
-        local nextTabId = Tabs.getNextTabId(chat.currentTabID)
+        local nextTabId = Tabs.getNextTabId(ChatState.getCurrentTabID())
         if nextTabId == nil then
             Logger.error("ISChat", "TRPC error: onToggleChatBox: next tab ID not found")
             return
         end
-        chat.currentTabID = nextTabId
-        chat.panel:activateView(chat.tabs[chat.currentTabID].tabTitle)
+        ChatState.setCurrentTabID(nextTabId)
+        chat.panel:activateView(ChatState.getTabs()[ChatState.getCurrentTabID()].tabTitle)
         ISChat.instance:onActivateView()
     end
 end
@@ -1249,7 +1250,7 @@ ISChat.ISTabPanelOnMouseDown = function(target, x, y)
         local tabIndex = target:getTabIndexAtX(target:getMouseX())
         local tabId = Tabs.getTabFromOrder(tabIndex)
         if tabId ~= nil then
-            ISChat.instance.currentTabID = tabId
+            ChatState.setCurrentTabID(tabId)
         end
         -- if we clicked on a tab, the first time we set up the x,y of the mouse, so next time we can see if the player moved the mouse (moved the tab)
         if tabIndex >= 1 and tabIndex <= #target.viewList and ISTabPanel.xMouse == -1 and ISTabPanel.yMouse == -1 then
@@ -1277,7 +1278,7 @@ local function OnRangeButtonClick()
         ISChat.instance.rangeButtonState = "visible"
         ISChat.instance.rangeButton:setImage(getTexture("media/ui/RadioButtonCircle.png"))
     end
-    RangeController.updateRangeIndicator(ISChat.lastTabStream[ISChat.instance.currentTabID])
+    RangeController.updateRangeIndicator(ISChat.lastTabStream[ChatState.getCurrentTabID()])
 end
 
 local function OnRadioButtonClick()
@@ -1512,10 +1513,10 @@ function ISChat:createChildren()
     self:setDrawFrame(true)
     self:addToUIManager()
 
-    self.tabs = {}
+    ChatState.setTabs({})
     self.tabCnt = 0
     self.btnHeight = 25
-    self.currentTabID = 0
+    ChatState.setCurrentTabID(0)
     self.inset = 2
     self.fontHgt = getTextManager():getFontFromEnum(UIFont.Medium):getLineHeight()
 
@@ -1586,11 +1587,11 @@ end
 
 function ISChat:focus()
     self:setVisible(true)
-    ISChat.focused = true
+    ChatState.setFocused(true)
     self.textEntry:setEditable(true)
     self.textEntry:focus()
     self.textEntry:ignoreFirstInput()
-    local stream = ISChat.lastTabStream[ISChat.instance.currentTabID]
+    local stream = ISChat.lastTabStream[ChatState.getCurrentTabID()]
     self.textEntry:setText(stream["command"])
     RangeController.updateRangeIndicator(stream)
     self.fade:reset()
@@ -1600,10 +1601,10 @@ end
 function ISChat:unfocus()
     self.textEntry:unfocus()
     self.textEntry:setText("")
-    if ISChat.focused then
+    if ChatState.isFocused() then
         self.fade:reset() -- to begin fade. unfocus called when element was unfocused also.
     end
-    ISChat.focused = false
+    ChatState.setFocused(false)
     self.textEntry:setEditable(false)
 end
 

@@ -8,12 +8,13 @@
 -- Requires propios: RangeIndicator
 
 local RangeIndicator = require("trpc/client/ui/RangeIndicator")
+local ChatState = require("trpc/client/ui/ChatState")
 
 local RangeController = {}
 
 local function UpdateRangeIndicatorVisibility()
     if ISChat.instance.rangeButtonState == "visible" then
-        if ISChat.instance.rangeIndicator and ISChat.instance.focused then
+        if ISChat.instance.rangeIndicator and ChatState.isFocused() then
             ISChat.instance.rangeIndicator:subscribe()
         end
     elseif ISChat.instance.rangeButtonState == "hidden" then

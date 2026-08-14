@@ -13,6 +13,7 @@ local PlayerBubble = require("trpc/client/ui/bubble/PlayerBubble")
 local RadioBubble = require("trpc/client/ui/bubble/RadioBubble")
 local World = require("trpc/shared/utils/World")
 local Logger = require("trpc/core/Logger")
+local ChatState = require("trpc/client/ui/ChatState")
 
 local BubbleFactory = {}
 
@@ -28,7 +29,7 @@ local function CreatePlayerBubble(
     authorColor
 )
     ISChat.instance.bubble = ISChat.instance.bubble or {}
-    ISChat.instance.typingDots = ISChat.instance.typingDots or {}
+    ChatState.setTypingDots(ChatState.getTypingDots() or {})
     if author == nil then
         Logger.error("BubbleFactory", "TRPC error: CreatePlayerBubble: author is null")
         return
@@ -75,8 +76,8 @@ local function CreatePlayerBubble(
         ISChat.instance.contextBubble = ContextBubble:new(message, color, timer, opacity, voiceEnabled, voicePitch)
     end
     -- the player is not typing anymore if his bubble appears
-    if ISChat.instance.typingDots[author] ~= nil then
-        ISChat.instance.typingDots[author] = nil
+    if ChatState.getTypingDots()[author] ~= nil then
+        ChatState.getTypingDots()[author] = nil
     end
 end
 

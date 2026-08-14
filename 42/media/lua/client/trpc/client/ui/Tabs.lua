@@ -8,21 +8,22 @@
 -- Requires propios: Streams (UpdateTabStreams)
 
 local Streams = require("trpc/client/chat/Streams")
+local ChatState = require("trpc/client/ui/ChatState")
 
 local Tabs = {}
 
 local function GetFirstTab()
-    if ISChat.instance.tabs == nil then
+    if ChatState.getTabs() == nil then
         return nil
     end
-    for tabId, tab in pairs(ISChat.instance.tabs) do
+    for tabId, tab in pairs(ChatState.getTabs()) do
         return tabId, tab
     end
 end
 
 local function AddTab(tabTitle, tabID)
     local chat = ISChat.instance
-    if chat.tabs[tabID] ~= nil then
+    if ChatState.getTabs()[tabID] ~= nil then
         return
     end
     local newTab = chat:createTab()
@@ -41,7 +42,7 @@ local function AddTab(tabTitle, tabID)
         chat:addChild(newTab)
         chat.chatText = newTab
         chat.chatText:setVisible(true)
-        chat.currentTabID = tabID
+        ChatState.setCurrentTabID(tabID)
     end
     if chat.tabCnt == 1 then
         chat.panel:setVisible(true)
@@ -56,15 +57,15 @@ local function AddTab(tabTitle, tabID)
         chat.panel:addView(tabTitle, newTab)
         chat.minimumWidth = chat.panel:getWidthOfAllTabs() + 2 * chat.inset
     end
-    chat.tabs[tabID] = newTab
+    ChatState.getTabs()[tabID] = newTab
     chat.tabCnt = chat.tabCnt + 1
 end
 
 local function RemoveTab(tabTitle, tabID)
     local foundTab
-    if ISChat.instance.tabs[tabID] ~= nil then
-        foundTab = ISChat.instance.tabs[tabID]
-        ISChat.instance.tabs[tabID] = nil
+    if ChatState.getTabs()[tabID] ~= nil then
+        foundTab = ChatState.getTabs()[tabID]
+        ChatState.getTabs()[tabID] = nil
     else
         return
     end
@@ -83,10 +84,10 @@ local function RemoveTab(tabTitle, tabID)
     if firstTabId == nil then
         return
     end
-    if ISChat.instance.currentTabID == tabID then
-        ISChat.instance.currentTabID = firstTabId
+    if ChatState.getCurrentTabID() == tabID then
+        ChatState.setCurrentTabID(firstTabId)
         local chat = ISChat.instance
-        chat.panel:activateView(chat.tabs[chat.currentTabID].tabTitle)
+        chat.panel:activateView(ChatState.getTabs()[ChatState.getCurrentTabID()].tabTitle)
     end
     if ISChat.instance.tabCnt == 1 then
         local lastTab = firstTab
@@ -101,7 +102,7 @@ end
 
 local function GetTabIdFromView(view)
     if view and view.name then
-        for tabId, tab in pairs(ISChat.instance.tabs) do
+        for tabId, tab in pairs(ChatState.getTabs()) do
             if tab.tabTitle == view.name then
                 return tabId
             end

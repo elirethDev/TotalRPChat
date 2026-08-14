@@ -8,6 +8,7 @@
 -- ISChat at load time, so it is safe to require before ISChat is initialized.
 
 local Streams = {}
+local ChatState = require("trpc/client/ui/ChatState")
 
 -- ---------------------------------------------------------------------------
 -- Chat stream (channel) definitions
@@ -59,7 +60,7 @@ end
 
 local function GetCommandFromMessage(command)
     if not luautils.stringStarts(command, "/") then
-        local defaultStream = ISChat.defaultTabStream[ISChat.instance.currentTabID]
+        local defaultStream = ISChat.defaultTabStream[ChatState.getCurrentTabID()]
         return defaultStream, "", false
     end
     if IsOnlySpacesOrEmpty(command) then
