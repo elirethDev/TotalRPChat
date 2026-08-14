@@ -30,6 +30,7 @@ local BubbleFactory = require("trpc/client/ui/bubble/Factory")
 local Tabs = require("trpc/client/ui/Tabs")
 local RangeController = require("trpc/client/ui/RangeController")
 local ChatState = require("trpc/client/ui/ChatState")
+local EventBus = require("trpc/core/EventBus")
 local Logger = require("trpc/core/Logger")
 
 ISChat.allChatStreams = Streams.allChatStreams
@@ -87,8 +88,87 @@ local function AskServerData()
     ClientSend.sendAskSandboxVars()
 end
 
+local function SetupEventBusSubscriptions()
+    if SetupEventBusSubscriptions.done then
+        return
+    end
+    SetupEventBusSubscriptions.done = true
+
+    EventBus:subscribe("chat:message", function(args)
+        ISChat.onMessagePacket(
+            args["type"],
+            args["author"],
+            args["characterName"],
+            args["message"],
+            args["language"],
+            args["color"],
+            args["hideInChat"],
+            args["target"],
+            false,
+            args["pitch"],
+            args["disableVerb"]
+        )
+    end)
+
+    EventBus:subscribe("chat:radio", function(args)
+        ISChat.onRadioPacket(
+            args["type"],
+            args["author"],
+            args["characterName"],
+            args["message"],
+            args["language"],
+            args["color"],
+            args["radios"],
+            args["pitch"],
+            args["disableVerb"]
+        )
+    end)
+
+    EventBus:subscribe("chat:radio_emitting", function(args)
+        ISChat.onRadioEmittingPacket(
+            args["type"],
+            args["author"],
+            args["characterName"],
+            args["message"],
+            args["language"],
+            args["color"],
+            args["frequency"],
+            args["disableVerb"]
+        )
+    end)
+
+    EventBus:subscribe("chat:discord", function(args)
+        ISChat.onDiscordPacket(args["message"])
+    end)
+
+    EventBus:subscribe("chat:typing", function(args)
+        ISChat.onTypingPacket(args["author"], args["type"])
+    end)
+
+    EventBus:subscribe("chat:error", function(args)
+        ISChat.onChatErrorPacket(args["type"], args["message"])
+    end)
+
+    EventBus:subscribe("chat:sandbox_vars", function(args)
+        ISChat.onRecvSandboxVars(args)
+    end)
+
+    EventBus:subscribe("chat:dice_result", function(args)
+        ISChat.onDiceResult(
+            args["username"],
+            args["characterName"],
+            args["diceCount"],
+            args["diceType"],
+            args["addCount"],
+            args["diceResults"],
+            args["finalResult"]
+        )
+    end)
+end
+
 ISChat.initChat = function()
     TrpcServerSettings = nil
+    SetupEventBusSubscriptions()
     local instance = ISChat.instance
     if instance.tabCnt == 1 then
         instance.chatText:setVisible(false)

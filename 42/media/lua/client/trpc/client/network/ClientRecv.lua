@@ -1,62 +1,32 @@
 local Logger = require("trpc/core/Logger")
 local AvatarManager = require("trpc/client/AvatarManager")
 local Radio = require("trpc/client/Radio")
+local EventBus = require("trpc/core/EventBus")
 
 local ClientRecv = {}
 
 ClientRecv["ChatMessage"] = function(args)
-    ISChat.onMessagePacket(
-        args["type"],
-        args["author"],
-        args["characterName"],
-        args["message"],
-        args["language"],
-        args["color"],
-        args["hideInChat"],
-        args["target"],
-        false,
-        args["pitch"],
-        args["disableVerb"]
-    )
+    EventBus:emit("chat:message", args)
 end
 
 ClientRecv["RadioMessage"] = function(args)
-    ISChat.onRadioPacket(
-        args["type"],
-        args["author"],
-        args["characterName"],
-        args["message"],
-        args["language"],
-        args["color"],
-        args["radios"],
-        args["pitch"],
-        args["disableVerb"]
-    )
+    EventBus:emit("chat:radio", args)
 end
 
 ClientRecv["RadioEmittingMessage"] = function(args)
-    ISChat.onRadioEmittingPacket(
-        args["type"],
-        args["author"],
-        args["characterName"],
-        args["message"],
-        args["language"],
-        args["color"],
-        args["frequency"],
-        args["disableVerb"]
-    )
+    EventBus:emit("chat:radio_emitting", args)
 end
 
 ClientRecv["DiscordMessage"] = function(args)
-    ISChat.onDiscordPacket(args["message"])
+    EventBus:emit("chat:discord", args)
 end
 
 ClientRecv["Typing"] = function(args)
-    ISChat.onTypingPacket(args["author"], args["type"])
+    EventBus:emit("chat:typing", args)
 end
 
 ClientRecv["ChatError"] = function(args)
-    ISChat.onChatErrorPacket(args["type"], args["message"])
+    EventBus:emit("chat:error", args)
 end
 
 ClientRecv["ServerPrint"] = function(args)
@@ -64,7 +34,7 @@ ClientRecv["ServerPrint"] = function(args)
 end
 
 ClientRecv["SendSandboxVars"] = function(args)
-    ISChat.onRecvSandboxVars(args)
+    EventBus:emit("chat:sandbox_vars", args)
 end
 
 ClientRecv["RadioSquareState"] = function(args)
@@ -210,7 +180,15 @@ ClientRecv["RollResult"] = function(args)
         Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "finalResult"')
         return
     end
-    ISChat.onDiceResult(username, characterName, diceCount, diceType, addCount, diceResults, finalResult)
+    EventBus:emit("chat:dice_result", {
+        username = username,
+        characterName = characterName,
+        diceCount = diceCount,
+        diceType = diceType,
+        addCount = addCount,
+        diceResults = diceResults,
+        finalResult = finalResult,
+    })
 end
 
 function OnServerCommand(module, command, args)
