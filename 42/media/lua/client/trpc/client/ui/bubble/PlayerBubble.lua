@@ -8,7 +8,7 @@ local StringBuilder = require("trpc/client/parser/StringBuilder")
 local KeyboardSound = require("trpc/client/voice/KeyboardSound")
 local PlayerVoice = require("trpc/client/voice/PlayerVoice")
 
-local PlayerBubble = ISUIElement:derive("PlayerBubble")
+local PlayerBubble = ABubble:derive("PlayerBubble")
 
 function PlayerBubble:loadTextures()
     if self.isAction then
@@ -153,8 +153,6 @@ function PlayerBubble:new(
     if x == nil then
         x, y = 0, 0
     end
-    PlayerBubble.__index = self
-    setmetatable(PlayerBubble, { __index = ABubble })
     local showArrow = not isAction
     local o = ABubble:new(
         x,

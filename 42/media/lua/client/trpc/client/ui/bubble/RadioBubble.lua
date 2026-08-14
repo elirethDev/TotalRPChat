@@ -3,7 +3,7 @@ local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
 local RadioVoice = require("trpc/client/voice/RadioVoice")
 
-local RadioBubble = ISUIElement:derive("RadioBubble")
+local RadioBubble = ABubble:derive("RadioBubble")
 
 function RadioBubble:loadTextures()
     self.bubbleTop = getTexture("media/ui/trpc/bubble/radio/bubble-top.png")
@@ -65,8 +65,6 @@ function RadioBubble:new(object, message, messageColor, timer, opacity, type, is
     if x == nil then
         x, y = 0, 0
     end
-    RadioBubble.__index = self
-    setmetatable(RadioBubble, { __index = ABubble })
     local o = ABubble:new(
         x,
         y,
