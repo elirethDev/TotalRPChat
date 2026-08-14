@@ -10,12 +10,17 @@
 --   local ChatState = require("trpc/client/ui/ChatState")
 --   ChatState.setCurrentTabID(1)
 --   local id = ChatState.getCurrentTabID()
+--
+--   -- Bubble access:
+--   ChatState.getBubbles():renderAll()
+--   ChatState.addBubble("player", author, myBubble)
 
+local BubbleState = require("trpc/client/ui/bubble/BubbleState")
 local ChatState = {}
 
 local state = {
     tabs = {},
-    bubbles = nil,
+    bubbles = BubbleState,
     typingDots = {},
     currentTabID = 0,
     focused = false,
@@ -33,6 +38,12 @@ function ChatState.getBubbles()
     return state.bubbles
 end
 
+-- Delegation: convenience to add a bubble directly via ChatState
+function ChatState.addBubble(kind, key, bubble)
+    BubbleState.add(kind, key, bubble)
+end
+
+-- setBubbles retained for backward compatibility but reads BubbleState
 function ChatState.setBubbles(value)
     state.bubbles = value
 end
