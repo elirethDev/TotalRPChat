@@ -2,6 +2,7 @@
 local Character = require('trpc/shared/utils/Character')
 local FakeRadio = require('trpc/server/radio/FakeRadio')
 local World = require('trpc/shared/utils/World')
+local Logger = require("trpc/core/Logger")
 
 local RadioManager = {}
 
@@ -32,7 +33,7 @@ local function ReadCache(cache)
     local squares = {}
     local cacheSquares = cache['squares']
     if cacheSquares == nil then
-        print('TRPC error: ReadCache: received cache data without squares object')
+        Logger.error('RadioManager', 'TRPC error: ReadCache: received cache data without squares object')
         return
     end
     local squaresCount = 0
@@ -43,17 +44,17 @@ local function ReadCache(cache)
             squares[key] = square
             squaresCount = squaresCount + 1
         else
-            print(
+            Logger.error('RadioManager', 
                 'TRPC error: ReadCache: found null square in radio cache file at: (' ..
                 pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
         end
     end
-    print('TRPC info: ' .. squaresCount .. ' squares found in cache')
+    Logger.info('RadioManager', 'TRPC info: ' .. squaresCount .. ' squares found in cache')
 
     local vehicles = {}
     local cacheVehicles = cache['vehicles']
     if cacheVehicles == nil then
-        print('TRPC error: ReadCache: received cache data without vehicles object')
+        Logger.error('RadioManager', 'TRPC error: ReadCache: received cache data without vehicles object')
         return
     end
     local vehiclesCount = 0
@@ -67,32 +68,32 @@ local function ReadCache(cache)
                     vehicles[key] = vehicle
                     vehiclesCount = vehiclesCount + 1
                 else
-                    print(
+                    Logger.error('RadioManager', 
                         'TRPC error: ReadCache: vehicle has unexpected key id ' ..
                         vehicleId .. ' on square in radio cache file at: (' ..
                         pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ') ' .. key .. ' was expected')
                 end
             else
-                print(
+                Logger.error('RadioManager', 
                     'TRPC error: ReadCache: no vehicle found on square in radio cache file at: (' ..
                     pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
             end
         else
-            print(
+            Logger.error('RadioManager', 
                 'TRPC error: ReadCache: found null vehicle square in radio cache file at: (' ..
                 pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
         end
     end
-    print('TRPC info: ' .. vehiclesCount .. ' vehicles found in cache')
+    Logger.info('RadioManager', 'TRPC info: ' .. vehiclesCount .. ' vehicles found in cache')
 
     return squares, vehicles
 end
 
 function RadioManager:load()
     local cache = ModData.getOrCreate('trpcRadioCache')
-    print('TRPC info: loading cache')
+    Logger.info('RadioManager', 'TRPC info: loading cache')
     if cache == nil then
-        print('TRPC info: no cache found')
+        Logger.info('RadioManager', 'TRPC info: no cache found')
         return
     end
     local squares, vehicles = ReadCache(cache)

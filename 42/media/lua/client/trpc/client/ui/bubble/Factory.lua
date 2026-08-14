@@ -12,6 +12,7 @@ local ContextBubble = require("trpc/client/ui/bubble/ContextBubble")
 local PlayerBubble = require("trpc/client/ui/bubble/PlayerBubble")
 local RadioBubble = require("trpc/client/ui/bubble/RadioBubble")
 local World = require("trpc/shared/utils/World")
+local Logger = require("trpc/core/Logger")
 
 local BubbleFactory = {}
 
@@ -29,12 +30,12 @@ local function CreatePlayerBubble(
     ISChat.instance.bubble = ISChat.instance.bubble or {}
     ISChat.instance.typingDots = ISChat.instance.typingDots or {}
     if author == nil then
-        print("TRPC error: CreatePlayerBubble: author is null")
+        Logger.error("BubbleFactory", "TRPC error: CreatePlayerBubble: author is null")
         return
     end
     local authorObj = World.getPlayerByUsername(author)
     if authorObj == nil then
-        print("TRPC error: CreatePlayerBubble: author not found " .. author)
+        Logger.error("BubbleFactory", "TRPC error: CreatePlayerBubble: author not found " .. author)
         return
     end
     local timer = 10
@@ -84,7 +85,7 @@ local function CreateSquareRadioBubble(position, message, messageColor, voicePit
     if position ~= nil then
         local x, y, z = position["x"], position["y"], position["z"]
         if x == nil or y == nil or z == nil then
-            print("TRPC error: CreateSquareRadioBubble: nil position for a square radio")
+            Logger.error("BubbleFactory", "TRPC error: CreateSquareRadioBubble: nil position for a square radio")
             return
         end
         x, y, z = math.abs(x), math.abs(y), math.abs(z)
@@ -118,12 +119,12 @@ end
 local function CreatePlayerRadioBubble(author, message, messageColor, voicePitch)
     ISChat.instance.playerRadioBubble = ISChat.instance.playerRadioBubble or {}
     if author == nil then
-        print("TRPC error: CreatePlayerRadioBubble: author is null")
+        Logger.error("BubbleFactory", "TRPC error: CreatePlayerRadioBubble: author is null")
         return
     end
     local authorObj = World.getPlayerByUsername(author)
     if authorObj == nil then
-        print("TRPC error: CreatePlayerRadioBubble: author not found " .. author)
+        Logger.error("BubbleFactory", "TRPC error: CreatePlayerRadioBubble: author not found " .. author)
         return
     end
     local timer = 10
@@ -155,7 +156,7 @@ local function CreateVehicleRadioBubble(vehicle, message, messageColor, voicePit
     end
     local keyId = vehicle:getKeyId()
     if keyId == nil then
-        print("TRPC error: CreateVehicleBubble: key id is null")
+        Logger.error("BubbleFactory", "TRPC error: CreateVehicleBubble: key id is null")
         return
     end
     local bubble = RadioBubble:new(

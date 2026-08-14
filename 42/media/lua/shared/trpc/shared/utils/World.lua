@@ -1,3 +1,4 @@
+local Logger = require("trpc/core/Logger")
 local World = {}
 
 local function MatchStringInList(list, element)
@@ -125,7 +126,7 @@ function World.getVehiclesInRange(player, range)
                         if vehicle ~= nil then
                             local vehicleId = vehicle:getKeyId()
                             if vehicleId == nil then
-                                print('TRPC error: World.getVehiclesInRange: impossible error: vehicle key ID is null')
+                                Logger.error('World', 'TRPC error: World.getVehiclesInRange: impossible error: vehicle key ID is null')
                             else
                                 vehicles[vehicleId] = vehicle
                             end

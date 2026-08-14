@@ -1,4 +1,5 @@
 local LanguageManager = {}
+local Logger = require("trpc/core/Logger")
 
 local LanguageRegister = 'trpcKnownLanguages'
 
@@ -239,17 +240,17 @@ end
 
 function LanguageManager:registerLanguage(language)
     if not LanguageManager.LanguageExists(language) then
-        print('TRPC error: language does not exist: ' .. language)
+        Logger.error('LanguageManager', 'TRPC error: language does not exist: ' .. language)
     end
     if self:isKnown(language) then
-        print('TRPC info: cannot learn language, already known: ' .. language)
+        Logger.info('LanguageManager', 'TRPC info: cannot learn language, already known: ' .. language)
     end
     if not LanguageManager.LanguageExists(language) or self:isKnown(language) then
         return false
     end
     local knownLanguages = self:getKnownLanguagesAndInitialize()
     knownLanguages[language] = AllLanguages[language]
-    print('TRPC info: learning language: ' .. knownLanguages[language])
+    Logger.info('LanguageManager', 'TRPC info: learning language: ' .. knownLanguages[language])
     ModData.add(LanguageRegister, knownLanguages)
     return true
 end

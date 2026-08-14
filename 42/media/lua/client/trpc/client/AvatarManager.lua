@@ -1,6 +1,7 @@
 local AvatarIO  = require('trpc/shared/utils/AvatarIO')
 local Character = require('trpc/shared/utils/Character')
 local File      = require('trpc/shared/utils/File')
+local Logger = require("trpc/core/Logger")
 
 
 local AvatarManager = {}
@@ -116,7 +117,7 @@ function AvatarManager:getRequestAvatar()
     end
     local texture = getTextureFromSaveDir(path, '../Lua')
     if texture == nil then
-        print('TRPC error: failed to load the request avatar for username "'
+        Logger.error('AvatarManager', 'TRPC error: failed to load the request avatar for username "'
             .. username .. '" with character named "'
             .. firstName .. ' ' .. lastName .. '"')
     end
@@ -130,12 +131,12 @@ function AvatarManager:getAvatar(username, firstName, lastName)
     end
     local path = avatar['path']
     if path == nil then
-        print('TRPC error: AvatarManager:getAvatar: avatar path is null')
+        Logger.error('AvatarManager', 'TRPC error: AvatarManager:getAvatar: avatar path is null')
         return nil
     end
     local texture = getTextureFromSaveDir(path, '../Lua')
     if texture == nil then
-        print('TRPC error: failed to load the avatar for username "'
+        Logger.error('AvatarManager', 'TRPC error: failed to load the avatar for username "'
             .. username .. '" with character named "'
             .. firstName .. ' ' .. lastName .. '", removing texture from cache')
         self:removeAvatarData(username, firstName, lastName)
@@ -182,26 +183,26 @@ function AvatarManager:getFirstAvatarPending()
         local firstName = avatar['firstName']
         local lastName = avatar['lastName']
         if path == nil then
-            print('TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache')
+            Logger.error('AvatarManager', 'TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache')
             table.insert(toRemove, key)
         elseif texture == nil then
-            print('TRPC error: failed to load the unapproved avatar texture for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar texture for "' ..
                 key .. '" at "' .. path .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif checksum == nil then
-            print('TRPC error: failed to load the unapproved avatar checksum for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar checksum for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif username == nil then
-            print('TRPC error: failed to load the unapproved avatar username for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar username for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif firstName == nil then
-            print('TRPC error: failed to load the unapproved avatar first name for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar first name for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif lastName == nil then
-            print('TRPC error: failed to load the unapproved avatar last name for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar last name for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         else
@@ -235,26 +236,26 @@ function AvatarManager:getAvatarsPending()
         local firstName = avatar['firstName']
         local lastName = avatar['lastName']
         if path == nil then
-            print('TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache')
+            Logger.error('AvatarManager', 'TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache')
             table.insert(toRemove, key)
         elseif texture == nil then
-            print('TRPC error: failed to load the unapproved avatar texture for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar texture for "' ..
                 key .. '" at "' .. path .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif checksum == nil then
-            print('TRPC error: failed to load the unapproved avatar checksum for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar checksum for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif username == nil then
-            print('TRPC error: failed to load the unapproved avatar username for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar username for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif firstName == nil then
-            print('TRPC error: failed to load the unapproved avatar first name for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar first name for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         elseif lastName == nil then
-            print('TRPC error: failed to load the unapproved avatar last name for "' ..
+            Logger.error('AvatarManager', 'TRPC error: failed to load the unapproved avatar last name for "' ..
                 key .. '", removing texture from cache')
             table.insert(toRemove, key)
         else

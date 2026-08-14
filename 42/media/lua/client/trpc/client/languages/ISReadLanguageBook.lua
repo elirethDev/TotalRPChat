@@ -1,4 +1,5 @@
 local LanguageManager = require('trpc/client/languages/LanguageManager')
+local Logger = require("trpc/core/Logger")
 
 
 local ISReadLanguageBook = ISReadABook:derive("ISReadABook");
@@ -8,7 +9,7 @@ function ISReadLanguageBook:perform()
     ISReadABook.perform(self)
 
     if self.language ~= 'Forget' and not LanguageManager.LanguageExists(self.language) then
-        print('TRPC error: ISReadLanguageBook:perform: unknown language ' .. self.language)
+        Logger.error('ISReadLanguageBook', 'TRPC error: ISReadLanguageBook:perform: unknown language ' .. self.language)
         return
     end
 

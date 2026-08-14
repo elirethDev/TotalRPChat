@@ -1,4 +1,5 @@
 local CRC32 = require('trpc/shared/libs/crc32/crc32')
+local Logger = require("trpc/core/Logger")
 
 
 local File = {}
@@ -24,17 +25,17 @@ end
 
 function File.readAllBytes(path)
     if path == nil then
-        print('TRPC error: File.readAllBytes: path is nil')
+        Logger.error('File', 'TRPC error: File.readAllBytes: path is nil')
         return
     end
     local file = getFileInput(path)
     if file == nil then
-        print('TRPC error: File.readAllBytes: could not read avatar file at :"' .. path .. '"')
+        Logger.error('File', 'TRPC error: File.readAllBytes: could not read avatar file at :"' .. path .. '"')
         return
     end
     local data = {}
     local checksum = CRC32.newcrc32()
-    print(
+    Logger.info('File', 
         'TRPC info: File.readAllBytes: ignore the InvocationTargetException below, it means the file has been read')
     while true do
         local byte = file:readUnsignedByte()
@@ -42,7 +43,7 @@ function File.readAllBytes(path)
         -- and I am not writing my own PNG/JPEG parser to avoid it
         -- the exception does not stop the execution flow
         if byte == nil then
-            print(
+            Logger.info('File', 
                 'TRPC info: File.readAllBytes: ignore the InvocationTargetException above, it means the file has been read')
             break
         end
@@ -56,7 +57,7 @@ end
 function File.writeAllBytes(data, path)
     local outFile = getFileOutput(path)
     if outFile == nil then
-        print('TRPC error: File.writeAllBytes: failed to write file in path: ' .. path)
+        Logger.error('File', 'TRPC error: File.writeAllBytes: failed to write file in path: ' .. path)
         return
     end
     for _, byte in pairs(data) do
@@ -68,7 +69,7 @@ end
 function File.writeStringWithNewLine(text, path)
     local outFile = getFileWriter(path, true, true)
     if outFile == nil then
-        print('TRPC error: File.writeString: failed to write file in path: ' .. path)
+        Logger.error('File', 'TRPC error: File.writeString: failed to write file in path: ' .. path)
         return
     end
     outFile:writeln(text)

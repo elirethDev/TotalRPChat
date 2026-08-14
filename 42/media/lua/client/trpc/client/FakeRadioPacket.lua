@@ -1,5 +1,6 @@
 local Character = require('trpc/shared/utils/Character')
 local World     = require('trpc/shared/utils/World')
+local Logger = require("trpc/core/Logger")
 
 
 local FakeRadioPacket = {}
@@ -89,15 +90,15 @@ end
 function FakeRadioPacket.getListeningRadiosPositions(player, range, frequency)
     local radios = {}
     if player == nil then
-        print('TRPC error: FakeRadioPacket.getListeningRadiosPositions: player is null')
+        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: player is null')
         return nil
     end
     if range == nil then
-        print('TRPC error: FakeRadioPacket.getListeningRadiosPositions: range is null')
+        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: range is null')
         return nil
     end
     if frequency == nil then
-        print('TRPC error: FakeRadioPacket.getListeningRadiosPositions: frequency is null')
+        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: frequency is null')
         return nil
     end
     local squaresRadios, squaresRadiosFound = GetSquaresRadiosPositions(player, range, frequency)

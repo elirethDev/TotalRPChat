@@ -4,6 +4,7 @@ local Parser        = require('trpc/client/parser/Parser')
 local StringBuilder = require('trpc/client/parser/StringBuilder')
 
 local KeyboardSound = require('trpc/client/voice/KeyboardSound')
+local Logger = require("trpc/core/Logger")
 
 local ContextBubble = ISUIElement:derive('ContextBubble')
 
@@ -172,7 +173,7 @@ function ContextBubble:render()
 
     local screenWidth = getCore():getScreenWidth()
     local x, y = screenWidth / 2 - self:getWidth() / 2, 150 - self:getHeight() / 2
-    -- print('TRPC debug: x:' .. x .. ', y:' .. y)
+    Logger.debug('ContextBubble', 'x:' .. x .. ', y:' .. y)
     self:updateText(x, y)
     self:drawBubble()
 end

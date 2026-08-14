@@ -1,15 +1,16 @@
 local RadioManager = require('trpc/server/radio/RadioManager')
 local ServerSend = require('trpc/server/network/ServerSend')
+local Logger = require("trpc/core/Logger")
 
 local Radio = {}
 
 function Radio.MuteRadio(radio, state)
     if radio == nil then
-        print('TRPC error: Radio.MuteRadio: radio is nil')
+        Logger.error('Radio', 'TRPC error: Radio.MuteRadio: radio is nil')
         return
     end
     if state == nil then
-        print('TRPC error: Radio.MuteRadio: state is nil')
+        Logger.error('Radio', 'TRPC error: Radio.MuteRadio: state is nil')
         return
     end
     local radioData = radio:getDeviceData()
@@ -18,13 +19,13 @@ end
 
 function Radio.SyncSquare(radio, player)
     if radio == nil then
-        print('TRPC error: Radio.SyncSquare: radio is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: radio is nil')
         return
     end
     RadioManager:subscribeSquare(radio:getSquare())
     local radioData = radio:getDeviceData()
     if radioData == nil or radioData:isIsoDevice() ~= true then
-        print('TRPC error: Radio.SyncSquare: radio is not on a square')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: radio is not on a square')
         return
     end
     local turnedOn = radioData:getIsTurnedOn()
@@ -50,44 +51,44 @@ end
 function Radio.SyncBelt(radio, player, turnedOn, muteState, volume, frequency,
                         battery, headphone, isTwoWay, transmitRange)
     if radio == nil then
-        print('TRPC error: Radio.SyncBelt: radio is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: radio is nil')
         return
     end
     if player == nil then
-        print('TRPC error: Radio.SyncBelt: player is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: player is nil')
         return
     end
     if turnedOn == nil then
-        print('TRPC error: Radio.SyncBelt: turnedOn is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: turnedOn is nil')
         return
     end
     if muteState == nil then
-        print('TRPC error: Radio.SyncBelt: muteState is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: muteState is nil')
         return
     end
     if volume == nil then
-        print('TRPC error: Radio.SyncBelt: volume is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: volume is nil')
         return
     end
     if frequency == nil then
-        print('TRPC error: Radio.SyncBelt: frequency is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: frequency is nil')
         return
     end
     if battery == nil then
-        print('TRPC error: Radio.SyncBelt: battery is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: battery is nil')
         return
     end
     if headphone == nil then
-        print('TRPC error: Radio.SyncBelt: headphone is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: headphone is nil')
         return
     end
     if transmitRange == nil then
-        print('TRPC error: Radio.SyncBelt: transmitRange is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncBelt: transmitRange is nil')
         return
     end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: Radio.SyncHand: radio has no device data')
+        Logger.error('Radio', 'TRPC error: Radio.SyncHand: radio has no device data')
         return
     end
     radioData:setIsTurnedOn(turnedOn)
@@ -105,12 +106,12 @@ end
 
 function Radio.SyncHand(radio, player, id)
     if radio == nil then
-        print('TRPC error: Radio.SyncHand: radio is nil')
+        Logger.error('Radio', 'TRPC error: Radio.SyncHand: radio is nil')
         return
     end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: Radio.SyncHand: radio has no device data')
+        Logger.error('Radio', 'TRPC error: Radio.SyncHand: radio has no device data')
         return
     end
     local turnedOn = radioData:getIsTurnedOn()

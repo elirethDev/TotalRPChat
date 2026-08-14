@@ -1,4 +1,5 @@
 local Character = require('trpc/shared/utils/Character')
+local Logger = require("trpc/core/Logger")
 
 local ClientSend = {}
 
@@ -58,7 +59,7 @@ function ClientSend.sendMuteRadio(radio, state)
     if not isClient() then return end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: ClientSend.sendMuteRadio: no radioData found')
+        Logger.error('ClientSend', 'TRPC error: ClientSend.sendMuteRadio: no radioData found')
         return
     end
     if radioData:isIsoDevice() then
@@ -82,7 +83,7 @@ function ClientSend.sendMuteRadio(radio, state)
             beltType = radio:getType()
         end
         if id == nil then
-            print('TRPC error: ClientSend.sendMuteRadio: no id found')
+            Logger.error('ClientSend', 'TRPC error: ClientSend.sendMuteRadio: no id found')
             return
         end
         ClientSendCommand('MuteInHandRadio', {
@@ -99,7 +100,7 @@ function ClientSend.sendGiveRadioState(radio)
     if not isClient() then return end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: ClientSend.sendTellRadioState: no radioData found')
+        Logger.error('ClientSend', 'TRPC error: ClientSend.sendTellRadioState: no radioData found')
         return
     end
 
@@ -137,7 +138,7 @@ function ClientSend.sendAskRadioState(radio)
     if not isClient() then return end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: ClientSend.sendAskRadioState: no radioData found')
+        Logger.error('ClientSend', 'TRPC error: ClientSend.sendAskRadioState: no radioData found')
         return
     end
     if radioData:isIsoDevice() then
@@ -160,7 +161,7 @@ function ClientSend.sendAskRadioState(radio)
             beltType = radio:getType()
         end
         if id == nil then
-            print('TRPC error: ClientSend.sendAskRadioState: no id found')
+            Logger.error('ClientSend', 'TRPC error: ClientSend.sendAskRadioState: no id found')
             return
         end
         ClientSendCommand('AskInHandRadioState', {

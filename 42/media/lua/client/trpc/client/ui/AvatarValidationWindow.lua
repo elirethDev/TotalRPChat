@@ -3,6 +3,7 @@ require('ISUI/ISCollapsableWindow')
 
 local AvatarManager = require('trpc/client/AvatarManager')
 local ClientSend = require('trpc/client/network/ClientSend')
+local Logger = require("trpc/core/Logger")
 
 
 local AvatarValidationWindow = ISCollapsableWindow:derive('AvatarValidationWindow')
@@ -195,7 +196,7 @@ function AvatarValidationWindow:approveAvatar()
     assert(type(firstName) == 'string', 'TRPC error: rejectAvatar: missing firstName')
     assert(type(lastName) == 'string', 'TRPC error: rejectAvatar: missing lastName')
     assert(type(checksum) == 'number', 'TRPC error: rejectAvatar: missing checksum')
-    print('TRPC info: avatar approved: ' ..
+    Logger.info('AvatarValidationWindow', 'TRPC info: avatar approved: ' ..
         username ..
         ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
     ClientSend.sendApprovePendingAvatar(username, firstName, lastName, checksum)
@@ -213,7 +214,7 @@ function AvatarValidationWindow:rejectAvatar()
     assert(type(firstName) == 'string', 'TRPC error: rejectAvatar: missing firstName')
     assert(type(lastName) == 'string', 'TRPC error: rejectAvatar: missing lastName')
     assert(type(checksum) == 'number', 'TRPC error: rejectAvatar: missing checksum')
-    print('TRPC info: avatar rejected: ' ..
+    Logger.info('AvatarValidationWindow', 'TRPC info: avatar rejected: ' ..
         username ..
         ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
     ClientSend.sendRejectPendingAvatar(username, firstName, lastName, checksum)

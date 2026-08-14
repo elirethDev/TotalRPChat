@@ -443,7 +443,7 @@ function ISChat.onMessagePacket(
     )
     local stream = GetStreamFromType(type)
     if stream == nil then
-        print("TRPC error: onMessagePacket: stream not found")
+        Logger.error("ISChat", "TRPC error: onMessagePacket: stream not found")
         return
     end
     if not hideInChat then
@@ -468,7 +468,7 @@ function ISChat.onServerMessage(message)
     local time = Calendar.getInstance():getTimeInMillis()
     local stream = GetStreamFromType("general")
     if stream == nil then
-        print("TRPC error: onServerMessage: stream not found")
+        Logger.error("ISChat", "TRPC error: onServerMessage: stream not found")
         return
     end
     local parsedMessage = Parser.ParseTrpcMessage(message, color, 20, 200)
@@ -487,7 +487,7 @@ end
 
 local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, voicePitch)
     if squaresInfo == nil then
-        print("TRPC error: CreateSquaresRadiosBubbles: squaresInfo table is null")
+        Logger.error("ISChat", "TRPC error: CreateSquaresRadiosBubbles: squaresInfo table is null")
         return
     end
     for _, info in pairs(squaresInfo) do
@@ -504,26 +504,26 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            print("TRPC error: received radio packet for a square radio without distance")
+                            Logger.error("ISChat", "TRPC error: received radio packet for a square radio without distance")
                         end
                     else
-                        print("TRPC error: received radio packet for a square radio without data")
+                        Logger.error("ISChat", "TRPC error: received radio packet for a square radio without data")
                     end
                 else
-                    print("TRPC error: received radio packet for a square with no radio")
+                    Logger.error("ISChat", "TRPC error: received radio packet for a square with no radio")
                 end
             else
-                print("TRPC error: received radio packet for a null square")
+                Logger.error("ISChat", "TRPC error: received radio packet for a null square")
             end
         else
-            print("TRPC error: received radio packet for a square without position")
+            Logger.error("ISChat", "TRPC error: received radio packet for a square without position")
         end
     end
 end
 
 local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, voicePitch)
     if playersInfo == nil then
-        print("TRPC error: CreatePlayersRadiosBubbles: playersInfo table is null")
+        Logger.error("ISChat", "TRPC error: CreatePlayersRadiosBubbles: playersInfo table is null")
         return
     end
     for _, info in pairs(playersInfo) do
@@ -539,24 +539,24 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            print("TRPC error: received radio packet for a player radio without distance")
+                            Logger.error("ISChat", "TRPC error: received radio packet for a player radio without distance")
                         end
                     else
-                        print("TRPC error: received radio packet for a player radio without data")
+                        Logger.error("ISChat", "TRPC error: received radio packet for a player radio without data")
                     end
                 else
-                    print("TRPC error: received radio packet for a player with no radio in hand")
+                    Logger.error("ISChat", "TRPC error: received radio packet for a player with no radio in hand")
                 end
             end
         else
-            print("TRPC error: received radio packet for a player without username")
+            Logger.error("ISChat", "TRPC error: received radio packet for a player without username")
         end
     end
 end
 
 local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, voicePitch)
     if vehiclesInfo == nil then
-        print("TRPC error: CreateVehiclesRadiosBubbles: vehiclesKeyIds table is null")
+        Logger.error("ISChat", "TRPC error: CreateVehiclesRadiosBubbles: vehiclesKeyIds table is null")
         return
     end
     local range = (TrpcServerSettings and TrpcServerSettings["say"]["range"]) or 15
@@ -575,19 +575,19 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            print("TRPC error: received radio packet for a vehicle radio without distance")
+                            Logger.error("ISChat", "TRPC error: received radio packet for a vehicle radio without distance")
                         end
                     else
-                        print("TRPC error: received radio packet for a vehicle radio without data")
+                        Logger.error("ISChat", "TRPC error: received radio packet for a vehicle radio without data")
                     end
                 else
-                    print("TRPC error: received radio packet for a vehicle with no radio")
+                    Logger.error("ISChat", "TRPC error: received radio packet for a vehicle with no radio")
                 end
             else
-                print("TRPC error: CreateVehiclesRadiosBubble: vehicle not found for key id " .. vehicleKeyId)
+                Logger.error("ISChat", "TRPC error: CreateVehiclesRadiosBubble: vehicle not found for key id " .. vehicleKeyId)
             end
         else
-            print("TRPC error: received vehicle packet for a vehicle with no key")
+            Logger.error("ISChat", "TRPC error: received vehicle packet for a vehicle with no key")
         end
     end
 end
@@ -600,7 +600,7 @@ function ISChat.onRadioEmittingPacket(type, author, characterName, message, lang
     local time = Calendar.getInstance():getTimeInMillis()
     local stream = GetStreamFromType(type)
     if stream == nil then
-        print("TRPC error: onRadioEmittingPacket: stream not found")
+        Logger.error("ISChat", "TRPC error: onRadioEmittingPacket: stream not found")
         return
     end
     local name = characterName
@@ -641,7 +641,7 @@ function ISChat.onRadioPacket(
     local time = Calendar.getInstance():getTimeInMillis()
     local stream = GetStreamFromType(type)
     if stream == nil then
-        print("TRPC error: onRadioPacket: stream not found")
+        Logger.error("ISChat", "TRPC error: onRadioPacket: stream not found")
         return
     end
 
@@ -1227,7 +1227,7 @@ ISChat.onToggleChatBox = function(key)
     if key == getCore():getKey("Switch chat stream") then
         local nextTabId = Tabs.getNextTabId(chat.currentTabID)
         if nextTabId == nil then
-            print("TRPC error: onToggleChatBox: next tab ID not found")
+            Logger.error("ISChat", "TRPC error: onToggleChatBox: next tab ID not found")
             return
         end
         chat.currentTabID = nextTabId
@@ -1611,7 +1611,7 @@ function ISChat:onGearButtonClick()
     local context =
         ISContextMenu.get(0, self:getAbsoluteX() + self:getWidth() / 2, self:getAbsoluteY() + self.gearButton:getY())
     if context == nil then
-        print("TRPC error: ISChat:onGearButtonClick: gear button context is null")
+        Logger.error("ISChat", "TRPC error: ISChat:onGearButtonClick: gear button context is null")
         return
     end
 

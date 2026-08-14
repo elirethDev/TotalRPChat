@@ -3,6 +3,7 @@ local Character  = require('trpc/shared/utils/Character')
 local File       = require('trpc/shared/utils/File')
 local ServerSend = require('trpc/server/network/ServerSend')
 local World      = require('trpc/shared/utils/World')
+local Logger = require("trpc/core/Logger")
 
 
 local AvatarManager = {}
@@ -45,7 +46,7 @@ function AvatarManager:loadPendingAvatar(key, avatar)
     local playerAvatar = AvatarIO.loadPlayerAvatarFromNames('pending', username, firstName, lastName)
     if playerAvatar ~= nil then
         if checksum ~= playerAvatar['checksum'] then
-            print(
+            Logger.error('AvatarManager', 
                 'TRPC error: pending avatar for user "' ..
                 username ..
                 '" and character "' ..
@@ -121,7 +122,7 @@ function AvatarManager:sendApprovedAvatars(playerUsername, playerAvatars)
                     avatar['data'], avatar['extension'])
                 playerAvatars[key] = storedAvatarChecksum
             else
-                print('TRPC error: sendApprovedAvatars: player not found: ' .. playerUsername)
+                Logger.error('AvatarManager', 'TRPC error: sendApprovedAvatars: player not found: ' .. playerUsername)
                 break
             end
         end
@@ -131,7 +132,7 @@ end
 function AvatarManager:sendPendingAvatars(playerUsername, playerAvatars)
     local player = self.connectedPlayers[playerUsername]
     if player == nil then
-        print('TRPC error: sendPendingAvatars: player not found: ' .. playerUsername)
+        Logger.error('AvatarManager', 'TRPC error: sendPendingAvatars: player not found: ' .. playerUsername)
         return
     end
     local accessLevel = player:getAccessLevel()
@@ -244,13 +245,13 @@ function AvatarManager:approveAvatar(admin, username, firstName, lastName, check
     local avatar = self.pendingAvatarsShared[key]
     local adminName = admin:getUsername()
     if avatar == nil then
-        print('TRPC error: avatar approved by ' .. adminName .. ' not found for ' ..
+        Logger.error('AvatarManager', 'TRPC error: avatar approved by ' .. adminName .. ' not found for ' ..
             username ..
             ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
         return
     end
     if checksum ~= avatar['checksum'] then
-        print('TRPC error: avatar approved by ' .. adminName .. ' outdated for ' ..
+        Logger.error('AvatarManager', 'TRPC error: avatar approved by ' .. adminName .. ' outdated for ' ..
             username ..
             ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
         return
@@ -277,13 +278,13 @@ function AvatarManager:rejectAvatar(admin, username, firstName, lastName, checks
     local avatar = self.pendingAvatarsShared[key]
     local adminName = admin:getUsername()
     if avatar == nil then
-        print('TRPC error: avatar rejected by ' .. adminName .. ' not found for ' ..
+        Logger.error('AvatarManager', 'TRPC error: avatar rejected by ' .. adminName .. ' not found for ' ..
             username ..
             ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
         return
     end
     if checksum ~= avatar['checksum'] then
-        print('TRPC error: avatar rejected by ' .. adminName .. ' outdated for ' ..
+        Logger.error('AvatarManager', 'TRPC error: avatar rejected by ' .. adminName .. ' outdated for ' ..
             username ..
             ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
         return

@@ -17,7 +17,7 @@ local function GetColorFromString(colorString)
     local defaultColor = { 255, 0, 255 }
     local rgb = StringParser.hexaStringToRGB(colorString)
     if rgb == nil then
-        print('TRPC error: invalid color string: "' .. colorString .. '"')
+        Logger.error("ChatMessage", 'TRPC error: invalid color string: "' .. colorString .. '"')
         return defaultColor
     end
     return rgb
@@ -200,7 +200,7 @@ local AuthorHasAccessByType = {
                     ServerSend.ChatErrorMessage(author, args.type, 'unknown player "' .. args.target .. '".')
                 end
             else
-                print(
+                Logger.error("ChatMessage", 
                     'TRPC error: Received a private message from "'
                         .. author:getUsername()
                         .. '" without a contact name'
@@ -366,19 +366,19 @@ end
 
 local function IsAllowedToTalk(author, args, sendError)
     if args.type == nil then
-        print("TRPC error: args.type is null")
+        Logger.error("ChatMessage", "TRPC error: args.type is null")
         return false
     end
     if AuthorHasAccessByType[args.type] == nil then
-        print("TRPC error: AuthorHasAccessByType has no method for type " .. args.type)
+        Logger.error("ChatMessage", "TRPC error: AuthorHasAccessByType has no method for type " .. args.type)
         return false
     end
     if ChatMessage.MessageTypeSettings[args.type] == nil then
-        print("TRPC error: ChatMessage.MessageTypeSettings of " .. args.type .. " is null")
+        Logger.error("ChatMessage", "TRPC error: ChatMessage.MessageTypeSettings of " .. args.type .. " is null")
         return false
     end
     if AuthorHasAccessByType[args.type] == nil then
-        print("TRPC error: AuthorHasAccessByType has no method for " .. args.type)
+        Logger.error("ChatMessage", "TRPC error: AuthorHasAccessByType has no method for " .. args.type)
         return false
     end
     return ChatMessage.MessageTypeSettings[args.type]["enabled"] == true
@@ -388,7 +388,7 @@ end
 
 local function IsAllowedToListen(author, player, args)
     if ListenerHasAccessByType[args.type] == nil then
-        print("TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type)
+        Logger.error("ChatMessage", "TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type)
         return false
     end
     return ListenerHasAccessByType[args.type](author, player, args)
@@ -413,7 +413,7 @@ end
 
 local function GetSquaresRadios(player, args, radioFrequencies, range)
     if ChatMessage.MessageTypeSettings == nil then
-        print("TRPC error: GetSquaresRadios: tried to get radios before server settings were initialized")
+        Logger.error("ChatMessage", "TRPC error: GetSquaresRadios: tried to get radios before server settings were initialized")
         return {}, false
     end
     local maxSoundRange = ChatMessage.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
@@ -487,7 +487,7 @@ end
 
 local function GetVehiclesRadios(player, args, radioFrequencies, range)
     if ChatMessage.MessageTypeSettings == nil then
-        print("TRPC error: GetVehiclesRadios: tried to get radios before server settings were initialized")
+        Logger.error("ChatMessage", "TRPC error: GetVehiclesRadios: tried to get radios before server settings were initialized")
         return {}, false
     end
     local maxSoundRange = ChatMessage.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
@@ -633,7 +633,7 @@ end
 
 function ChatMessage.ProcessMessage(player, args, packetType, sendError)
     if args.type == nil then
-        print('TRPC error: Received a message from "' .. player:getUsername() .. '" with no type')
+        Logger.error("ChatMessage", 'TRPC error: Received a message from "' .. player:getUsername() .. '" with no type')
         return
     end
 

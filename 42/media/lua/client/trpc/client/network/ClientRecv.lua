@@ -60,7 +60,7 @@ ClientRecv["ChatError"] = function(args)
 end
 
 ClientRecv["ServerPrint"] = function(args)
-    print("Server: " .. args.message)
+    Logger.info("ServerPrint", "Server: " .. args.message)
 end
 
 ClientRecv["SendSandboxVars"] = function(args)
@@ -84,27 +84,27 @@ ClientRecv["ApprovedAvatar"] = function(args)
     local data = args["data"]
 
     if type(username) ~= "string" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "username"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "username"')
         return
     end
     if type(firstName) ~= "string" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "firstName"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "firstName"')
         return
     end
     if type(lastName) ~= "string" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "lastName"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "lastName"')
         return
     end
     if type(extension) ~= "string" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "extension"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "extension"')
         return
     end
     if type(checksum) ~= "number" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "checksum"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "checksum"')
         return
     end
     if type(data) ~= "table" then
-        print('TRPC error: ApprovedAvatar packet does not contain a valid "data"')
+        Logger.error("ClientRecv", 'TRPC error: ApprovedAvatar packet does not contain a valid "data"')
         return
     end
 
@@ -120,27 +120,27 @@ ClientRecv["PendingAvatar"] = function(args)
     local data = args["data"]
 
     if type(username) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "username"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "username"')
         return
     end
     if type(firstName) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "firstName"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "firstName"')
         return
     end
     if type(lastName) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "lastName"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "lastName"')
         return
     end
     if type(extension) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "extension"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "extension"')
         return
     end
     if type(checksum) ~= "number" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "checksum"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "checksum"')
         return
     end
     if type(data) ~= "table" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "data"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "data"')
         return
     end
 
@@ -154,19 +154,19 @@ ClientRecv["AvatarProcessed"] = function(args)
     local checksum = args["checksum"]
 
     if type(username) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "username"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "username"')
         return
     end
     if type(firstName) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "firstName"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "firstName"')
         return
     end
     if type(lastName) ~= "string" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "lastName"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "lastName"')
         return
     end
     if type(checksum) ~= "number" then
-        print('TRPC error: PendingAvatar packet does not contain a valid "checksum"')
+        Logger.error("ClientRecv", 'TRPC error: PendingAvatar packet does not contain a valid "checksum"')
         return
     end
     AvatarManager:removeAvatarPending(username, firstName, lastName, checksum)
@@ -183,31 +183,31 @@ ClientRecv["RollResult"] = function(args)
     local finalResult = args["finalResult"]
 
     if type(username) ~= "string" then
-        print('TRPC error: RollResult packet does not contain a valid "username"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "username"')
         return
     end
     if type(characterName) ~= "string" then
-        print('TRPC error: RollResult packet does not contain a valid "characterName"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "characterName"')
         return
     end
     if type(diceCount) ~= "number" then
-        print('TRPC error: RollResult packet does not contain a valid "diceCount"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "diceCount"')
         return
     end
     if type(diceType) ~= "number" then
-        print('TRPC error: RollResult packet does not contain a valid "diceType"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "diceType"')
         return
     end
     if addCount ~= nil and type(addCount) ~= "number" then
-        print('TRPC error: RollResult packet does not contain a valid "addCount"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "addCount"')
         return
     end
     if type(diceResults) ~= "table" then
-        print('TRPC error: RollResult packet does not contain a valid "diceResults"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "diceResults"')
         return
     end
     if type(finalResult) ~= "number" then
-        print('TRPC error: RollResult packet does not contain a valid "finalResult"')
+        Logger.error("ClientRecv", 'TRPC error: RollResult packet does not contain a valid "finalResult"')
         return
     end
     ISChat.onDiceResult(username, characterName, diceCount, diceType, addCount, diceResults, finalResult)

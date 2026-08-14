@@ -1,8 +1,9 @@
+local Logger = require("trpc/core/Logger")
 local Coordinates = {}
 
 function Coordinates.CenterTopOfPlayer(player, width, height)
     if player == nil then
-        print('TRPC error: CenterTopOfPlayer: nil player parameter')
+        Logger.error('Coordinates', 'TRPC error: CenterTopOfPlayer: nil player parameter')
         return nil
     end
     local x, y = Coordinates.CenterTopOfObject(player, width, height)
@@ -14,7 +15,7 @@ end
 
 function Coordinates.TopLeftOfPlayer(player, width, height)
     if player == nil then
-        print('TRPC error: CenterTopOfPlayer: nil player parameter')
+        Logger.error('Coordinates', 'TRPC error: CenterTopOfPlayer: nil player parameter')
         return nil
     end
     local x, y = Coordinates.CenterTopOfObject(player, width, height)
@@ -27,7 +28,7 @@ end
 
 function Coordinates.CenterTopOfObject(object, width, height)
     if object == nil then
-        print('TRPC error: CenterTopOfObject: nil player parameter')
+        Logger.error('Coordinates', 'TRPC error: CenterTopOfObject: nil player parameter')
         return nil
     end
     local x, y = IsoUtils.XToScreenExact(object:getX(), object:getY(), object:getZ(), 0),
@@ -40,7 +41,7 @@ end
 
 function Coordinates.CenterBaseOfObjectNoZoom(object, width, height)
     if object == nil then
-        print('TRPC error: CenterBaseOfObjectNoZoom: nil object parameter')
+        Logger.error('Coordinates', 'TRPC error: CenterBaseOfObjectNoZoom: nil object parameter')
         return nil
     end
     local x, y = ISCoordConversion.ToScreen(object:getX(), object:getY(), object:getZ(), nil)
@@ -53,7 +54,7 @@ end
 
 function Coordinates.CenterFeetOfPlayer(player, width, height)
     if player == nil then
-        print('TRPC error: CenterFeetOfPlayer: nil player parameter')
+        Logger.error('Coordinates', 'TRPC error: CenterFeetOfPlayer: nil player parameter')
         return nil
     end
     local x, y = ISCoordConversion.ToScreen(player:getX(), player:getY(), player:getZ(), nil)

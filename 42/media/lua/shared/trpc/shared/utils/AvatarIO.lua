@@ -1,5 +1,6 @@
 local Character = require('trpc/shared/utils/Character')
 local File = require('trpc/shared/utils/File')
+local Logger = require("trpc/core/Logger")
 
 
 local AvatarIO = {}
@@ -12,7 +13,7 @@ function AvatarIO.getBasePath()
         local serverName = getServerName()
         if serverName == nil then
             serverName = 'unknown'
-            print('TRPC error: AvatarIO: unknown server name, using "unknown" directory for avatars')
+            Logger.error('AvatarIO', 'TRPC error: AvatarIO: unknown server name, using "unknown" directory for avatars')
         end
         return 'avatars/server/' .. serverName .. '/'
     end
@@ -56,7 +57,7 @@ function AvatarIO.loadPlayerAvatarFromNames(path, username, firstName, lastName)
     end
     local data, checksum = File.readAllBytes(fullPath)
     if data == nil or checksum == nil then
-        print('TRPC error: failed to read file at path: "' .. fullPath .. '"')
+        Logger.error('AvatarIO', 'TRPC error: failed to read file at path: "' .. fullPath .. '"')
         return
     end
     return {

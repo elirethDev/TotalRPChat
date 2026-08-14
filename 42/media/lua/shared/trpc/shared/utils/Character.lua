@@ -1,4 +1,5 @@
 local World = require('trpc/shared/utils/World')
+local Logger = require("trpc/core/Logger")
 
 
 local Character = {}
@@ -102,7 +103,7 @@ end
 
 function Character.getAttachedItemByIndex(player, index)
     if index == nil then
-        print('TRPC error: Character.getAttachedItemByIndex: tried to access attached item with a null index')
+        Logger.error('Character', 'TRPC error: Character.getAttachedItemByIndex: tried to access attached item with a null index')
         return nil
     end
     local inventoryItems = player:getAttachedItems()
@@ -229,11 +230,11 @@ end
 
 function Character.getRunningRadiosInRange(player, range, frequency)
     if player == nil then
-        print('TRPC error: Character.getListeningRadios: player is null')
+        Logger.error('Character', 'TRPC error: Character.getListeningRadios: player is null')
         return nil
     end
     if range == nil then
-        print('TRPC error: Character.getListeningRadios: range is null')
+        Logger.error('Character', 'TRPC error: Character.getListeningRadios: range is null')
         return nil
     end
     local squaresRadios, squaresRadiosFound = GetSquaresRadios(player, range, frequency)

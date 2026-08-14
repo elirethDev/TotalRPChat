@@ -1,41 +1,42 @@
 local Character              = require('trpc/shared/utils/Character')
 local World                  = require('trpc/shared/utils/World')
 local TrpcClientSendCommands = require('trpc/client/network/ClientSend')
+local Logger = require("trpc/core/Logger")
 
 
 local Radio = {}
 
 function Radio.SyncSquare(turnedOn, mute, power, volume, frequency, x, y, z)
     if turnedOn == nil then
-        print('TRPC error: Radio.SyncSquare: nil turnedOn parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil turnedOn parameter')
         return
     end
     if mute == nil then
-        print('TRPC error: Radio.SyncSquare: nil mute parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil mute parameter')
         return
     end
     if power == nil then
-        print('TRPC error: Radio.SyncSquare: nil power parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil power parameter')
         return
     end
     if volume == nil then
-        print('TRPC error: Radio.SyncSquare: nil volume parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil volume parameter')
         return
     end
     if frequency == nil then
-        print('TRPC error: Radio.SyncSquare: nil frequency parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil frequency parameter')
         return
     end
     if x == nil then
-        print('TRPC error: Radio.SyncSquare: nil x parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil x parameter')
         return
     end
     if y == nil then
-        print('TRPC error: Radio.SyncSquare: nil y parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil y parameter')
         return
     end
     if z == nil then
-        print('TRPC error: Radio.SyncSquare: nil z parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: nil z parameter')
         return
     end
     local square = getSquare(x, y, z)
@@ -44,13 +45,13 @@ function Radio.SyncSquare(turnedOn, mute, power, volume, frequency, x, y, z)
     end
     local radios = World.getSquareItemsByGroup(square, 'IsoRadio')
     if radios == nil or #radios <= 0 then
-        print('TRPC error: Radio.SyncSquare: no radio found at ' .. x .. ', ' .. y .. ', ' .. z)
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: no radio found at ' .. x .. ', ' .. y .. ', ' .. z)
         return
     end
     local radio = radios[1]
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: Radio.SyncSquare: radio has not device data')
+        Logger.error('Radio', 'TRPC error: Radio.SyncSquare: radio has not device data')
         return
     end
     if radioData.setIsTurnedOn ~= nil then
@@ -61,37 +62,37 @@ end
 
 function Radio.SyncInHand(id, turnedOn, mute, power, volume, frequency)
     if id == nil then
-        print('TRPC error: Radio.SyncInHand: nil id parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil id parameter')
         return
     end
     if turnedOn == nil then
-        print('TRPC error: Radio.SyncInHand: nil turnedOn parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil turnedOn parameter')
         return
     end
     if mute == nil then
-        print('TRPC error: Radio.SyncInHand: nil mute parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil mute parameter')
         return
     end
     if power == nil then
-        print('TRPC error: Radio.SyncInHand: nil power parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil power parameter')
         return
     end
     if volume == nil then
-        print('TRPC error: Radio.SyncInHand: nil volume parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil volume parameter')
         return
     end
     if frequency == nil then
-        print('TRPC error: Radio.SyncInHand: nil frequency parameter')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: nil frequency parameter')
         return
     end
     local radio = Character.getItemById(getPlayer(), id)
     if radio == nil then
-        print('TRPC error: Radio.SyncInHand: no radio found on player')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: no radio found on player')
         return
     end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        print('TRPC error: Radio.SyncInHand: radio has not device data')
+        Logger.error('Radio', 'TRPC error: Radio.SyncInHand: radio has not device data')
         return
     end
     if radioData.setIsTurnedOn ~= nil then
