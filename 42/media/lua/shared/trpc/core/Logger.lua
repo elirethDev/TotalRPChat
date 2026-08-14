@@ -24,7 +24,10 @@
 local Logger = {}
 
 local DateTime = require("trpc/shared/utils/DateTime")
-local File = require("trpc/shared/utils/File")
+-- OJO: NO requerir File.lua al cargar el módulo. File.lua requiere Logger
+-- (migración de prints a Logger), y Logger usa File.writeStringWithNewLine en
+-- logChat -> un require al tope crea un ciclo: Logger -> File -> Logger.
+-- Se carga bajo demanda (lazy require) dentro de logChat().
 
 local LEVELS = {
     ERROR = 1,
@@ -123,6 +126,7 @@ function Logger.logChat(type, author, characterName, message, radiosFrequenciesL
         text = text .. "]"
     end
     text = text .. ": " .. message
+    local File = require("trpc/shared/utils/File")
     File.writeStringWithNewLine(text, ChatLogPath())
 end
 

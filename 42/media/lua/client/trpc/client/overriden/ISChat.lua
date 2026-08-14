@@ -88,11 +88,12 @@ local function AskServerData()
     ClientSend.sendAskSandboxVars()
 end
 
+local eventBusSetupDone = false
 local function SetupEventBusSubscriptions()
-    if SetupEventBusSubscriptions.done then
+    if eventBusSetupDone then
         return
     end
-    SetupEventBusSubscriptions.done = true
+    eventBusSetupDone = true
 
     EventBus:subscribe("chat:message", function(args)
         ISChat.onMessagePacket(
