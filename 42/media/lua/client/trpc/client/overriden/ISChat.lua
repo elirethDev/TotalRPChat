@@ -34,6 +34,7 @@ local EventBus = require("trpc/core/EventBus")
 local Logger = require("trpc/core/Logger")
 
 ISChat.allChatStreams = Streams.allChatStreams
+ISChat.chatStreamsByName = Streams.chatStreamsByName
 ISChat.trpcCommand = Streams.trpcCommand
 ISChat.defaultTabStream = Streams.defaultTabStream
 ISChat.lastTabStream = Streams.lastTabStream
@@ -320,12 +321,7 @@ function ISChat.onTypingPacket(author, type)
 end
 
 local function GetStreamFromType(type)
-    for _, stream in ipairs(ISChat.allChatStreams) do
-        if type == stream["name"] then
-            return stream
-        end
-    end
-    return nil
+    return ISChat.chatStreamsByName[type]
 end
 
 local function AddMessageToTab(tabID, language, time, formattedMessage, line, channel)
