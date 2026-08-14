@@ -1,4 +1,4 @@
-local AToken = require('trpc/client/lexer/AToken')
+local AToken = require("trpc/client/lexer/AToken")
 
 local TokenRoot = {}
 
@@ -12,7 +12,7 @@ function TokenRoot:new(message, childs, defaultColor)
         o.color = {
             242,
             242,
-            242
+            242,
         }
     end
     return o
@@ -23,7 +23,7 @@ function TokenRoot:getColor()
 end
 
 function TokenRoot.getName()
-    return 'root'
+    return "root"
 end
 
 function TokenRoot.getTagSize()
@@ -31,7 +31,7 @@ function TokenRoot.getTagSize()
 end
 
 function TokenRoot.getTag()
-    return ''
+    return ""
 end
 
 return TokenRoot

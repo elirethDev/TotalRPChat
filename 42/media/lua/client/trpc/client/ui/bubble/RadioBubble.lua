@@ -1,7 +1,7 @@
-local ABubble     = require('trpc/client/ui/bubble/ABubble')
-local Coordinates = require('trpc/client/utils/Coordinates')
-local Parser      = require('trpc/client/parser/Parser')
-local RadioVoice  = require('trpc/client/voice/RadioVoice')
+local ABubble = require("trpc/client/ui/bubble/ABubble")
+local Coordinates = require("trpc/client/utils/Coordinates")
+local Parser = require("trpc/client/parser/Parser")
+local RadioVoice = require("trpc/client/voice/RadioVoice")
 
 local RadioBubble = ISUIElement:derive("RadioBubble")
 
@@ -46,7 +46,7 @@ function RadioBubble.CenterTop(type, object, width, height)
     elseif type == RadioBubble.types.vehicle then
         return Coordinates.CenterTopOfPlayer(object, width, height)
     else
-        error('tried to initialize RadioBubble without a type')
+        error("tried to initialize RadioBubble without a type")
     end
 end
 
@@ -58,7 +58,7 @@ RadioBubble.types = {
 
 function RadioBubble:new(object, message, messageColor, timer, opacity, type, isVoicesEnabled, voicePitch, offsetY)
     local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 20, 200)
-    local textLength = getTextManager():MeasureStringX(UIFont.medium, parsedMessages['rawMessage'])
+    local textLength = getTextManager():MeasureStringX(UIFont.medium, parsedMessages["rawMessage"])
     local width = math.min(textLength * 1.25, 162) + 40
     local height = 0
     local x, y = RadioBubble.CenterTop(type, object, width, height)
@@ -68,8 +68,20 @@ function RadioBubble:new(object, message, messageColor, timer, opacity, type, is
     RadioBubble.__index = self
     setmetatable(RadioBubble, { __index = ABubble })
     local o = ABubble:new(
-        x, y, parsedMessages['bubble'], parsedMessages['rawMessage'],
-        message, messageColor, timer, opacity, 20, true, false, nil, nil)
+        x,
+        y,
+        parsedMessages["bubble"],
+        parsedMessages["rawMessage"],
+        message,
+        messageColor,
+        timer,
+        opacity,
+        20,
+        true,
+        false,
+        nil,
+        nil
+    )
     if x == nil then
         self.dead = true
     end
@@ -77,7 +89,7 @@ function RadioBubble:new(object, message, messageColor, timer, opacity, type, is
     o.type = type
     o.object = object
     if isVoicesEnabled then
-        o.voice = RadioVoice:new(parsedMessages['rawMessage'], object, voicePitch)
+        o.voice = RadioVoice:new(parsedMessages["rawMessage"], object, voicePitch)
     end
     o.message = message
     o.color = messageColor

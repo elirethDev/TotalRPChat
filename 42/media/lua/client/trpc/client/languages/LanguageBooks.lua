@@ -1,6 +1,5 @@
-local ISReadLanguageBook = require('trpc/client/languages/ISReadLanguageBook')
-local LanguageManager    = require('trpc/client/languages/LanguageManager')
-
+local ISReadLanguageBook = require("trpc/client/languages/ISReadLanguageBook")
+local LanguageManager = require("trpc/client/languages/LanguageManager")
 
 ISInventoryMenuElements = ISInventoryMenuElements or {}
 
@@ -8,24 +7,24 @@ function ISInventoryMenuElements.ContextLanguageBooks()
     local self = ISMenuElement.new()
     self.inventoryMenu = ISContextManager.getInstance().getInventoryMenu()
 
-    function self.init()
-    end
+    function self.init() end
 
     function self.createMenu(item)
         local itemFullType = item:getFullType()
-        local languageName = itemFullType:match('(%a+)LanguageBook')
+        local languageName = itemFullType:match("(%a+)LanguageBook")
         if languageName == nil then
             return
         end
 
-        self.inventoryMenu.context:removeOptionByName(getText('ContextMenu_Read'))
-        if languageName == 'Forget' then
+        self.inventoryMenu.context:removeOptionByName(getText("ContextMenu_Read"))
+        if languageName == "Forget" then
             self.inventoryMenu.context:addOption(
                 getText("ContextMenu_TRPC_forget_languages"),
                 self.inventoryMenu,
                 self.registerLanguage,
                 item,
-                languageName)
+                languageName
+            )
         else
             local languageNameTranslated = LanguageManager.GetLanguageTranslated(languageName)
             if languageNameTranslated == nil then
@@ -36,7 +35,8 @@ function ISInventoryMenuElements.ContextLanguageBooks()
                 self.inventoryMenu,
                 self.registerLanguage,
                 item,
-                languageName)
+                languageName
+            )
         end
     end
 

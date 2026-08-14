@@ -1,22 +1,21 @@
-local CRC32 = require('trpc/shared/libs/crc32/crc32')
+local CRC32 = require("trpc/shared/libs/crc32/crc32")
 local Logger = require("trpc/core/Logger")
-
 
 local File = {}
 
 function File.exists(path)
-    return serverFileExists('../Lua/' .. path)
+    return serverFileExists("../Lua/" .. path)
 end
 
 function File.createDirectory(path, fileName)
     -- create useless file to ensure the directory is created
     local fullPath
     if fileName then
-        fullPath = path .. '/' .. fileName
+        fullPath = path .. "/" .. fileName
     else
-        fullPath = path .. '/delete_me'
+        fullPath = path .. "/delete_me"
     end
-    if serverFileExists('../Lua/' .. fullPath) then
+    if serverFileExists("../Lua/" .. fullPath) then
         return
     end
     getFileOutput(fullPath)
@@ -25,26 +24,30 @@ end
 
 function File.readAllBytes(path)
     if path == nil then
-        Logger.error('File', 'TRPC error: File.readAllBytes: path is nil')
+        Logger.error("File", "TRPC error: File.readAllBytes: path is nil")
         return
     end
     local file = getFileInput(path)
     if file == nil then
-        Logger.error('File', 'TRPC error: File.readAllBytes: could not read avatar file at :"' .. path .. '"')
+        Logger.error("File", 'TRPC error: File.readAllBytes: could not read avatar file at :"' .. path .. '"')
         return
     end
     local data = {}
     local checksum = CRC32.newcrc32()
-    Logger.info('File', 
-        'TRPC info: File.readAllBytes: ignore the InvocationTargetException below, it means the file has been read')
+    Logger.info(
+        "File",
+        "TRPC info: File.readAllBytes: ignore the InvocationTargetException below, it means the file has been read"
+    )
     while true do
         local byte = file:readUnsignedByte()
         -- an exception will be thrown, it's unavoidable unless we know the size of the file
         -- and I am not writing my own PNG/JPEG parser to avoid it
         -- the exception does not stop the execution flow
         if byte == nil then
-            Logger.info('File', 
-                'TRPC info: File.readAllBytes: ignore the InvocationTargetException above, it means the file has been read')
+            Logger.info(
+                "File",
+                "TRPC info: File.readAllBytes: ignore the InvocationTargetException above, it means the file has been read"
+            )
             break
         end
         checksum:update(byte)
@@ -57,7 +60,7 @@ end
 function File.writeAllBytes(data, path)
     local outFile = getFileOutput(path)
     if outFile == nil then
-        Logger.error('File', 'TRPC error: File.writeAllBytes: failed to write file in path: ' .. path)
+        Logger.error("File", "TRPC error: File.writeAllBytes: failed to write file in path: " .. path)
         return
     end
     for _, byte in pairs(data) do
@@ -69,7 +72,7 @@ end
 function File.writeStringWithNewLine(text, path)
     local outFile = getFileWriter(path, true, true)
     if outFile == nil then
-        Logger.error('File', 'TRPC error: File.writeString: failed to write file in path: ' .. path)
+        Logger.error("File", "TRPC error: File.writeString: failed to write file in path: " .. path)
         return
     end
     outFile:writeln(text)

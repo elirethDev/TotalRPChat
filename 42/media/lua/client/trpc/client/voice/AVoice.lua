@@ -1,108 +1,133 @@
-local LanguageManager = require('trpc/client/languages/LanguageManager')
-
+local LanguageManager = require("trpc/client/languages/LanguageManager")
 
 local AVoice = {}
 
 local Phonemes = {
     A = {
-        'AIR',
-        'AI',
-        'AR',
-        'A'
+        "AIR",
+        "AI",
+        "AR",
+        "A",
     },
     B = {
-        'B'
+        "B",
     },
     C = {
-        'CH',
-        'C'
+        "CH",
+        "C",
     },
     D = {
-        'D'
+        "D",
     },
     E = {
-        'ERE',
-        'EE',
-        'ER',
-        'E'
+        "ERE",
+        "EE",
+        "ER",
+        "E",
     },
     F = {
-        'F'
+        "F",
     },
     G = {
-        'G'
+        "G",
     },
     H = {
-        'H'
+        "H",
     },
     I = {
-        'IS',
-        'IR',
-        'I'
+        "IS",
+        "IR",
+        "I",
     },
     J = {
-        'J'
+        "J",
     },
     K = {
-        'K'
+        "K",
     },
     L = {
-        'L'
+        "L",
     },
     M = {
-        'M'
+        "M",
     },
     N = {
-        'NG',
-        'N'
+        "NG",
+        "N",
     },
     O = {
-        'OOR',
-        'OO',
-        'OW',
-        'OY',
-        'O'
+        "OOR",
+        "OO",
+        "OW",
+        "OY",
+        "O",
     },
     P = {
-        'P'
+        "P",
     },
     Q = {
-        'Q'
+        "Q",
     },
     R = {
-        'R'
+        "R",
     },
     S = {
-        'SH',
-        'S'
+        "SH",
+        "S",
     },
     T = {
-        'TH',
-        'T'
+        "TH",
+        "T",
     },
     U = {
-        'UP',
-        'U'
+        "UP",
+        "U",
     },
     V = {
-        'V'
+        "V",
     },
     W = {
-        'W'
+        "W",
     },
     X = {
-        'X '
+        "X ",
     },
     Y = {
-        'Y'
+        "Y",
     },
     Z = {
-        'Z'
+        "Z",
     },
 }
 
-local Alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' }
+local Alphabet = {
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+}
 
 local function GetPhoneme(nextLetters)
     local firstLetter = nextLetters:sub(1, 1)
@@ -118,7 +143,7 @@ local function GetPhoneme(nextLetters)
         return nil
     end
     for _, phoneme in pairs(letterPhonemes) do
-        if #nextLetters >= #phoneme and nextLetters:match('^' .. phoneme) then
+        if #nextLetters >= #phoneme and nextLetters:match("^" .. phoneme) then
             return phoneme
         end
     end
@@ -127,10 +152,10 @@ end
 
 function AVoice:GetSoundPathFromPhoneme(phoneme, isFirstWordLetter, soundPrefix)
     local filePhoneme
-    if phoneme == 'K' or phoneme == 'Q' then
-        filePhoneme = 'C'
-    elseif phoneme == 'Y' and isFirstWordLetter then
-        filePhoneme = 'YStart'
+    if phoneme == "K" or phoneme == "Q" then
+        filePhoneme = "C"
+    elseif phoneme == "Y" and isFirstWordLetter then
+        filePhoneme = "YStart"
     else
         filePhoneme = phoneme
     end
@@ -189,7 +214,8 @@ function AVoice:update()
                     local updatePitchVariation = (ZombRand(80) - 40) / 1000
                     self.pitchVariation = math.min(
                         math.max(self.pitchVariation + updatePitchVariation, MIN_PITCH_VARIATION),
-                        MAX_PITCH_VARIATION)
+                        MAX_PITCH_VARIATION
+                    )
                     self.soundEmitter:setPitch(self.soundId, self.pitch + self.pitchVariation)
                     soundPlayed = true
                 end
@@ -200,11 +226,7 @@ function AVoice:update()
 end
 
 local function isPunctuationMark(letter)
-    return letter == ','
-        or letter == '.'
-        or letter == '!'
-        or letter == '?'
-        or letter == ':'
+    return letter == "," or letter == "." or letter == "!" or letter == "?" or letter == ":"
 end
 
 function AVoice:createSoundTable(soundPrefix)
@@ -217,7 +239,7 @@ function AVoice:createSoundTable(soundPrefix)
     while index <= messageSize do
         local soundFile = nil
         local firstLetter = self.message:sub(index, index)
-        if firstLetter == ' ' then
+        if firstLetter == " " then
             index = index + 1
             isFirstWordLetter = true
             time = time + 10
@@ -234,8 +256,8 @@ function AVoice:createSoundTable(soundPrefix)
             else
                 soundFile = self:GetSoundPathFromPhoneme(phoneme, isFirstWordLetter, soundPrefix)
                 isFirstWordLetter = false
-                if #phoneme == 1 or phoneme == 'OO' then
-                    local identicalLetters = nextLetters:match('^(' .. phoneme:sub(1, 1) .. '+)')
+                if #phoneme == 1 or phoneme == "OO" then
+                    local identicalLetters = nextLetters:match("^(" .. phoneme:sub(1, 1) .. "+)")
                     -- assert(identicalLetters ~= nil,
                     --     'failure: identicalLetters should never be null at this point for phoneme "' ..
                     --     phoneme .. '" and nextLetters "' .. nextLetters .. '"')

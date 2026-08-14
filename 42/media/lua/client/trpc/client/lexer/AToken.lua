@@ -1,4 +1,4 @@
-local StringBuilder = require('trpc/client/parser/StringBuilder')
+local StringBuilder = require("trpc/client/parser/StringBuilder")
 
 local AToken = {}
 
@@ -22,14 +22,14 @@ end
 function AToken:formatCustom(wrapWords, keepTags, rgbCall, lengthLeft)
     local colorObj = self:getColor()
     local color = rgbCall(colorObj)
-    local newMessage = ''
+    local newMessage = ""
     local stop = false
-    local rawMessage = ''
+    local rawMessage = ""
     if keepTags and self.getTagSize() > 0 then
         newMessage = color .. self.getTag()
     end
     for _, child in pairs(self.childs) do
-        if child.getName() == 'string' then
+        if child.getName() == "string" then
             newMessage = newMessage .. color
         end
         local subMessage, subRawMessage, subLengthLeft = child:formatCustom(wrapWords, keepTags, rgbCall, lengthLeft)
@@ -55,19 +55,19 @@ function AToken:format(keepTags, wrapWords, maxBubbleLength)
 end
 
 function AToken:getColor()
-    error('abstract method not implemented')
+    error("abstract method not implemented")
 end
 
 function AToken.getName()
-    error('abstract method not implemented')
+    error("abstract method not implemented")
 end
 
 function AToken.getTagSize()
-    error('abstract method not implemented')
+    error("abstract method not implemented")
 end
 
 function AToken.getTag()
-    error('abstract method not implemented')
+    error("abstract method not implemented")
 end
 
 return AToken

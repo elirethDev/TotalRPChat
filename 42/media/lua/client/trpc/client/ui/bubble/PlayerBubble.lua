@@ -1,36 +1,35 @@
-local ABubble       = require('trpc/client/ui/bubble/ABubble')
-local AvatarManager = require('trpc/client/AvatarManager')
-local Character     = require('trpc/shared/utils/Character')
-local Coordinates   = require('trpc/client/utils/Coordinates')
-local Parser        = require('trpc/client/parser/Parser')
-local StringBuilder = require('trpc/client/parser/StringBuilder')
+local ABubble = require("trpc/client/ui/bubble/ABubble")
+local AvatarManager = require("trpc/client/AvatarManager")
+local Character = require("trpc/shared/utils/Character")
+local Coordinates = require("trpc/client/utils/Coordinates")
+local Parser = require("trpc/client/parser/Parser")
+local StringBuilder = require("trpc/client/parser/StringBuilder")
 
-local KeyboardSound = require('trpc/client/voice/KeyboardSound')
-local PlayerVoice   = require('trpc/client/voice/PlayerVoice')
+local KeyboardSound = require("trpc/client/voice/KeyboardSound")
+local PlayerVoice = require("trpc/client/voice/PlayerVoice")
 
-
-local PlayerBubble = ISUIElement:derive('PlayerBubble')
+local PlayerBubble = ISUIElement:derive("PlayerBubble")
 
 function PlayerBubble:loadTextures()
     if self.isAction then
-        self.bubbleTopLeft = getTexture('media/ui/trpc/bubble/simple/bubble-top-left-square.png')
-        self.bubbleTopRight = getTexture('media/ui/trpc/bubble/simple/bubble-top-right-square.png')
-        self.bubbleBotLeft = getTexture('media/ui/trpc/bubble/simple/bubble-bot-left-square.png')
-        self.bubbleBotRight = getTexture('media/ui/trpc/bubble/simple/bubble-bot-right-square.png')
+        self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/simple/bubble-top-left-square.png")
+        self.bubbleTopRight = getTexture("media/ui/trpc/bubble/simple/bubble-top-right-square.png")
+        self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left-square.png")
+        self.bubbleBotRight = getTexture("media/ui/trpc/bubble/simple/bubble-bot-right-square.png")
     else
-        self.bubbleTopLeft = getTexture('media/ui/trpc/bubble/simple/bubble-top-left.png')
-        self.bubbleTopRight = getTexture('media/ui/trpc/bubble/simple/bubble-top-right.png')
-        self.bubbleBotLeft = getTexture('media/ui/trpc/bubble/simple/bubble-bot-left.png')
-        self.bubbleBotRight = getTexture('media/ui/trpc/bubble/simple/bubble-bot-right.png')
+        self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/simple/bubble-top-left.png")
+        self.bubbleTopRight = getTexture("media/ui/trpc/bubble/simple/bubble-top-right.png")
+        self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left.png")
+        self.bubbleBotRight = getTexture("media/ui/trpc/bubble/simple/bubble-bot-right.png")
     end
-    self.bubbleTop = getTexture('media/ui/trpc/bubble/simple/bubble-top.png')
-    self.bubbleCenter = getTexture('media/ui/trpc/bubble/simple/bubble-center.png')
-    self.bubbleCenterLeft = getTexture('media/ui/trpc/bubble/simple/bubble-left.png')
-    self.bubbleCenterRight = getTexture('media/ui/trpc/bubble/simple/bubble-right.png')
-    self.bubbleBot = getTexture('media/ui/trpc/bubble/simple/bubble-bot.png')
-    self.bubbleArrow = getTexture('media/ui/trpc/bubble/simple/bubble-arrow.png')
+    self.bubbleTop = getTexture("media/ui/trpc/bubble/simple/bubble-top.png")
+    self.bubbleCenter = getTexture("media/ui/trpc/bubble/simple/bubble-center.png")
+    self.bubbleCenterLeft = getTexture("media/ui/trpc/bubble/simple/bubble-left.png")
+    self.bubbleCenterRight = getTexture("media/ui/trpc/bubble/simple/bubble-right.png")
+    self.bubbleBot = getTexture("media/ui/trpc/bubble/simple/bubble-bot.png")
+    self.bubbleArrow = getTexture("media/ui/trpc/bubble/simple/bubble-arrow.png")
 
-    self.bubbleBotLeftSquare = getTexture('media/ui/trpc/bubble/simple/bubble-bot-left-square.png')
+    self.bubbleBotLeftSquare = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left-square.png")
 
     if self.portrait == 3 then
         self.avatarWidth = 33
@@ -91,10 +90,14 @@ function PlayerBubble:render()
     self:updateText(x, y)
     self:drawBubble()
     if self.playerAvatar and (self.portrait == 3 or self.portrait == 2) then
-        self:drawTextureScaled(self.playerAvatar,
-            2, self:getHeight() - self.avatarHeight - 2,
-            self.avatarWidth, self.avatarHeight,
-            math.min(1, self.fadingProgression + 0.35))
+        self:drawTextureScaled(
+            self.playerAvatar,
+            2,
+            self:getHeight() - self.avatarHeight - 2,
+            self.avatarWidth,
+            self.avatarHeight,
+            math.min(1, self.fadingProgression + 0.35)
+        )
     elseif self.playerModel then
         local width = self:getWidth()
         local height = self:getHeight()
@@ -123,15 +126,25 @@ local function BuildPlayerNameString(playerName, playerColor)
 end
 
 function PlayerBubble:new(
-    player, isAction, message, messageColor, timer, opacity,
-    isVoicesEnabled, voicePitch, portrait,
-    showPlayerName, playerName, playerColor)
+    player,
+    isAction,
+    message,
+    messageColor,
+    timer,
+    opacity,
+    isVoicesEnabled,
+    voicePitch,
+    portrait,
+    showPlayerName,
+    playerName,
+    playerColor
+)
     local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 20, 200)
-    local rawMessage = parsedMessages['rawMessage']
-    local bubbleMessage = parsedMessages['bubble']
+    local rawMessage = parsedMessages["rawMessage"]
+    local bubbleMessage = parsedMessages["bubble"]
     if showPlayerName then
-        rawMessage = playerName .. ' ' .. rawMessage
-        bubbleMessage = BuildPlayerNameString(playerName, playerColor) .. ' ' .. bubbleMessage
+        rawMessage = playerName .. " " .. rawMessage
+        bubbleMessage = BuildPlayerNameString(playerName, playerColor) .. " " .. bubbleMessage
     end
     local textLength = getTextManager():MeasureStringX(UIFont.medium, rawMessage)
     local width = math.min(textLength * 1.25, 162) + 40
@@ -144,8 +157,20 @@ function PlayerBubble:new(
     setmetatable(PlayerBubble, { __index = ABubble })
     local showArrow = not isAction
     local o = ABubble:new(
-        x, y, bubbleMessage, rawMessage,
-        message, messageColor, timer, opacity, 20, showArrow, showPlayerName, playerName, playerColor)
+        x,
+        y,
+        bubbleMessage,
+        rawMessage,
+        message,
+        messageColor,
+        timer,
+        opacity,
+        20,
+        showArrow,
+        showPlayerName,
+        playerName,
+        playerColor
+    )
     if x == nil then
         self.dead = true
     end

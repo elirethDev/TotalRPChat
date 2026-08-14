@@ -1,36 +1,36 @@
-local ABubble       = require('trpc/client/ui/bubble/ABubble')
-local Coordinates   = require('trpc/client/utils/Coordinates')
-local Parser        = require('trpc/client/parser/Parser')
-local StringBuilder = require('trpc/client/parser/StringBuilder')
+local ABubble = require("trpc/client/ui/bubble/ABubble")
+local Coordinates = require("trpc/client/utils/Coordinates")
+local Parser = require("trpc/client/parser/Parser")
+local StringBuilder = require("trpc/client/parser/StringBuilder")
 
-local KeyboardSound = require('trpc/client/voice/KeyboardSound')
+local KeyboardSound = require("trpc/client/voice/KeyboardSound")
 local Logger = require("trpc/core/Logger")
 
-local ContextBubble = ISUIElement:derive('ContextBubble')
+local ContextBubble = ISUIElement:derive("ContextBubble")
 
 function ContextBubble:loadTextures()
-    self.bubbleTopLeft     = getTexture('media/ui/trpc/bubble/simple/bubble-top-left-square.png')
-    self.bubbleTopRight    = getTexture('media/ui/trpc/bubble/simple/bubble-top-right-square.png')
-    self.bubbleBotLeft     = getTexture('media/ui/trpc/bubble/simple/bubble-bot-left-square.png')
-    self.bubbleBotRight    = getTexture('media/ui/trpc/bubble/simple/bubble-bot-right-square.png')
-    self.bubbleTop         = getTexture('media/ui/trpc/bubble/simple/bubble-top.png')
-    self.bubbleCenter      = getTexture('media/ui/trpc/bubble/simple/bubble-center.png')
-    self.bubbleCenterLeft  = getTexture('media/ui/trpc/bubble/simple/bubble-left.png')
-    self.bubbleCenterRight = getTexture('media/ui/trpc/bubble/simple/bubble-right.png')
-    self.bubbleBot         = getTexture('media/ui/trpc/bubble/simple/bubble-bot.png')
+    self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/simple/bubble-top-left-square.png")
+    self.bubbleTopRight = getTexture("media/ui/trpc/bubble/simple/bubble-top-right-square.png")
+    self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left-square.png")
+    self.bubbleBotRight = getTexture("media/ui/trpc/bubble/simple/bubble-bot-right-square.png")
+    self.bubbleTop = getTexture("media/ui/trpc/bubble/simple/bubble-top.png")
+    self.bubbleCenter = getTexture("media/ui/trpc/bubble/simple/bubble-center.png")
+    self.bubbleCenterLeft = getTexture("media/ui/trpc/bubble/simple/bubble-left.png")
+    self.bubbleCenterRight = getTexture("media/ui/trpc/bubble/simple/bubble-right.png")
+    self.bubbleBot = getTexture("media/ui/trpc/bubble/simple/bubble-bot.png")
 end
 
 function ContextBubble:setY(y)
     local ys = y
     if self:getKeepOnScreen() then
-        local maxY = getCore():getScreenHeight();
+        local maxY = getCore():getScreenHeight()
         local topSpace = self.topSpace
-        ys = math.max(topSpace, math.min(y, maxY - self.height));
+        ys = math.max(topSpace, math.min(y, maxY - self.height))
     end
 
-    self.y = ys;
+    self.y = ys
     if self.javaObject ~= nil then
-        self.javaObject:setY(ys);
+        self.javaObject:setY(ys)
     end
 end
 
@@ -47,7 +47,7 @@ end
 
 function ContextBubble:parseMessage(length)
     local parsedMessages = Parser.ParseTrpcMessage(self.message, self.color, 20, length)
-    return parsedMessages['rawMessage'], parsedMessages['bubble']
+    return parsedMessages["rawMessage"], parsedMessages["bubble"]
 end
 
 function ContextBubble:updateText(x, y)
@@ -71,7 +71,7 @@ function ContextBubble:updateText(x, y)
     end
     local rawMessage, bubbleMessage = self:parseMessage(length)
 
-    self.text = StringBuilder.BuildFontSizeString('medium') .. bubbleMessage
+    self.text = StringBuilder.BuildFontSizeString("medium") .. bubbleMessage
     self.rawText = rawMessage
 
     self:paginate()
@@ -173,15 +173,15 @@ function ContextBubble:render()
 
     local screenWidth = getCore():getScreenWidth()
     local x, y = screenWidth / 2 - self:getWidth() / 2, 150 - self:getHeight() / 2
-    Logger.debug('ContextBubble', 'x:' .. x .. ', y:' .. y)
+    Logger.debug("ContextBubble", "x:" .. x .. ", y:" .. y)
     self:updateText(x, y)
     self:drawBubble()
 end
 
 function ContextBubble:new(message, messageColor, timer, opacity, isVoiceEnabled, voicePitch)
     local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 40, 200)
-    local rawMessage = parsedMessages['rawMessage']
-    local bubbleMessage = parsedMessages['bubble']
+    local rawMessage = parsedMessages["rawMessage"]
+    local bubbleMessage = parsedMessages["bubble"]
 
     local textLength = getTextManager():MeasureStringX(UIFont.medium, rawMessage)
     local width = math.min(textLength * 1.25, 364) + 40
@@ -197,7 +197,7 @@ function ContextBubble:new(message, messageColor, timer, opacity, isVoiceEnabled
     if isVoiceEnabled then
         o.voice = KeyboardSound:new(rawMessage, getPlayer(), voicePitch)
     end
-    o.text = ''
+    o.text = ""
     o.timer = timer * 1000
     o.opacity = opacity / 100
     o.message = message

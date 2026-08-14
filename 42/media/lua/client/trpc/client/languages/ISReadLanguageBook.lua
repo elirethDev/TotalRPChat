@@ -1,30 +1,28 @@
-local LanguageManager = require('trpc/client/languages/LanguageManager')
+local LanguageManager = require("trpc/client/languages/LanguageManager")
 local Logger = require("trpc/core/Logger")
 
-
-local ISReadLanguageBook = ISReadABook:derive("ISReadABook");
-
+local ISReadLanguageBook = ISReadABook:derive("ISReadABook")
 
 function ISReadLanguageBook:perform()
     ISReadABook.perform(self)
 
-    if self.language ~= 'Forget' and not LanguageManager.LanguageExists(self.language) then
-        Logger.error('ISReadLanguageBook', 'TRPC error: ISReadLanguageBook:perform: unknown language ' .. self.language)
+    if self.language ~= "Forget" and not LanguageManager.LanguageExists(self.language) then
+        Logger.error("ISReadLanguageBook", "TRPC error: ISReadLanguageBook:perform: unknown language " .. self.language)
         return
     end
 
-    if self.language == 'Forget' then
+    if self.language == "Forget" then
         LanguageManager:forgetAll()
-        ISChat.sendInfoToCurrentTab(getText('UI_TRPC_Messages_languages_forgotten', getText('UI_TRPC_Languages_en')))
+        ISChat.sendInfoToCurrentTab(getText("UI_TRPC_Messages_languages_forgotten", getText("UI_TRPC_Languages_en")))
         return
     else
         local languageTranslated = LanguageManager.GetLanguageTranslated(self.language)
         if LanguageManager:isKnown(self.language) then
-            ISChat.sendErrorToCurrentTab(getText('UI_TRPC_Messages_language_already_learnt', languageTranslated))
+            ISChat.sendErrorToCurrentTab(getText("UI_TRPC_Messages_language_already_learnt", languageTranslated))
             return
         end
         LanguageManager:registerLanguage(self.language)
-        ISChat.sendInfoToCurrentTab(getText('UI_TRPC_Messages_language_learnt', languageTranslated))
+        ISChat.sendInfoToCurrentTab(getText("UI_TRPC_Messages_language_learnt", languageTranslated))
     end
 
     local player = getPlayer()
@@ -33,16 +31,16 @@ function ISReadLanguageBook:perform()
 end
 
 function ISReadLanguageBook:start(character, item, time)
-    self.item:setJobType(getText("ContextMenu_Read") .. ' ' .. self.item:getName());
-    self.item:setJobDelta(0.0);
+    self.item:setJobType(getText("ContextMenu_Read") .. " " .. self.item:getName())
+    self.item:setJobDelta(0.0)
     self:setAnimVariable("ReadType", "book")
-    self:setActionAnim(CharacterActionAnims.Read);
+    self:setActionAnim(CharacterActionAnims.Read)
 
-    self.displayItem = instanceItem('Base.SmithingMag3')
-    self:setOverrideHandModels(nil, self.displayItem);
+    self.displayItem = instanceItem("Base.SmithingMag3")
+    self:setOverrideHandModels(nil, self.displayItem)
 
     self.character:setReading(true)
-    self.character:reportEvent("EventRead");
+    self.character:reportEvent("EventRead")
     self.character:playSound("OpenMagazine")
 end
 

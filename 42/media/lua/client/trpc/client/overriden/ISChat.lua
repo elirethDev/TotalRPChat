@@ -582,7 +582,10 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            Logger.error("ISChat", "TRPC error: received radio packet for a square radio without distance")
+                            Logger.error(
+                                "ISChat",
+                                "TRPC error: received radio packet for a square radio without distance"
+                            )
                         end
                     else
                         Logger.error("ISChat", "TRPC error: received radio packet for a square radio without data")
@@ -617,7 +620,10 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            Logger.error("ISChat", "TRPC error: received radio packet for a player radio without distance")
+                            Logger.error(
+                                "ISChat",
+                                "TRPC error: received radio packet for a player radio without distance"
+                            )
                         end
                     else
                         Logger.error("ISChat", "TRPC error: received radio packet for a player radio without data")
@@ -653,7 +659,10 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
                         if distance ~= nil then
                             radioData:doReceiveSignal(distance)
                         else
-                            Logger.error("ISChat", "TRPC error: received radio packet for a vehicle radio without distance")
+                            Logger.error(
+                                "ISChat",
+                                "TRPC error: received radio packet for a vehicle radio without distance"
+                            )
                         end
                     else
                         Logger.error("ISChat", "TRPC error: received radio packet for a vehicle radio without data")
@@ -662,7 +671,10 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
                     Logger.error("ISChat", "TRPC error: received radio packet for a vehicle with no radio")
                 end
             else
-                Logger.error("ISChat", "TRPC error: CreateVehiclesRadiosBubble: vehicle not found for key id " .. vehicleKeyId)
+                Logger.error(
+                    "ISChat",
+                    "TRPC error: CreateVehiclesRadiosBubble: vehicle not found for key id " .. vehicleKeyId
+                )
             end
         else
             Logger.error("ISChat", "TRPC error: received vehicle packet for a vehicle with no key")

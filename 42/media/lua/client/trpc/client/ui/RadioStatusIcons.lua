@@ -1,8 +1,6 @@
-local Coordinates = require('trpc/client/utils/Coordinates')
-
+local Coordinates = require("trpc/client/utils/Coordinates")
 
 local RadioStatusIcons = {}
-
 
 function RadioStatusIcons:update()
     if self.enabled then

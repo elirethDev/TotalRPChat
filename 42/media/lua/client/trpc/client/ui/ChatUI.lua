@@ -26,10 +26,26 @@ function ChatUI:prerender()
         b = 42 / 255,
     }
     local titlebarAlpha = self:calcAlpha(ISChat.minControlOpaque, ISChat.maxGeneralOpaque, self.fade:fraction())
-    self:drawRect(0, 0, self:getWidth(), self:titleBarHeight(), math.max(titlebarAlpha + 0.3, 1),
-        titleBar.r, titleBar.g, titleBar.b)
-    self:drawRect(0, self:titleBarHeight(), self:getWidth(), self:getHeight() - self:titleBarHeight(), titlebarAlpha,
-        background.r, background.g, background.b)
+    self:drawRect(
+        0,
+        0,
+        self:getWidth(),
+        self:titleBarHeight(),
+        math.max(titlebarAlpha + 0.3, 1),
+        titleBar.r,
+        titleBar.g,
+        titleBar.b
+    )
+    self:drawRect(
+        0,
+        self:titleBarHeight(),
+        self:getWidth(),
+        self:getHeight() - self:titleBarHeight(),
+        titlebarAlpha,
+        background.r,
+        background.g,
+        background.b
+    )
     local th = self:titleBarHeight()
     -- self:drawRect(2, 1, self:getWidth() - 4, th - 2, titlebarAlpha, r, g, b)
     -- self:drawTextureScaled(self.titlebarbkg, 2, 1, self:getWidth() - 4, th - 2, titlebarAlpha, 1, 1, 1)
@@ -65,8 +81,16 @@ function ChatUI:render()
         self:clearStencilRect()
     end
     if self.drawFrame then
-        self:drawRectBorder(0, 0, self:getWidth(), height, self.borderColor.a, self.borderColor.r, self.borderColor.g,
-            self.borderColor.b)
+        self:drawRectBorder(
+            0,
+            0,
+            self:getWidth(),
+            height,
+            self.borderColor.a,
+            self.borderColor.r,
+            self.borderColor.g,
+            self.borderColor.b
+        )
     end
 
     if self.drawJoypadFocus then
@@ -79,8 +103,12 @@ function ChatUI.tabPanel:prerender()
     -- if the mouse is over the tab panel and we got a tab to drag, we gonna display it outside
     if ISTabPanel.mouseOut and ISTabPanel.viewDragging and not ISMouseDrag.dragView then
         self:clearStencilRect()
-        self:setStencilRect(0 - self:getAbsoluteX(), 0 - self:getAbsoluteY(), getCore():getScreenWidth(),
-            getCore():getScreenHeight())
+        self:setStencilRect(
+            0 - self:getAbsoluteX(),
+            0 - self:getAbsoluteY(),
+            getCore():getScreenWidth(),
+            getCore():getScreenHeight()
+        )
         -- self:drawRectBorder(self:getMouseX(), self:getMouseY(), ISTabPanel.viewDragging.view:getWidth(),
         --     ISTabPanel.viewDragging.view:getHeight(), 1, 1, 1, 1)
         self:clearStencilRect()
@@ -95,12 +123,17 @@ end
 function ChatUI.tabPanel:render()
     local newViewList = {}
     local tabDragSelected = -1
-    if self.draggingTab and not self.isDragging and ISTabPanel.xMouse > -1 and ISTabPanel.xMouse ~= self:getMouseX() then -- do we move the mouse since we have let the left button down ?
+    if
+        self.draggingTab
+        and not self.isDragging
+        and ISTabPanel.xMouse > -1
+        and ISTabPanel.xMouse ~= self:getMouseX()
+    then -- do we move the mouse since we have let the left button down ?
         self.isDragging = self.allowDraggingTabs
     end
     local tabWidth = self.maxLength
     local inset = 1 -- assumes a 1-pixel window border on the left to avoid
-    local gap = 1   -- gap between tabs
+    local gap = 1 -- gap between tabs
     if self.isDragging and not ISTabPanel.mouseOut then
         -- we fetch all our view to remove the tab of the view we're dragging
         for i, viewObject in ipairs(self.viewList) do
@@ -119,10 +152,26 @@ function ChatUI.tabPanel:render()
         newViewList = self.viewList
     end
     -- our principal rect, wich display our different view
-    self:drawRect(0, self.tabHeight, self.width, self.height - self.tabHeight, self.backgroundColor.a,
-        self.backgroundColor.r, self.backgroundColor.g, self.backgroundColor.b)
-    self:drawRectBorder(0, self.tabHeight, self.width, self.height - self.tabHeight, self.borderColor.a,
-        self.borderColor.r, self.borderColor.g, self.borderColor.b)
+    self:drawRect(
+        0,
+        self.tabHeight,
+        self.width,
+        self.height - self.tabHeight,
+        self.backgroundColor.a,
+        self.backgroundColor.r,
+        self.backgroundColor.g,
+        self.backgroundColor.b
+    )
+    self:drawRectBorder(
+        0,
+        self.tabHeight,
+        self.width,
+        self.height - self.tabHeight,
+        self.borderColor.a,
+        self.borderColor.r,
+        self.borderColor.g,
+        self.borderColor.b
+    )
     local x = inset
     if self.centerTabs and (self:getWidth() >= self:getWidthOfAllTabs()) then
         x = (self:getWidth() - self:getWidthOfAllTabs()) / 2
@@ -166,15 +215,15 @@ function ChatUI.tabPanel:render()
                 end
 
                 if not self.blinkTabAlphaIncrease then
-                    self.blinkTabAlpha = self.blinkTabAlpha -
-                        0.1 * self.tabTransparency * (UIManager.getMillisSinceLastRender() / 33.3)
+                    self.blinkTabAlpha = self.blinkTabAlpha
+                        - 0.1 * self.tabTransparency * (UIManager.getMillisSinceLastRender() / 33.3)
                     if self.blinkTabAlpha < 0 then
                         self.blinkTabAlpha = 0
                         self.blinkTabAlphaIncrease = true
                     end
                 else
-                    self.blinkTabAlpha = self.blinkTabAlpha +
-                        0.1 * self.tabTransparency * (UIManager.getMillisSinceLastRender() / 33.3)
+                    self.blinkTabAlpha = self.blinkTabAlpha
+                        + 0.1 * self.tabTransparency * (UIManager.getMillisSinceLastRender() / 33.3)
                     if self.blinkTabAlpha > self.tabTransparency then
                         self.blinkTabAlpha = self.tabTransparency
                         self.blinkTabAlphaIncrease = false
@@ -196,7 +245,12 @@ function ChatUI.tabPanel:render()
             else
                 -- self:drawTextureScaled(ISTabPanel.tabUnSelected, x, 0, tabWidth, self.tabHeight - 1, self
                 --     .tabTransparency, 1, 1, 1)
-                if self:getMouseY() >= 0 and self:getMouseY() < self.tabHeight and self:isMouseOver() and self:getTabIndexAtX(self:getMouseX()) == i then
+                if
+                    self:getMouseY() >= 0
+                    and self:getMouseY() < self.tabHeight
+                    and self:isMouseOver()
+                    and self:getTabIndexAtX(self:getMouseX()) == i
+                then
                     viewObject.fade:setFadeIn(true)
                 else
                     viewObject.fade:setFadeIn(false)
@@ -233,17 +287,49 @@ function ChatUI.tabPanel:render()
     -- we draw a ghost of our tab we currently dragging
     if self.draggingTab and self.isDragging and not ISTabPanel.mouseOut then
         if self.draggingTab > 0 then
-            self:drawTextureScaled(ISTabPanel.tabSelected,
-                inset + (self.draggingTab * (tabWidth + gap)) + (self:getMouseX() - ISTabPanel.xMouse), 0, tabWidth,
-                self.tabHeight - 1, 0.8, 1, 1, 1)
-            self:drawTextCentre(ISTabPanel.viewDragging.name,
+            self:drawTextureScaled(
+                ISTabPanel.tabSelected,
+                inset + (self.draggingTab * (tabWidth + gap)) + (self:getMouseX() - ISTabPanel.xMouse),
+                0,
+                tabWidth,
+                self.tabHeight - 1,
+                0.8,
+                1,
+                1,
+                1
+            )
+            self:drawTextCentre(
+                ISTabPanel.viewDragging.name,
                 inset + (self.draggingTab * (tabWidth + gap)) + (self:getMouseX() - ISTabPanel.xMouse) + (tabWidth / 2),
-                3, 1, 1, 1, 1, UIFont.Normal)
+                3,
+                1,
+                1,
+                1,
+                1,
+                UIFont.Normal
+            )
         else
-            self:drawTextureScaled(ISTabPanel.tabSelected, inset + (self:getMouseX() - ISTabPanel.xMouse), 0, tabWidth,
-                self.tabHeight - 1, 0.8, 1, 1, 1)
-            self:drawTextCentre(ISTabPanel.viewDragging.name,
-                inset + (self:getMouseX() - ISTabPanel.xMouse) + (tabWidth / 2), 3, 1, 1, 1, 1, UIFont.Normal)
+            self:drawTextureScaled(
+                ISTabPanel.tabSelected,
+                inset + (self:getMouseX() - ISTabPanel.xMouse),
+                0,
+                tabWidth,
+                self.tabHeight - 1,
+                0.8,
+                1,
+                1,
+                1
+            )
+            self:drawTextCentre(
+                ISTabPanel.viewDragging.name,
+                inset + (self:getMouseX() - ISTabPanel.xMouse) + (tabWidth / 2),
+                3,
+                1,
+                1,
+                1,
+                1,
+                UIFont.Normal
+            )
         end
     end
 end

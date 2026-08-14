@@ -1,8 +1,8 @@
-local coordinates = require('trpc/client/utils/coordinates')
+local coordinates = require("trpc/client/utils/coordinates")
 
 local RangeIndicator = ISUIElement:derive("RangeIndicator")
 
-local RectTexturePath = 'media/ui/trpc/indicator/white-rectangle.png'
+local RectTexturePath = "media/ui/trpc/indicator/white-rectangle.png"
 local function PreLoadTextures()
     getTexture(RectTexturePath)
 end
@@ -10,26 +10,23 @@ end
 -- draw a square at the center and parts of losanges on the borders to avoid
 -- drawing too many losanges and hurt the performances
 function RangeIndicator:render(z)
-    if (z ~= nil and z ~= 0) then
+    if z ~= nil and z ~= 0 then
         return
     end
-    local width         = 128
-    local height        = 64
-    local alpha         = 0.02
+    local width = 128
+    local height = 64
+    local alpha = 0.02
     local squareOffsetX = self.object:getX() - math.floor(self.object:getX())
     local squareOffsetY = self.object:getY() - math.floor(self.object:getY())
-
 
     local xOffset = (squareOffsetX - squareOffsetY) * (width / 2)
     local yOffset = (squareOffsetX + squareOffsetY) * (height / 2) - (height / 2)
 
-
     local rectTexture = getTexture(RectTexturePath)
 
-
     local x, y = coordinates.CenterBaseOfObjectNoZoom(self.object)
-    x          = math.floor(x - xOffset)
-    y          = math.floor(y - yOffset)
+    x = math.floor(x - xOffset)
+    y = math.floor(y - yOffset)
     if self.range <= 120 then
         for j = 0, self.range do
             local i = -self.range + math.abs(j)
@@ -40,7 +37,8 @@ function RangeIndicator:render(z)
             local xBTile = j * width / 2 + i * width / 2
             local yBTile = -j * height / 2 + i * height / 2
 
-            self:drawTextureAllPoint(rectTexture,
+            self:drawTextureAllPoint(
+                rectTexture,
                 x + xTTile - 2,
                 y + yTTile - height / 2,
                 x + xTTile + 2,
@@ -50,9 +48,13 @@ function RangeIndicator:render(z)
                 y + yBTile - 1,
                 x + xBTile + width / 2,
                 y + yBTile + 1,
-                self.color[1] / 255, self.color[2] / 255, self.color[3] / 255,
-                alpha)
-            self:drawTextureAllPoint(rectTexture,
+                self.color[1] / 255,
+                self.color[2] / 255,
+                self.color[3] / 255,
+                alpha
+            )
+            self:drawTextureAllPoint(
+                rectTexture,
                 x - (xTTile - 2),
                 y - (yTTile - height / 2),
                 x - (xTTile + 2),
@@ -62,9 +64,13 @@ function RangeIndicator:render(z)
                 y - (yBTile - 1),
                 x - (xBTile + width / 2),
                 y - (yBTile + 1),
-                self.color[1] / 255, self.color[2] / 255, self.color[3] / 255,
-                alpha)
-            self:drawTextureAllPoint(rectTexture,
+                self.color[1] / 255,
+                self.color[2] / 255,
+                self.color[3] / 255,
+                alpha
+            )
+            self:drawTextureAllPoint(
+                rectTexture,
                 x + xTTile - 2,
                 y - (yTTile - height / 2),
                 x + xTTile + 2,
@@ -74,9 +80,13 @@ function RangeIndicator:render(z)
                 y - (yBTile - 1),
                 x + xBTile + width / 2,
                 y - (yBTile + 1),
-                self.color[1] / 255, self.color[2] / 255, self.color[3] / 255,
-                alpha)
-            self:drawTextureAllPoint(rectTexture,
+                self.color[1] / 255,
+                self.color[2] / 255,
+                self.color[3] / 255,
+                alpha
+            )
+            self:drawTextureAllPoint(
+                rectTexture,
                 x - (xTTile - 2),
                 y + yTTile - height / 2,
                 x - (xTTile + 2),
@@ -86,8 +96,11 @@ function RangeIndicator:render(z)
                 y + yBTile - 1,
                 x - (xBTile + width / 2),
                 y + yBTile + 1,
-                self.color[1] / 255, self.color[2] / 255, self.color[3] / 255,
-                alpha)
+                self.color[1] / 255,
+                self.color[2] / 255,
+                self.color[3] / 255,
+                alpha
+            )
         end
     end
 end

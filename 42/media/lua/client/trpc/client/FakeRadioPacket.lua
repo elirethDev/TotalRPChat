@@ -1,14 +1,13 @@
-local Character = require('trpc/shared/utils/Character')
-local World     = require('trpc/shared/utils/World')
+local Character = require("trpc/shared/utils/Character")
+local World = require("trpc/shared/utils/World")
 local Logger = require("trpc/core/Logger")
-
 
 local FakeRadioPacket = {}
 
 local function GetSquaresRadiosPositions(player, range, frequency)
     local radiosResult = {}
     local radioMaxRange = range
-    local radios = World.getItemsInRangeByGroup(player, radioMaxRange, 'IsoRadio')
+    local radios = World.getItemsInRangeByGroup(player, radioMaxRange, "IsoRadio")
     local found = false
     for _, radio in pairs(radios) do
         local pos = {
@@ -20,7 +19,9 @@ local function GetSquaresRadiosPositions(player, range, frequency)
         if radioData ~= nil then
             local radioFrequency = radioData:getChannel()
             local turnedOn = radioData:getIsTurnedOn()
-            if turnedOn and radioFrequency == frequency
+            if
+                turnedOn
+                and radioFrequency == frequency
                 and Character.canHearRadioSound(player, radio, radioData, range)
             then
                 table.insert(radiosResult, {
@@ -35,7 +36,7 @@ end
 
 local function GetPlayerRadiosPositions(player, range, frequency)
     local radiosResult = {}
-    local radio = Character.getFirstHandOrBeltItemByGroup(player, 'Radio')
+    local radio = Character.getFirstHandOrBeltItemByGroup(player, "Radio")
     local found = false
     if radio == nil then
         return radiosResult
@@ -47,11 +48,9 @@ local function GetPlayerRadiosPositions(player, range, frequency)
         --  1 earbuds
         local hasHeadphones = radioData:getHeadphoneType() >= 0
         local radioFrequency = radioData:getChannel()
-        if radioData:getIsTurnedOn() and radioFrequency == frequency
-            and not hasHeadphones
-        then
+        if radioData:getIsTurnedOn() and radioFrequency == frequency and not hasHeadphones then
             table.insert(radiosResult, {
-                username = player:getUsername()
+                username = player:getUsername(),
             })
             found = true
         end
@@ -65,16 +64,18 @@ local function GetVehiclesRadiosPositions(player, range, frequency)
     local vehicles = World.getVehiclesInRange(player, radioMaxRange)
     local found = false
     for _, vehicle in pairs(vehicles) do
-        local radio = vehicle:getPartById('Radio')
+        local radio = vehicle:getPartById("Radio")
         if radio ~= nil then
             local radioData = radio:getDeviceData()
             if radioData ~= nil then
                 local radioFrequency = radioData:getChannel()
-                if radioData:getIsTurnedOn() and radioFrequency == frequency
+                if
+                    radioData:getIsTurnedOn()
+                    and radioFrequency == frequency
                     and Character.canHearRadioSound(player, vehicle, radioData, range)
                 then
                     table.insert(radiosResult, {
-                        key = vehicle:getKeyId()
+                        key = vehicle:getKeyId(),
                     })
                     found = true
                 end
@@ -90,15 +91,15 @@ end
 function FakeRadioPacket.getListeningRadiosPositions(player, range, frequency)
     local radios = {}
     if player == nil then
-        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: player is null')
+        Logger.error("FakeRadioPacket", "TRPC error: FakeRadioPacket.getListeningRadiosPositions: player is null")
         return nil
     end
     if range == nil then
-        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: range is null')
+        Logger.error("FakeRadioPacket", "TRPC error: FakeRadioPacket.getListeningRadiosPositions: range is null")
         return nil
     end
     if frequency == nil then
-        Logger.error('FakeRadioPacket', 'TRPC error: FakeRadioPacket.getListeningRadiosPositions: frequency is null')
+        Logger.error("FakeRadioPacket", "TRPC error: FakeRadioPacket.getListeningRadiosPositions: frequency is null")
         return nil
     end
     local squaresRadios, squaresRadiosFound = GetSquaresRadiosPositions(player, range, frequency)

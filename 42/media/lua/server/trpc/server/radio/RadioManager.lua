@@ -1,7 +1,7 @@
 ---@diagnostic disable: trailing-space
-local Character = require('trpc/shared/utils/Character')
-local FakeRadio = require('trpc/server/radio/FakeRadio')
-local World = require('trpc/shared/utils/World')
+local Character = require("trpc/shared/utils/Character")
+local FakeRadio = require("trpc/server/radio/FakeRadio")
+local World = require("trpc/shared/utils/World")
 local Logger = require("trpc/core/Logger")
 
 local RadioManager = {}
@@ -9,10 +9,7 @@ local RadioManager = {}
 local function FormatCache(squares, vehicles)
     local cacheSquares = {}
     for key, square in pairs(squares) do
-        table.insert(
-            cacheSquares,
-            { x = square:getX(), y = square:getY(), z = square:getZ() }
-        )
+        table.insert(cacheSquares, { x = square:getX(), y = square:getY(), z = square:getZ() })
     end
     local cacheVehicles = {}
     for key, vehicle in pairs(vehicles) do
@@ -26,40 +23,47 @@ end
 
 function RadioManager:save()
     local cacheData = FormatCache(self.squares, self.vehicles)
-    ModData.add('trpcRadioCache', cacheData)
+    ModData.add("trpcRadioCache", cacheData)
 end
 
 local function ReadCache(cache)
     local squares = {}
-    local cacheSquares = cache['squares']
+    local cacheSquares = cache["squares"]
     if cacheSquares == nil then
-        Logger.error('RadioManager', 'TRPC error: ReadCache: received cache data without squares object')
+        Logger.error("RadioManager", "TRPC error: ReadCache: received cache data without squares object")
         return
     end
     local squaresCount = 0
     for _, pos in pairs(cacheSquares) do
-        local square = getSquare(pos['x'], pos['y'], pos['z'])
+        local square = getSquare(pos["x"], pos["y"], pos["z"])
         if square ~= nil then
-            local key = math.abs(pos['x']) .. ',' .. math.abs(pos['y']) .. ',' .. math.abs(pos['z'])
+            local key = math.abs(pos["x"]) .. "," .. math.abs(pos["y"]) .. "," .. math.abs(pos["z"])
             squares[key] = square
             squaresCount = squaresCount + 1
         else
-            Logger.error('RadioManager', 
-                'TRPC error: ReadCache: found null square in radio cache file at: (' ..
-                pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
+            Logger.error(
+                "RadioManager",
+                "TRPC error: ReadCache: found null square in radio cache file at: ("
+                    .. pos["x"]
+                    .. ", "
+                    .. pos["y"]
+                    .. ", "
+                    .. pos["z"]
+                    .. ")"
+            )
         end
     end
-    Logger.info('RadioManager', 'TRPC info: ' .. squaresCount .. ' squares found in cache')
+    Logger.info("RadioManager", "TRPC info: " .. squaresCount .. " squares found in cache")
 
     local vehicles = {}
-    local cacheVehicles = cache['vehicles']
+    local cacheVehicles = cache["vehicles"]
     if cacheVehicles == nil then
-        Logger.error('RadioManager', 'TRPC error: ReadCache: received cache data without vehicles object')
+        Logger.error("RadioManager", "TRPC error: ReadCache: received cache data without vehicles object")
         return
     end
     local vehiclesCount = 0
     for key, pos in pairs(cacheVehicles) do
-        local square = getSquare(pos['x'], pos['y'], pos['z'])
+        local square = getSquare(pos["x"], pos["y"], pos["z"])
         if square ~= nil then
             local vehicle = square:getVehicleContainer()
             if vehicle ~= nil then
@@ -68,32 +72,56 @@ local function ReadCache(cache)
                     vehicles[key] = vehicle
                     vehiclesCount = vehiclesCount + 1
                 else
-                    Logger.error('RadioManager', 
-                        'TRPC error: ReadCache: vehicle has unexpected key id ' ..
-                        vehicleId .. ' on square in radio cache file at: (' ..
-                        pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ') ' .. key .. ' was expected')
+                    Logger.error(
+                        "RadioManager",
+                        "TRPC error: ReadCache: vehicle has unexpected key id "
+                            .. vehicleId
+                            .. " on square in radio cache file at: ("
+                            .. pos["x"]
+                            .. ", "
+                            .. pos["y"]
+                            .. ", "
+                            .. pos["z"]
+                            .. ") "
+                            .. key
+                            .. " was expected"
+                    )
                 end
             else
-                Logger.error('RadioManager', 
-                    'TRPC error: ReadCache: no vehicle found on square in radio cache file at: (' ..
-                    pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
+                Logger.error(
+                    "RadioManager",
+                    "TRPC error: ReadCache: no vehicle found on square in radio cache file at: ("
+                        .. pos["x"]
+                        .. ", "
+                        .. pos["y"]
+                        .. ", "
+                        .. pos["z"]
+                        .. ")"
+                )
             end
         else
-            Logger.error('RadioManager', 
-                'TRPC error: ReadCache: found null vehicle square in radio cache file at: (' ..
-                pos['x'] .. ', ' .. pos['y'] .. ', ' .. pos['z'] .. ')')
+            Logger.error(
+                "RadioManager",
+                "TRPC error: ReadCache: found null vehicle square in radio cache file at: ("
+                    .. pos["x"]
+                    .. ", "
+                    .. pos["y"]
+                    .. ", "
+                    .. pos["z"]
+                    .. ")"
+            )
         end
     end
-    Logger.info('RadioManager', 'TRPC info: ' .. vehiclesCount .. ' vehicles found in cache')
+    Logger.info("RadioManager", "TRPC info: " .. vehiclesCount .. " vehicles found in cache")
 
     return squares, vehicles
 end
 
 function RadioManager:load()
-    local cache = ModData.getOrCreate('trpcRadioCache')
-    Logger.info('RadioManager', 'TRPC info: loading cache')
+    local cache = ModData.getOrCreate("trpcRadioCache")
+    Logger.info("RadioManager", "TRPC info: loading cache")
     if cache == nil then
-        Logger.info('RadioManager', 'TRPC info: no cache found')
+        Logger.info("RadioManager", "TRPC info: no cache found")
         return
     end
     local squares, vehicles = ReadCache(cache)
@@ -107,7 +135,7 @@ function RadioManager:subscribeSquare(square)
     if not self.loaded then
         self:load()
     end
-    local key = math.abs(square:getX()) .. ',' .. math.abs(square:getY()) .. ',' .. math.abs(square:getZ())
+    local key = math.abs(square:getX()) .. "," .. math.abs(square:getY()) .. "," .. math.abs(square:getZ())
     local squareWasUnassigned = self.squares[key] == nil
     self.squares[key] = square
     if squareWasUnassigned then
@@ -133,7 +161,7 @@ function RadioManager:executeSquare(action)
         if square == nil then
             table.insert(radiosToDelete, key)
         else
-            local radio = World.getFirstSquareItem(square, 'IsoRadio')
+            local radio = World.getFirstSquareItem(square, "IsoRadio")
             if radio == nil then
                 table.insert(radiosToDelete, key)
             else
@@ -156,7 +184,7 @@ function RadioManager:executeVehicle(action)
         if vehicle == nil then
             table.insert(radiosToDelete, key)
         else
-            local radio = vehicle:getPartById('Radio')
+            local radio = vehicle:getPartById("Radio")
             if radio == nil then
                 table.insert(radiosToDelete, key)
             else
@@ -188,49 +216,42 @@ function RadioManager:makeNoise(frequency, range)
     if not self.loaded then
         self:load()
     end
-    self:execute(
-        function(source, radio)
+    self:execute(function(source, radio)
+        local radioData = radio:getDeviceData()
+        if radioData ~= nil then
+            local radioFrequency = radioData:getChannel()
+
+            -- -1 nothing
+            --  0 headphones
+            --  1 earbuds
+            local hasHeadphones = radioData:getHeadphoneType() >= 0
+            if radioData:getIsTurnedOn() and radioFrequency == frequency and not hasHeadphones then
+                local radioRange = Character.getRadioRange(radioData, range)
+                addSound(source, source:getX(), source:getY(), source:getZ(), radioRange, radioRange)
+            end
+        end
+    end)
+    World.forAllPlayers(function(player)
+        local radio = Character.getFirstHandOrBeltItemByGroup(player, "Radio")
+        if radio ~= nil then
             local radioData = radio:getDeviceData()
             if radioData ~= nil then
                 local radioFrequency = radioData:getChannel()
+                local turnedOn = radioData:getIsTurnedOn()
+                -- TODO
+                -- local volume = radioData:getDeviceVolume()
 
                 -- -1 nothing
                 --  0 headphones
                 --  1 earbuds
                 local hasHeadphones = radioData:getHeadphoneType() >= 0
-                if radioData:getIsTurnedOn()
-                    and radioFrequency == frequency
-                    and not hasHeadphones
-                then
+                if turnedOn and radioFrequency == frequency and not hasHeadphones then
                     local radioRange = Character.getRadioRange(radioData, range)
-                    addSound(source, source:getX(), source:getY(), source:getZ(), radioRange, radioRange)
+                    addSound(player, player:getX(), player:getY(), player:getZ(), radioRange, radioRange)
                 end
             end
         end
-    )
-    World.forAllPlayers(
-        function(player)
-            local radio = Character.getFirstHandOrBeltItemByGroup(player, 'Radio')
-            if radio ~= nil then
-                local radioData = radio:getDeviceData()
-                if radioData ~= nil then
-                    local radioFrequency = radioData:getChannel()
-                    local turnedOn = radioData:getIsTurnedOn()
-                    -- TODO
-                    -- local volume = radioData:getDeviceVolume()
-
-                    -- -1 nothing
-                    --  0 headphones
-                    --  1 earbuds
-                    local hasHeadphones = radioData:getHeadphoneType() >= 0
-                    if turnedOn and radioFrequency == frequency and not hasHeadphones then
-                        local radioRange = Character.getRadioRange(radioData, range)
-                        addSound(player, player:getX(), player:getY(), player:getZ(), radioRange, radioRange)
-                    end
-                end
-            end
-        end
-    )
+    end)
 end
 
 function RadioManager:getOrCreateFakeBeltRadio(player)

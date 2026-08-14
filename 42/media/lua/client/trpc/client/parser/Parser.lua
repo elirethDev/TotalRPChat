@@ -1,7 +1,7 @@
-local TokenBold = require 'trpc/client/lexer/TokenBold'
-local TokenItalic = require 'trpc/client/lexer/TokenItalic'
-local TokenRoot = require 'trpc/client/lexer/TokenRoot'
-local TokenString = require 'trpc/client/lexer/TokenString'
+local TokenBold = require("trpc/client/lexer/TokenBold")
+local TokenItalic = require("trpc/client/lexer/TokenItalic")
+local TokenRoot = require("trpc/client/lexer/TokenRoot")
+local TokenString = require("trpc/client/lexer/TokenString")
 
 local Parser = {}
 
@@ -17,13 +17,13 @@ local function GetTag(message, indexStart, tag)
         index = index + 1
     end
     return {
-        ['first'] = indexStart,
-        ['last'] = index - 1 + indexStart - 1,
-        ['tag'] = tag,
+        ["first"] = indexStart,
+        ["last"] = index - 1 + indexStart - 1,
+        ["tag"] = tag,
     }
 end
 
-local tags = { '**', '*', '__', '_' }
+local tags = { "**", "*", "__", "_" }
 local function ListTags(message)
     local list = {}
     local index = 1
@@ -46,13 +46,13 @@ local function ListTags(message)
 end
 
 local function CreateToken(tag, message, childs)
-    if tag == '**' then
+    if tag == "**" then
         return TokenBold:new(message, childs)
-    elseif tag == '*' then
+    elseif tag == "*" then
         return TokenItalic:new(message, childs)
-    elseif tag == '__' then
+    elseif tag == "__" then
         return TokenBold:new(message, childs)
-    elseif tag == '_' then
+    elseif tag == "_" then
         return TokenItalic:new(message, childs)
     else
         error('unknown tag "' .. tag .. '"')
@@ -69,14 +69,18 @@ local function SubTokenize(message, messageStart, messageEnd, tagsFound, indexSt
             if tagsFound[index].tag == tagsFound[indexMatch].tag then
                 matchTagFound = true
                 if messageIndex ~= tagsFound[index].first then
-                    local tokenString = TokenString:new(
-                        string.sub(message, messageIndex, tagsFound[index].first - 1))
+                    local tokenString = TokenString:new(string.sub(message, messageIndex, tagsFound[index].first - 1))
                     table.insert(tokens, tokenString)
                 end
-                local subMessage = string.sub(
-                    message, tagsFound[index].last + 1, tagsFound[indexMatch].first - 1)
-                local childTokens = SubTokenize(message, tagsFound[index].last + 1, tagsFound[indexMatch].first - 1,
-                    tagsFound, index + 1, indexMatch - 1)
+                local subMessage = string.sub(message, tagsFound[index].last + 1, tagsFound[indexMatch].first - 1)
+                local childTokens = SubTokenize(
+                    message,
+                    tagsFound[index].last + 1,
+                    tagsFound[indexMatch].first - 1,
+                    tagsFound,
+                    index + 1,
+                    indexMatch - 1
+                )
                 local newToken = CreateToken(tagsFound[index].tag, subMessage, childTokens)
                 table.insert(tokens, newToken)
                 index = indexMatch + 1
@@ -89,8 +93,7 @@ local function SubTokenize(message, messageStart, messageEnd, tagsFound, indexSt
         end
     end
     if messageIndex <= messageEnd then
-        local tokenString = TokenString:new(
-            string.sub(message, messageIndex, messageEnd))
+        local tokenString = TokenString:new(string.sub(message, messageIndex, messageEnd))
         table.insert(tokens, tokenString)
     end
     return tokens
@@ -104,18 +107,15 @@ local function FormatMessage(message, defaultColor, wrapWords, maxBubbleLength)
     local tagsFound = ListTags(message)
     local token = Tokenize(message, tagsFound, defaultColor)
     local wrappedMessage, wrappedRawMessage = token:format(false, wrapWords, maxBubbleLength)
-    return token:format(false),
-        wrappedMessage,
-        wrappedRawMessage
+    return token:format(false), wrappedMessage, wrappedRawMessage
 end
 
 function Parser.ParseTrpcMessage(message, defaultColor, wrapWords, maxBubbleLength)
-    local chatMessage, bubbleMessage, rawMessage = FormatMessage(message, defaultColor, wrapWords,
-        maxBubbleLength)
+    local chatMessage, bubbleMessage, rawMessage = FormatMessage(message, defaultColor, wrapWords, maxBubbleLength)
     return {
-        ['body'] = chatMessage,
-        ['bubble'] = bubbleMessage,
-        ['rawMessage'] = rawMessage,
+        ["body"] = chatMessage,
+        ["bubble"] = bubbleMessage,
+        ["rawMessage"] = rawMessage,
     }
 end
 

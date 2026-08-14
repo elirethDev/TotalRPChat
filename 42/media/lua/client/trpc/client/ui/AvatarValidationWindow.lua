@@ -1,13 +1,10 @@
-require('ISUI/ISCollapsableWindow')
+require("ISUI/ISCollapsableWindow")
 
-
-local AvatarManager = require('trpc/client/AvatarManager')
-local ClientSend = require('trpc/client/network/ClientSend')
+local AvatarManager = require("trpc/client/AvatarManager")
+local ClientSend = require("trpc/client/network/ClientSend")
 local Logger = require("trpc/core/Logger")
 
-
-local AvatarValidationWindow = ISCollapsableWindow:derive('AvatarValidationWindow')
-
+local AvatarValidationWindow = ISCollapsableWindow:derive("AvatarValidationWindow")
 
 local FONT_HGT_NORMAL = getTextManager():getFontHeight(UIFont.Normal)
 local lineSpace = 2
@@ -31,27 +28,35 @@ end
 local voteButtonWidth = 32
 local voteButtonHeight = 32
 function AvatarValidationWindow:onMouseUp(x, y)
-    if self._rejectButtonState == true and
-        x > leftMargin and
-        x < leftMargin + voteButtonWidth and
-        y > avatarCellHeight - voteButtonHeight + topMargin and
-        y < avatarCellHeight + topMargin
+    if
+        self._rejectButtonState == true
+        and x > leftMargin
+        and x < leftMargin + voteButtonWidth
+        and y > avatarCellHeight - voteButtonHeight + topMargin
+        and y < avatarCellHeight + topMargin
     then
         self:rejectAvatar()
         AvatarManager:removeAvatarPending(
-            self._avatar['username'], self._avatar['firstName'],
-            self._avatar['lastName'], self._avatar['checksum'])
+            self._avatar["username"],
+            self._avatar["firstName"],
+            self._avatar["lastName"],
+            self._avatar["checksum"]
+        )
         self._avatar = nil
-    elseif self._approveButtonState == true and
-        x > leftMargin + avatarCellWidth - voteButtonWidth and
-        x < leftMargin + avatarCellWidth and
-        y > avatarCellHeight - voteButtonHeight + topMargin and
-        y < avatarCellHeight + topMargin
+    elseif
+        self._approveButtonState == true
+        and x > leftMargin + avatarCellWidth - voteButtonWidth
+        and x < leftMargin + avatarCellWidth
+        and y > avatarCellHeight - voteButtonHeight + topMargin
+        and y < avatarCellHeight + topMargin
     then
         self:approveAvatar()
         AvatarManager:removeAvatarPending(
-            self._avatar['username'], self._avatar['firstName'],
-            self._avatar['lastName'], self._avatar['checksum'])
+            self._avatar["username"],
+            self._avatar["firstName"],
+            self._avatar["lastName"],
+            self._avatar["checksum"]
+        )
         self._avatar = nil
     end
     self._rejectButtonState = false
@@ -60,16 +65,18 @@ function AvatarValidationWindow:onMouseUp(x, y)
 end
 
 function AvatarValidationWindow:onMouseDown(x, y)
-    if x > leftMargin and
-        x < leftMargin + voteButtonWidth and
-        y > avatarCellHeight - voteButtonHeight + topMargin and
-        y < avatarCellHeight + topMargin
+    if
+        x > leftMargin
+        and x < leftMargin + voteButtonWidth
+        and y > avatarCellHeight - voteButtonHeight + topMargin
+        and y < avatarCellHeight + topMargin
     then
         self._rejectButtonState = true
-    elseif x > leftMargin + avatarCellWidth - voteButtonWidth and
-        x < leftMargin + avatarCellWidth and
-        y > avatarCellHeight - voteButtonHeight + topMargin and
-        y < avatarCellHeight + topMargin
+    elseif
+        x > leftMargin + avatarCellWidth - voteButtonWidth
+        and x < leftMargin + avatarCellWidth
+        and y > avatarCellHeight - voteButtonHeight + topMargin
+        and y < avatarCellHeight + topMargin
     then
         self._approveButtonState = true
     else
@@ -89,9 +96,14 @@ end
 
 function AvatarValidationWindow:render()
     self._parentClass.render(self)
-    if self._avatar == nil or
-        not AvatarManager:isPendingAvatarAlive(self._avatar['username'],
-            self._avatar['firstName'], self._avatar['lastName'], self._avatar['checksum'])
+    if
+        self._avatar == nil
+        or not AvatarManager:isPendingAvatarAlive(
+            self._avatar["username"],
+            self._avatar["firstName"],
+            self._avatar["lastName"],
+            self._avatar["checksum"]
+        )
     then
         self._avatar = AvatarManager:getFirstAvatarPending()
     end
@@ -113,7 +125,7 @@ function AvatarValidationWindow:createChildren()
     self.closeButton.backgroundColor.a = 0
     self.closeButton.backgroundColorMouseOver.a = 0.5
     self.closeButton:setImage(self.closeButtonTexture)
-    self.closeButton:setUIName('avatar validator window close button')
+    self.closeButton:setUIName("avatar validator window close button")
     self:addChild(self.closeButton)
 end
 
@@ -121,7 +133,7 @@ function AvatarValidationWindow:drawAvatarChoice()
     if self._avatar == nil then
         return
     end
-    local texture = self._avatar['texture']
+    local texture = self._avatar["texture"]
     -- TODO: invalidate bad size
     local x = 20 + leftMargin
     local y = 44 + topMargin -- magic number I'm really lazy
@@ -134,31 +146,32 @@ function AvatarValidationWindow:drawAvatarText()
     end
     local alpha = 1
     local x = (avatarCellWidth + leftMargin + rightMargin) / 2
-    self:drawTextCentre(self._avatar['username'],
-        x, topMargin + FONT_HGT_NORMAL,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
-    local name = '"' .. self._avatar['firstName'] .. ' ' .. self._avatar['lastName'] .. '"'
-    self:drawTextCentre(name,
-        x, topMargin + FONT_HGT_NORMAL * 2 + lineSpace,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    self:drawTextCentre(self._avatar["username"], x, topMargin + FONT_HGT_NORMAL, 1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    local name = '"' .. self._avatar["firstName"] .. " " .. self._avatar["lastName"] .. '"'
+    self:drawTextCentre(name, x, topMargin + FONT_HGT_NORMAL * 2 + lineSpace, 1.0, 1.0, 1.0, alpha, UIFont.Normal)
 end
 
 function AvatarValidationWindow:drawNoMoreAvatarText()
     local alpha = 1
-    local text = 'No avatar request'
-    local text2 = 'to process'
+    local text = "No avatar request"
+    local text2 = "to process"
     local x = (avatarCellWidth + leftMargin + rightMargin) / 2
-    self:drawTextCentre(text,
-        x, avatarCellHeight / 2,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
-    self:drawTextCentre(text2,
-        x, avatarCellHeight / 2 + FONT_HGT_NORMAL + lineSpace,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    self:drawTextCentre(text, x, avatarCellHeight / 2, 1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    self:drawTextCentre(
+        text2,
+        x,
+        avatarCellHeight / 2 + FONT_HGT_NORMAL + lineSpace,
+        1.0,
+        1.0,
+        1.0,
+        alpha,
+        UIFont.Normal
+    )
 end
 
 function AvatarValidationWindow:drawButtons()
-    local rejectButtonTexture = getTexture('media/ui/emotes/thumbdown_red.png')
-    local approveButtonTexture = getTexture('media/ui/emotes/thumbup_green.png')
+    local rejectButtonTexture = getTexture("media/ui/emotes/thumbdown_red.png")
+    local approveButtonTexture = getTexture("media/ui/emotes/thumbup_green.png")
     local y = avatarCellHeight - voteButtonHeight + topMargin
     local r, g, b = 1.0, 1.0, 1.0
     if self._rejectButtonState == true then
@@ -177,7 +190,7 @@ function AvatarValidationWindow:subscribe()
     self:addToUIManager()
     self:setResizable(false)
     self:setVisible(true)
-    ISLayoutManager.RegisterWindow('avatar validation window', ISCollapsableWindow, self)
+    ISLayoutManager.RegisterWindow("avatar validation window", ISCollapsableWindow, self)
 end
 
 function AvatarValidationWindow:unsubscribe()
@@ -188,17 +201,18 @@ function AvatarValidationWindow:approveAvatar()
     if self._avatar == nil then
         return
     end
-    local username  = self._avatar['username']
-    local firstName = self._avatar['firstName']
-    local lastName  = self._avatar['lastName']
-    local checksum  = self._avatar['checksum']
-    assert(type(username) == 'string', 'TRPC error: rejectAvatar: missing username')
-    assert(type(firstName) == 'string', 'TRPC error: rejectAvatar: missing firstName')
-    assert(type(lastName) == 'string', 'TRPC error: rejectAvatar: missing lastName')
-    assert(type(checksum) == 'number', 'TRPC error: rejectAvatar: missing checksum')
-    Logger.info('AvatarValidationWindow', 'TRPC info: avatar approved: ' ..
-        username ..
-        ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
+    local username = self._avatar["username"]
+    local firstName = self._avatar["firstName"]
+    local lastName = self._avatar["lastName"]
+    local checksum = self._avatar["checksum"]
+    assert(type(username) == "string", "TRPC error: rejectAvatar: missing username")
+    assert(type(firstName) == "string", "TRPC error: rejectAvatar: missing firstName")
+    assert(type(lastName) == "string", "TRPC error: rejectAvatar: missing lastName")
+    assert(type(checksum) == "number", "TRPC error: rejectAvatar: missing checksum")
+    Logger.info(
+        "AvatarValidationWindow",
+        "TRPC info: avatar approved: " .. username .. ' "' .. firstName .. " " .. lastName .. '" (' .. checksum .. ")"
+    )
     ClientSend.sendApprovePendingAvatar(username, firstName, lastName, checksum)
 end
 
@@ -206,17 +220,18 @@ function AvatarValidationWindow:rejectAvatar()
     if self._avatar == nil then
         return
     end
-    local username  = self._avatar['username']
-    local firstName = self._avatar['firstName']
-    local lastName  = self._avatar['lastName']
-    local checksum  = self._avatar['checksum']
-    assert(type(username) == 'string', 'TRPC error: rejectAvatar: missing username')
-    assert(type(firstName) == 'string', 'TRPC error: rejectAvatar: missing firstName')
-    assert(type(lastName) == 'string', 'TRPC error: rejectAvatar: missing lastName')
-    assert(type(checksum) == 'number', 'TRPC error: rejectAvatar: missing checksum')
-    Logger.info('AvatarValidationWindow', 'TRPC info: avatar rejected: ' ..
-        username ..
-        ' "' .. firstName .. ' ' .. lastName .. '" (' .. checksum .. ')')
+    local username = self._avatar["username"]
+    local firstName = self._avatar["firstName"]
+    local lastName = self._avatar["lastName"]
+    local checksum = self._avatar["checksum"]
+    assert(type(username) == "string", "TRPC error: rejectAvatar: missing username")
+    assert(type(firstName) == "string", "TRPC error: rejectAvatar: missing firstName")
+    assert(type(lastName) == "string", "TRPC error: rejectAvatar: missing lastName")
+    assert(type(checksum) == "number", "TRPC error: rejectAvatar: missing checksum")
+    Logger.info(
+        "AvatarValidationWindow",
+        "TRPC info: avatar rejected: " .. username .. ' "' .. firstName .. " " .. lastName .. '" (' .. checksum .. ")"
+    )
     ClientSend.sendRejectPendingAvatar(username, firstName, lastName, checksum)
 end
 

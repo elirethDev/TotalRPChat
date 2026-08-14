@@ -1,11 +1,11 @@
-local AToken = require('trpc/client/lexer/AToken')
+local AToken = require("trpc/client/lexer/AToken")
 
 local TokenItalic = {}
 
 TokenItalic.color = {
     93,
     255,
-    60
+    60,
 }
 
 function TokenItalic:new(message, childs)
@@ -18,14 +18,14 @@ end
 
 function TokenItalic:getColor()
     if TrpcServerSettings ~= nil then
-        return TrpcServerSettings['markdown']['italic']['color']
+        return TrpcServerSettings["markdown"]["italic"]["color"]
     else
         return TokenItalic.color
     end
 end
 
 function TokenItalic.getName()
-    return 'italic'
+    return "italic"
 end
 
 function TokenItalic.getTagSize()
@@ -33,7 +33,7 @@ function TokenItalic.getTagSize()
 end
 
 function TokenItalic.getTag()
-    return '*'
+    return "*"
 end
 
 return TokenItalic

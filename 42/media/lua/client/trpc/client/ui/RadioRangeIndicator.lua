@@ -1,10 +1,9 @@
-local RangeIndicator      = require('trpc/client/ui/RangeIndicator')
-local Character           = require('trpc/shared/utils/Character')
-local World               = require('trpc/shared/utils/World')
-local RadioStatusIcons    = require('trpc/client/ui/RadioStatusIcons')
+local RangeIndicator = require("trpc/client/ui/RangeIndicator")
+local Character = require("trpc/shared/utils/Character")
+local World = require("trpc/shared/utils/World")
+local RadioStatusIcons = require("trpc/client/ui/RadioStatusIcons")
 
 local RadioRangeIndicator = {}
-
 
 local Colors = {
     { 235, 255, 000 },
@@ -16,7 +15,6 @@ local Colors = {
 }
 
 local NextColorIndex = 1
-
 
 function RadioRangeIndicator:freeIndicators()
     for _, indicator in pairs(self.indicators) do
@@ -33,7 +31,7 @@ function RadioRangeIndicator:registerRadio(object, radio)
         if radioData:getIsTurnedOn() then
             local range = Character.getRadioRange(radioData, self.radioMaxRange)
             local indicator = RangeIndicator:new(object, range, Colors[NextColorIndex])
-            NextColorIndex = (NextColorIndex) % #Colors + 1
+            NextColorIndex = NextColorIndex % #Colors + 1
             indicator:subscribe()
             table.insert(self.indicators, indicator)
             table.insert(self.radios, { object = object, radio = radio, range = range })
@@ -56,8 +54,8 @@ function RadioRangeIndicator:discoverRadios()
     --     self:registerRadio(player, radio)
     -- end
     for _, info in pairs(radios.vehicles) do
-        local vehicle = info['vehicle']
-        local radio = info['radio']
+        local vehicle = info["vehicle"]
+        local radio = info["radio"]
         self:registerRadio(vehicle, radio)
     end
 end
@@ -74,7 +72,7 @@ function RadioRangeIndicator:update()
 end
 
 function RadioRangeIndicator:updateIcons()
-    local radios = Character.getAllHandAndBeltItemsByGroup(self.player, 'Radio')
+    local radios = Character.getAllHandAndBeltItemsByGroup(self.player, "Radio")
     for _, radio in pairs(radios) do
         local radioData = radio:getDeviceData()
         if radioData then
@@ -85,8 +83,8 @@ function RadioRangeIndicator:updateIcons()
         end
     end
     for _, info in pairs(self.radios) do
-        local object   = info['object']
-        local range    = info['range']
+        local object = info["object"]
+        local range = info["range"]
 
         local distance = World.distanceManhatten(object, self.player)
         if distance <= range then

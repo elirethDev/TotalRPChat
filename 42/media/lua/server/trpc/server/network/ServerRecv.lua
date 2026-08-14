@@ -27,7 +27,10 @@ RecvServer["MuteInHandRadio"] = function(player, args)
     end
     local radio = Character.getItemById(player, id) or Character.getFirstAttachedItemByType(player, args["belt"])
     if radio == nil or not instanceof(radio, "Radio") then
-        Logger.error("ServerRecv", "TRPC error: MuteInHandRadio packet asking for id " .. id .. " but no radio was found")
+        Logger.error(
+            "ServerRecv",
+            "TRPC error: MuteInHandRadio packet asking for id " .. id .. " but no radio was found"
+        )
         return
     end
     local muteState = args["mute"]
@@ -49,7 +52,8 @@ RecvServer["MuteSquareRadio"] = function(player, args)
     end
     local square = getSquare(x, y, z)
     if square == nil then
-        Logger.error("ServerRecv", 
+        Logger.error(
+            "ServerRecv",
             "TRPC error: MuteSquareRadio packet coordinate do not point to a square: x: "
                 .. x
                 .. ", y: "
@@ -61,7 +65,8 @@ RecvServer["MuteSquareRadio"] = function(player, args)
     end
     local radios = World.getSquareItemsByGroup(square, "IsoRadio")
     if radios == nil or #radios <= 0 then
-        Logger.error("ServerRecv", 
+        Logger.error(
+            "ServerRecv",
             "TRPC error: MuteSquareRadio packet square does not contain a radio at: x: "
                 .. x
                 .. ", y: "
@@ -73,7 +78,10 @@ RecvServer["MuteSquareRadio"] = function(player, args)
     end
     local radio = radios[1]
     if radio == nil or radio.getModData == nil or radio:getModData() == nil then
-        Logger.error("ServerRecv", "TRPC error: MuteSquareRadio packet lead to an impossible error where we found a corrupted radio")
+        Logger.error(
+            "ServerRecv",
+            "TRPC error: MuteSquareRadio packet lead to an impossible error where we found a corrupted radio"
+        )
         return
     end
     local muteState = args["mute"]
@@ -150,7 +158,8 @@ RecvServer["GiveBeltRadioState"] = function(player, args)
     end
     local radio = Character.getFirstAttachedItemByType(player, beltType)
     if radio == nil or not instanceof(radio, "Radio") then
-        Logger.error("ServerRecv", 
+        Logger.error(
+            "ServerRecv",
             "TRPC error: GiveBeltRadioState packet asking for a belt radio of type "
                 .. beltType
                 .. " but no radio was found"
@@ -175,7 +184,10 @@ RecvServer["AskInHandRadioState"] = function(player, args)
     end
     local radio = Character.getItemById(player, id) or Character.getFirstAttachedItemByType(player, args["belt"])
     if radio == nil or not instanceof(radio, "Radio") then
-        Logger.error("ServerRecv", "TRPC error: AskInHandRadioState packet asking for id " .. id .. " but no radio was found")
+        Logger.error(
+            "ServerRecv",
+            "TRPC error: AskInHandRadioState packet asking for id " .. id .. " but no radio was found"
+        )
         return
     end
     Radio.SyncHand(radio, player, id)
@@ -191,7 +203,8 @@ RecvServer["AskSquareRadioState"] = function(player, args)
     end
     local square = getSquare(x, y, z)
     if square == nil then
-        Logger.error("ServerRecv", 
+        Logger.error(
+            "ServerRecv",
             "TRPC error: AskSquareRadioState packet coordinate do not point to a square: x: "
                 .. x
                 .. ", y: "
@@ -203,7 +216,8 @@ RecvServer["AskSquareRadioState"] = function(player, args)
     end
     local radios = World.getSquareItemsByGroup(square, "IsoRadio")
     if radios == nil or #radios <= 0 then
-        Logger.error("ServerRecv", 
+        Logger.error(
+            "ServerRecv",
             "TRPC error: AskSquareRadioState packet square does not contain a radio at: x: "
                 .. x
                 .. ", y: "

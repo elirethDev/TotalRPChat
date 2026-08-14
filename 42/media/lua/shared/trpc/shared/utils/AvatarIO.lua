@@ -1,36 +1,35 @@
-local Character = require('trpc/shared/utils/Character')
-local File = require('trpc/shared/utils/File')
+local Character = require("trpc/shared/utils/Character")
+local File = require("trpc/shared/utils/File")
 local Logger = require("trpc/core/Logger")
-
 
 local AvatarIO = {}
 
 function AvatarIO.getBasePath()
     if isClient() then
         -- a client does not know the server name...
-        return 'avatars/client/' .. getServerIP() .. '/'
+        return "avatars/client/" .. getServerIP() .. "/"
     else
         local serverName = getServerName()
         if serverName == nil then
-            serverName = 'unknown'
-            Logger.error('AvatarIO', 'TRPC error: AvatarIO: unknown server name, using "unknown" directory for avatars')
+            serverName = "unknown"
+            Logger.error("AvatarIO", 'TRPC error: AvatarIO: unknown server name, using "unknown" directory for avatars')
         end
-        return 'avatars/server/' .. serverName .. '/'
+        return "avatars/server/" .. serverName .. "/"
     end
 end
 
 function AvatarIO.getAvatarPath(partialPath)
     local basePath = AvatarIO.getBasePath()
-    local pathPrefix = basePath .. '/' .. partialPath .. '.'
-    local extension = 'png'
+    local pathPrefix = basePath .. "/" .. partialPath .. "."
+    local extension = "png"
     local path = pathPrefix .. extension
-    if not serverFileExists('../Lua/' .. path) then
-        extension = 'jpg'
+    if not serverFileExists("../Lua/" .. path) then
+        extension = "jpg"
         path = pathPrefix .. extension
-        if not serverFileExists('../Lua/' .. path) then
-            extension = 'jpeg'
+        if not serverFileExists("../Lua/" .. path) then
+            extension = "jpeg"
             path = pathPrefix .. extension
-            if not serverFileExists('../Lua/' .. path) then
+            if not serverFileExists("../Lua/" .. path) then
                 return nil
             end
         end
@@ -39,7 +38,7 @@ function AvatarIO.getAvatarPath(partialPath)
 end
 
 function AvatarIO.createFileName(username, firstName, lastName)
-    return username .. '_' .. firstName .. '_' .. lastName
+    return username .. "_" .. firstName .. "_" .. lastName
 end
 
 function AvatarIO.createFileNameFromPlayer(player)
@@ -50,14 +49,14 @@ end
 
 function AvatarIO.loadPlayerAvatarFromNames(path, username, firstName, lastName)
     local key = AvatarIO.createFileName(username, firstName, lastName)
-    local partialPath = path .. '/' .. key
+    local partialPath = path .. "/" .. key
     local fullPath, extension = AvatarIO.getAvatarPath(partialPath)
     if fullPath == nil then
         return
     end
     local data, checksum = File.readAllBytes(fullPath)
     if data == nil or checksum == nil then
-        Logger.error('AvatarIO', 'TRPC error: failed to read file at path: "' .. fullPath .. '"')
+        Logger.error("AvatarIO", 'TRPC error: failed to read file at path: "' .. fullPath .. '"')
         return
     end
     return {
@@ -79,7 +78,7 @@ end
 function AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, path)
     local basePath = AvatarIO.getBasePath()
     local fileName = AvatarIO.createFileName(username, firstName, lastName)
-    local fullPath = basePath .. '/' .. path .. '/' .. fileName .. '.' .. extension
+    local fullPath = basePath .. "/" .. path .. "/" .. fileName .. "." .. extension
     File.writeAllBytes(data, fullPath)
     return fullPath
 end

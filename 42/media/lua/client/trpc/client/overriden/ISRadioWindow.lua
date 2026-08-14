@@ -1,6 +1,5 @@
-local Character              = require('trpc/shared/utils/Character')
-local TrpcClientSendCommands = require('trpc/client/network/ClientSend')
-
+local Character = require("trpc/shared/utils/Character")
+local TrpcClientSendCommands = require("trpc/client/network/ClientSend")
 
 local DefaultISRadioWindowActivate = ISRadioWindow.activate
 
@@ -20,7 +19,7 @@ local dist = 10
 function ISRadioWindow:update()
     if self:getIsVisible() then
         if self.deviceType and self.device and self.player and self.deviceData then
-            if self.deviceType == 'InventoryItem' then -- incase of inventory item check if player has it on belt
+            if self.deviceType == "InventoryItem" then -- incase of inventory item check if player has it on belt
                 if self.device:getAttachedSlot() ~= -1 then
                     ISCollapsableWindow.update(self)
                     return

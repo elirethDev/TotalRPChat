@@ -126,7 +126,10 @@ function World.getVehiclesInRange(player, range)
                         if vehicle ~= nil then
                             local vehicleId = vehicle:getKeyId()
                             if vehicleId == nil then
-                                Logger.error('World', 'TRPC error: World.getVehiclesInRange: impossible error: vehicle key ID is null')
+                                Logger.error(
+                                    "World",
+                                    "TRPC error: World.getVehiclesInRange: impossible error: vehicle key ID is null"
+                                )
                             else
                                 vehicles[vehicleId] = vehicle
                             end
@@ -163,8 +166,8 @@ function World.forAllPlayers(action)
 end
 
 function World.distanceManhatten(source, target)
-    return math.abs(math.floor(target:getX()) - math.floor(source:getX())) +
-        math.abs(math.floor(target:getY()) - math.floor(source:getY()))
+    return math.abs(math.floor(target:getX()) - math.floor(source:getX()))
+        + math.abs(math.floor(target:getY()) - math.floor(source:getY()))
 end
 
 function World.getFirstSquareItem(square, category)

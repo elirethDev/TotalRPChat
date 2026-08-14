@@ -39,7 +39,8 @@ local function UpdateRangeIndicator(stream)
             ISChat.instance.rangeIndicator:unsubscribe()
         end
         local range = TrpcServerSettings[stream.name]["range"]
-        ISChat.instance.rangeIndicator = RangeIndicator:new(getPlayer(), range, TrpcServerSettings[stream.name]["color"])
+        ISChat.instance.rangeIndicator =
+            RangeIndicator:new(getPlayer(), range, TrpcServerSettings[stream.name]["color"])
         UpdateRangeIndicatorVisibility()
     else
         if ISChat.instance.rangeIndicator then

@@ -199,7 +199,8 @@ local AuthorHasAccessByType = {
                     ServerSend.ChatErrorMessage(author, args.type, 'unknown player "' .. args.target .. '".')
                 end
             else
-                Logger.error("ChatDomain",
+                Logger.error(
+                    "ChatDomain",
                     'TRPC error: Received a private message from "'
                         .. author:getUsername()
                         .. '" without a contact name'
@@ -333,7 +334,10 @@ end
 
 function ChatDomain.IsAllowedToListen(author, player, args)
     if ListenerHasAccessByType[args.type] == nil then
-        Logger.error("ChatDomain", "TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type)
+        Logger.error(
+            "ChatDomain",
+            "TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type
+        )
         return false
     end
     return ListenerHasAccessByType[args.type](author, player, args)

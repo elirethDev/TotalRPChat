@@ -1,15 +1,15 @@
-local ISTrpcRichTextPanel = require('trpc/client/ui/ISTrpcRichTextPanel')
-local Parser              = require('trpc/client/parser/Parser')
-local StringBuilder       = require('trpc/client/parser/StringBuilder')
+local ISTrpcRichTextPanel = require("trpc/client/ui/ISTrpcRichTextPanel")
+local Parser = require("trpc/client/parser/Parser")
+local StringBuilder = require("trpc/client/parser/StringBuilder")
 
 local ABubble = ISTrpcRichTextPanel:derive("ABubble")
 
 function ABubble:loadTextures()
-    error('loadTextures not implemented in child class')
+    error("loadTextures not implemented in child class")
 end
 
 function ABubble:render()
-    error('render not implemented in child class')
+    error("render not implemented in child class")
 end
 
 function ABubble:prerender()
@@ -41,14 +41,14 @@ function ABubble:parseMessage(length)
         end
     end
     local parsedMessages = Parser.ParseTrpcMessage(self.message, self.color, 20, messageLength)
-    local rawMessage = parsedMessages['rawMessage']
-    local bubbleMessage = parsedMessages['bubble']
+    local rawMessage = parsedMessages["rawMessage"]
+    local bubbleMessage = parsedMessages["bubble"]
     if self.showPlayerName then
         local nameLength = length and (#self.playerName + 1) or nil -- + 1 for the trailing space
-        local truncatedName = self.playerName .. ' '
+        local truncatedName = self.playerName .. " "
         truncatedName = length >= nameLength and truncatedName or truncatedName:sub(1, length)
         rawMessage = truncatedName .. rawMessage
-        bubbleMessage = BuildPlayerNameString(truncatedName, self.playerColor) .. ' ' .. bubbleMessage
+        bubbleMessage = BuildPlayerNameString(truncatedName, self.playerColor) .. " " .. bubbleMessage
     end
     return rawMessage, bubbleMessage
 end
@@ -71,7 +71,7 @@ function ABubble:updateText(x, y)
         self.messageFinishedScrolling = true
     end
     local rawMessage, bubbleMessage = self:parseMessage(length)
-    self.text = StringBuilder.BuildFontSizeString('medium') .. bubbleMessage
+    self.text = StringBuilder.BuildFontSizeString("medium") .. bubbleMessage
     self.rawText = rawMessage
     self:paginate()
 
@@ -149,16 +149,21 @@ function ABubble:drawBubble()
     self:drawTextureScaled(self.bubbleBot, centerX, botY, centerW, botH, self.alpha)
     self:drawTextureScaled(self.bubbleBotRight, rightX, botY, rightW, botH, self.alpha)
 
-    if self.showArrow and self.currentX > 0 and self.currentY > self.topSpace
+    if
+        self.showArrow
+        and self.currentX > 0
+        and self.currentY > self.topSpace
         and self.currentX + self:getWidth() < getCore():getScreenWidth()
         and self.currentY + self:getHeight() < getCore():getScreenHeight()
     then
-        self:drawTextureScaled(self.bubbleArrow,
+        self:drawTextureScaled(
+            self.bubbleArrow,
             centerX + centerW / 2 + 5,
             botY + 4 * botH / 5,
             7 / scale,
             9 / scale,
-            self.alpha)
+            self.alpha
+        )
     end
 
     ISRichTextPanel.render(self)
@@ -168,27 +173,39 @@ end
 function ABubble:setY(y)
     local ys = y
     if self:getKeepOnScreen() then
-        local maxY = getCore():getScreenHeight();
+        local maxY = getCore():getScreenHeight()
         local topSpace = self.topSpace
-        ys = math.max(topSpace, math.min(y, maxY - self.height));
+        ys = math.max(topSpace, math.min(y, maxY - self.height))
     end
 
-    self.y = ys;
+    self.y = ys
     if self.javaObject ~= nil then
-        self.javaObject:setY(ys);
+        self.javaObject:setY(ys)
     end
 end
 
 function ABubble:new(
-    x, y, text, rawText, message, messageColor, timer, opacity, heightOffsetStart,
-    showArrow, showPlayerName, playerName, playerColor)
+    x,
+    y,
+    text,
+    rawText,
+    message,
+    messageColor,
+    timer,
+    opacity,
+    heightOffsetStart,
+    showArrow,
+    showPlayerName,
+    playerName,
+    playerColor
+)
     local textLength = getTextManager():MeasureStringX(UIFont.medium, rawText)
     local width = math.min(textLength * 1.25, 162) + 40
     local height = 0
     local o = ISTrpcRichTextPanel:new(x, y, width, height)
     setmetatable(o, self)
     self.__index = self
-    o.text = StringBuilder.BuildFontSizeString('medium') .. text
+    o.text = StringBuilder.BuildFontSizeString("medium") .. text
     o.timer = timer * 1000
     o.opacity = opacity / 100
     o.message = message

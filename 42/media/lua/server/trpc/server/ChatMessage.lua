@@ -80,7 +80,10 @@ end
 
 local function GetSquaresRadios(player, args, radioFrequencies, range)
     if ChatDomain.MessageTypeSettings == nil then
-        Logger.error("ChatMessage", "TRPC error: GetSquaresRadios: tried to get radios before server settings were initialized")
+        Logger.error(
+            "ChatMessage",
+            "TRPC error: GetSquaresRadios: tried to get radios before server settings were initialized"
+        )
         return {}, false
     end
     local maxSoundRange = ChatDomain.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
@@ -154,7 +157,10 @@ end
 
 local function GetVehiclesRadios(player, args, radioFrequencies, range)
     if ChatDomain.MessageTypeSettings == nil then
-        Logger.error("ChatMessage", "TRPC error: GetVehiclesRadios: tried to get radios before server settings were initialized")
+        Logger.error(
+            "ChatMessage",
+            "TRPC error: GetVehiclesRadios: tried to get radios before server settings were initialized"
+        )
         return {}, false
     end
     local maxSoundRange = ChatDomain.MessageTypeSettings["options"]["radio"]["soundMaxRange"]

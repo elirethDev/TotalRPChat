@@ -1,5 +1,5 @@
-local Character              = require('trpc/shared/utils/Character')
-local TrpcClientSendCommands = require('trpc/client/network/ClientSend')
+local Character = require("trpc/shared/utils/Character")
+local TrpcClientSendCommands = require("trpc/client/network/ClientSend")
 
 -- mute was not sync at all with the server so we do it there
 function ISRadioAction:performMuteMicrophone()
@@ -9,8 +9,7 @@ function ISRadioAction:performMuteMicrophone()
             self.deviceData:setMicIsMuted(self.secondaryItem)
             TrpcClientSendCommands.sendGiveRadioState(self.device)
         else
-            TrpcClientSendCommands.sendMuteRadio(
-                self.device, self.secondaryItem)
+            TrpcClientSendCommands.sendMuteRadio(self.device, self.secondaryItem)
         end
     end
 end

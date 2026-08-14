@@ -19,19 +19,19 @@ local ChannelRegistry = require("trpc/shared/ChannelRegistry")
 -- stays the single source of the 13 wire names. Values copied verbatim from the
 -- previous literal table (byte-equivalent).
 local STREAM_META = {
-    say           = { command = "/say ",       shortCommand = "/s ",  tabID = 1 },
-    whisper       = { command = "/whisper ",   shortCommand = "/w ",  tabID = 1 },
-    low           = { command = "/low ",       shortCommand = "/l ",  tabID = 1 },
-    yell          = { command = "/yell ",      shortCommand = "/y ",  tabID = 1 },
-    faction       = { command = "/faction ",   shortCommand = "/f ",  tabID = 1 },
-    safehouse     = { command = "/safehouse ", shortCommand = "/sh ", tabID = 1 },
-    general       = { command = "/all ",       shortCommand = "/g ",  tabID = 1 },
+    say = { command = "/say ", shortCommand = "/s ", tabID = 1 },
+    whisper = { command = "/whisper ", shortCommand = "/w ", tabID = 1 },
+    low = { command = "/low ", shortCommand = "/l ", tabID = 1 },
+    yell = { command = "/yell ", shortCommand = "/y ", tabID = 1 },
+    faction = { command = "/faction ", shortCommand = "/f ", tabID = 1 },
+    safehouse = { command = "/safehouse ", shortCommand = "/sh ", tabID = 1 },
+    general = { command = "/all ", shortCommand = "/g ", tabID = 1 },
     scriptedRadio = { tabID = 1 },
-    ooc           = { command = "/ooc ",       shortCommand = "/o ",  tabID = 2 },
-    pm            = { command = "/pm ",        shortCommand = "/p ",  tabID = 3 },
-    admin         = { command = "/admin ",     shortCommand = "/a ",  tabID = 4 },
-    me            = { command = "/me ",        shortCommand = nil,    tabID = 1, forget = true },
-    ["do"]        = { command = "/do ",        shortCommand = nil,    tabID = 1, forget = true },
+    ooc = { command = "/ooc ", shortCommand = "/o ", tabID = 2 },
+    pm = { command = "/pm ", shortCommand = "/p ", tabID = 3 },
+    admin = { command = "/admin ", shortCommand = "/a ", tabID = 4 },
+    me = { command = "/me ", shortCommand = nil, tabID = 1, forget = true },
+    ["do"] = { command = "/do ", shortCommand = nil, tabID = 1, forget = true },
 }
 
 Streams.allChatStreams = {}

@@ -1,6 +1,5 @@
-local World = require('trpc/shared/utils/World')
+local World = require("trpc/shared/utils/World")
 local Logger = require("trpc/core/Logger")
-
 
 local Character = {}
 
@@ -83,8 +82,7 @@ function Character.getAllHandAndBeltItemsByGroup(player, group)
 end
 
 function Character.isItemOnBeltAndNotInHand(player, item)
-    return item.getID ~= nil and item:getAttachedSlot() ~= -1
-        and not Character.getHandItemById(player, item:getID())
+    return item.getID ~= nil and item:getAttachedSlot() ~= -1 and not Character.getHandItemById(player, item:getID())
 end
 
 function Character.getAttachedItemById(player, id)
@@ -103,7 +101,10 @@ end
 
 function Character.getAttachedItemByIndex(player, index)
     if index == nil then
-        Logger.error('Character', 'TRPC error: Character.getAttachedItemByIndex: tried to access attached item with a null index')
+        Logger.error(
+            "Character",
+            "TRPC error: Character.getAttachedItemByIndex: tried to access attached item with a null index"
+        )
         return nil
     end
     local inventoryItems = player:getAttachedItems()
@@ -163,15 +164,14 @@ end
 local function GetSquaresRadios(player, range, frequency)
     local radiosResult = {}
     local radioMaxRange = range
-    local radios = World.getItemsInRangeByGroup(player, radioMaxRange, 'IsoRadio')
+    local radios = World.getItemsInRangeByGroup(player, radioMaxRange, "IsoRadio")
     local found = false
     for _, radio in pairs(radios) do
         local radioData = radio:getDeviceData()
         if radioData ~= nil then
             local radioFrequency = radioData:getChannel()
             local turnedOn = radioData:getIsTurnedOn()
-            if turnedOn and (frequency == nil or radioFrequency == frequency)
-            then
+            if turnedOn and (frequency == nil or radioFrequency == frequency) then
                 table.insert(radiosResult, radio)
                 found = true
             end
@@ -183,7 +183,7 @@ end
 -- TODO check other player radio without headphones
 local function GetPlayerRadios(player, range, frequency)
     local radiosResult = {}
-    local radio = Character.getFirstHandItemByGroup(player, 'Radio')
+    local radio = Character.getFirstHandItemByGroup(player, "Radio")
     local found = false
     if radio == nil then
         return radiosResult
@@ -191,8 +191,7 @@ local function GetPlayerRadios(player, range, frequency)
     local radioData = radio and radio:getDeviceData() or nil
     if radioData then
         local radioFrequency = radioData:getChannel()
-        if radioData:getIsTurnedOn() and (frequency == nil or radioFrequency == frequency)
-        then
+        if radioData:getIsTurnedOn() and (frequency == nil or radioFrequency == frequency) then
             table.insert(radiosResult, {
                 player = player,
                 radio = radio,
@@ -209,16 +208,15 @@ local function GetVehiclesRadios(player, range, frequency)
     local vehicles = World.getVehiclesInRange(player, radioMaxRange)
     local found = false
     for _, vehicle in pairs(vehicles) do
-        local radio = vehicle:getPartById('Radio')
+        local radio = vehicle:getPartById("Radio")
         if radio ~= nil then
             local radioData = radio:getDeviceData()
             if radioData ~= nil then
                 local radioFrequency = radioData:getChannel()
-                if radioData:getIsTurnedOn() and (frequency == nil or radioFrequency == frequency)
-                then
+                if radioData:getIsTurnedOn() and (frequency == nil or radioFrequency == frequency) then
                     table.insert(radiosResult, {
                         vehicle = vehicle,
-                        radio = radio
+                        radio = radio,
                     })
                     found = true
                 end
@@ -230,11 +228,11 @@ end
 
 function Character.getRunningRadiosInRange(player, range, frequency)
     if player == nil then
-        Logger.error('Character', 'TRPC error: Character.getListeningRadios: player is null')
+        Logger.error("Character", "TRPC error: Character.getListeningRadios: player is null")
         return nil
     end
     if range == nil then
-        Logger.error('Character', 'TRPC error: Character.getListeningRadios: range is null')
+        Logger.error("Character", "TRPC error: Character.getListeningRadios: range is null")
         return nil
     end
     local squaresRadios, squaresRadiosFound = GetSquaresRadios(player, range, frequency)

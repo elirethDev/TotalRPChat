@@ -1,13 +1,11 @@
-require('ISUI/ISModalRichText')
+require("ISUI/ISModalRichText")
 
-local AvatarIO = require('trpc/shared/utils/AvatarIO')
-local AvatarManager = require('trpc/client/AvatarManager')
-local Character = require('trpc/shared/utils/Character')
-local ClientSend = require('trpc/client/network/ClientSend')
+local AvatarIO = require("trpc/shared/utils/AvatarIO")
+local AvatarManager = require("trpc/client/AvatarManager")
+local Character = require("trpc/shared/utils/Character")
+local ClientSend = require("trpc/client/network/ClientSend")
 
-
-local AvatarUploadWindow = ISModalRichText:derive('AvatarUploadWindow')
-
+local AvatarUploadWindow = ISModalRichText:derive("AvatarUploadWindow")
 
 local FONT_HGT_NORMAL = getTextManager():getFontHeight(UIFont.Normal)
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
@@ -77,7 +75,7 @@ function AvatarUploadWindow:subscribe()
     self:addToUIManager()
     -- self:setResizable(false)
     self:setVisible(true)
-    ISLayoutManager.RegisterWindow('avatar upload window', ISCollapsableWindow, self)
+    ISLayoutManager.RegisterWindow("avatar upload window", ISCollapsableWindow, self)
 end
 
 function AvatarUploadWindow:unsubscribe()
@@ -86,8 +84,7 @@ end
 
 function AvatarUploadWindow:render()
     self._parentClass.render(self)
-    if self._avatar == nil
-    then
+    if self._avatar == nil then
         self._avatar = AvatarManager:getRequestAvatar()
         if self._avatar then
             Texture.reload(self._avatar:getName())
@@ -108,10 +105,8 @@ function AvatarUploadWindow:render()
         self:setHeight(HEIGHT)
         self.chatText:setWidth(WIDTH)
         self.chatText:setHeight(HEIGHT)
-        self.chatText.text = ''
-        if self._avatar:getWidth() ~= AVATAR_WIDTH or
-            self._avatar:getHeight() ~= AVATAR_HEIGHT
-        then
+        self.chatText.text = ""
+        if self._avatar:getWidth() ~= AVATAR_WIDTH or self._avatar:getHeight() ~= AVATAR_HEIGHT then
             self:drawInvalidSize()
             if self.yesButton then
                 self:removeChild(self.yesButton)
@@ -119,7 +114,7 @@ function AvatarUploadWindow:render()
                 self.yesButton = nil
                 self.noButton = nil
             end
-            if self._lastUpdate == 'help' then
+            if self._lastUpdate == "help" then
                 if self.ok then
                     self:removeChild(self.ok)
                     self.ok = nil
@@ -137,9 +132,9 @@ function AvatarUploadWindow:render()
                 self.ok = nil
             end
         end
-        self._lastUpdate = 'avatar'
+        self._lastUpdate = "avatar"
     else
-        self._lastUpdate = 'help'
+        self._lastUpdate = "help"
         local screenWidth = getCore():getScreenWidth()
         local screenHeight = getCore():getScreenHeight()
         local width = WIDTH_HELP
@@ -162,8 +157,15 @@ end
 
 function AvatarUploadWindow:addOkButton()
     if self.ok == nil then
-        self.ok = ISButton:new((self:getWidth() / 2) - btnWid / 2, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt,
-            getText("UI_Ok"), self, AvatarUploadWindow.onClick)
+        self.ok = ISButton:new(
+            (self:getWidth() / 2) - btnWid / 2,
+            self:getHeight() - padBottom - btnHgt,
+            btnWid,
+            btnHgt,
+            getText("UI_Ok"),
+            self,
+            AvatarUploadWindow.onClick
+        )
         self.ok.internal = "OK"
         self.ok.anchorTop = false
         self.ok.anchorBottom = true
@@ -178,18 +180,15 @@ function AvatarUploadWindow:drawHelp()
     local player = getPlayer()
     local username = player:getUsername()
     local firstName, lastName = Character.getFirstAndLastName(player)
-    local path = '%userprofile%\\Zomboid\\Lua\\avatars\\client\\' .. getServerIP() .. '\\' .. username .. '\\request\\'
-    local text = getText('SurvivalGuide_TRPC_AvatarUploadHelp',
-        AvatarIO.createFileName(username, firstName, lastName),
-        path
-    )
+    local path = "%userprofile%\\Zomboid\\Lua\\avatars\\client\\" .. getServerIP() .. "\\" .. username .. "\\request\\"
+    local text =
+        getText("SurvivalGuide_TRPC_AvatarUploadHelp", AvatarIO.createFileName(username, firstName, lastName), path)
     self.chatText.text = text
     self:addOkButton()
 end
 
 function AvatarUploadWindow:drawInvalidSize()
-    local text = getText('SurvivalGuide_TRPC_AvatarSizeError',
-        AVATAR_WIDTH, AVATAR_HEIGHT)
+    local text = getText("SurvivalGuide_TRPC_AvatarSizeError", AVATAR_WIDTH, AVATAR_HEIGHT)
     self.chatText.text = text
 end
 
@@ -208,16 +207,12 @@ function AvatarUploadWindow:drawAvatarText()
     if self._avatar == nil then
         return
     end
-    local text1 = 'Do you want to send a request'
-    local text2 = 'of approval for this avatar?'
+    local text1 = "Do you want to send a request"
+    local text2 = "of approval for this avatar?"
     local alpha = 1
     local x = WIDTH / 2
-    self:drawTextCentre(text1,
-        x, topMargin + FONT_HGT_NORMAL,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
-    self:drawTextCentre(text2,
-        x, topMargin + FONT_HGT_NORMAL * 2 + lineSpace,
-        1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    self:drawTextCentre(text1, x, topMargin + FONT_HGT_NORMAL, 1.0, 1.0, 1.0, alpha, UIFont.Normal)
+    self:drawTextCentre(text2, x, topMargin + FONT_HGT_NORMAL * 2 + lineSpace, 1.0, 1.0, 1.0, alpha, UIFont.Normal)
 end
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
@@ -231,12 +226,16 @@ function AvatarUploadWindow:createButtons()
         self:close()
     end
 
-
-    self.yesButton = ISButton:new(leftMargin, y, buttonWidth, buttonHeight,
-        getText("UI_Yes"), nil, yesCallback)
-    self.noButton  = ISButton:new(WIDTH - buttonWidth - rightMargin, y, buttonWidth, buttonHeight,
-        getText("UI_No"), self, self.close)
-
+    self.yesButton = ISButton:new(leftMargin, y, buttonWidth, buttonHeight, getText("UI_Yes"), nil, yesCallback)
+    self.noButton = ISButton:new(
+        WIDTH - buttonWidth - rightMargin,
+        y,
+        buttonWidth,
+        buttonHeight,
+        getText("UI_No"),
+        self,
+        self.close
+    )
 
     self:addChild(self.yesButton)
     self:addChild(self.noButton)
@@ -246,20 +245,20 @@ function AvatarUploadWindow:sendAvatar()
     local player = getPlayer()
     local firstName, lastName = Character.getFirstAndLastName(player)
     if self._avatarRequest then
-        if self._avatarRequest['checksum'] == self._lastSentAvatar then
-            ISChat.sendErrorToCurrentTab('Avatar request already sent for "' .. firstName .. ' ' .. lastName .. '"')
+        if self._avatarRequest["checksum"] == self._lastSentAvatar then
+            ISChat.sendErrorToCurrentTab('Avatar request already sent for "' .. firstName .. " " .. lastName .. '"')
             return
         end
         ClientSend.sendAvatarRequest(self._avatarRequest)
-        ISChat.sendInfoToCurrentTab('Uploaded avatar request for "' .. firstName .. ' ' .. lastName .. '"')
+        ISChat.sendInfoToCurrentTab('Uploaded avatar request for "' .. firstName .. " " .. lastName .. '"')
     else
-        ISChat.sendErrorToCurrentTab('Avatar already approved for "' .. firstName .. ' ' .. lastName .. '"')
+        ISChat.sendErrorToCurrentTab('Avatar already approved for "' .. firstName .. " " .. lastName .. '"')
     end
 end
 
 function AvatarUploadWindow:new()
     local x, y, width, height = CalculateCoordinatesAndSize()
-    local o = ISModalRichText:new(x, y, width, height, '', false)
+    local o = ISModalRichText:new(x, y, width, height, "", false)
     setmetatable(o, self)
     self.__index = self
     o._parentClass = ISModalRichText

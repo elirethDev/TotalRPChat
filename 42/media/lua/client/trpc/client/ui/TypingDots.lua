@@ -1,11 +1,11 @@
-local Coordinates = require('trpc/client/utils/Coordinates')
+local Coordinates = require("trpc/client/utils/Coordinates")
 
-local TypingDots = ISUIElement:derive('TypingDots');
+local TypingDots = ISUIElement:derive("TypingDots")
 
 function TypingDots:render()
-    local typingDots1 = getTexture('media/ui/trpc/typing-dots/typing-dots-1.png')
-    local typingDots2 = getTexture('media/ui/trpc/typing-dots/typing-dots-2.png')
-    local typingDots3 = getTexture('media/ui/trpc/typing-dots/typing-dots-3.png')
+    local typingDots1 = getTexture("media/ui/trpc/typing-dots/typing-dots-1.png")
+    local typingDots2 = getTexture("media/ui/trpc/typing-dots/typing-dots-2.png")
+    local typingDots3 = getTexture("media/ui/trpc/typing-dots/typing-dots-3.png")
 
     local time = Calendar.getInstance():getTimeInMillis()
     if time - self.startingTime > self.timer then
@@ -15,7 +15,7 @@ function TypingDots:render()
     local elapsedTime = time - self.lastStepTime
     if elapsedTime >= self.stepTime then
         self.lastStepTime = time
-        self.step = (self.step) % 3 + 1
+        self.step = self.step % 3 + 1
     end
     local texture
     if self.step == 1 then

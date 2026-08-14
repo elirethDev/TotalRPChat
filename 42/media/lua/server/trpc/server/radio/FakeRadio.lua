@@ -1,4 +1,4 @@
-local FakeDeviceData = require('trpc/server/radio/FakeDeviceData')
+local FakeDeviceData = require("trpc/server/radio/FakeDeviceData")
 
 local FakeRadio = {}
 

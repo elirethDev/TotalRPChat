@@ -1,11 +1,11 @@
-local AToken = require('trpc/client/lexer/AToken')
+local AToken = require("trpc/client/lexer/AToken")
 
 local TokenBold = {}
 
 TokenBold.color = {
     255,
     28,
-    77
+    77,
 }
 
 function TokenBold:new(message, childs)
@@ -18,14 +18,14 @@ end
 
 function TokenBold:getColor()
     if TrpcServerSettings ~= nil then
-        return TrpcServerSettings['markdown']['bold']['color']
+        return TrpcServerSettings["markdown"]["bold"]["color"]
     else
         return TokenBold.color
     end
 end
 
 function TokenBold.getName()
-    return 'bold'
+    return "bold"
 end
 
 function TokenBold.getTagSize()
@@ -33,7 +33,7 @@ function TokenBold.getTagSize()
 end
 
 function TokenBold.getTag()
-    return '**'
+    return "**"
 end
 
 return TokenBold

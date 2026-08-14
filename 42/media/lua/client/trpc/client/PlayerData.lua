@@ -17,13 +17,13 @@ local function GenerateRandomColor()
 end
 
 local function SetPlayerColor(color)
-    ISChat.instance.trpcModData['playerColor'] = color
-    ModData.add('trpc', ISChat.instance.trpcModData)
+    ISChat.instance.trpcModData["playerColor"] = color
+    ModData.add("trpc", ISChat.instance.trpcModData)
 end
 
 local function SetPlayerPitch(pitch)
-    ISChat.instance.trpcModData['voicePitch'] = pitch
-    ModData.add('trpc', ISChat.instance.trpcModData)
+    ISChat.instance.trpcModData["voicePitch"] = pitch
+    ModData.add("trpc", ISChat.instance.trpcModData)
 end
 
 local function RandomVoicePitch(isFemale)

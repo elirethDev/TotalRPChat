@@ -1,21 +1,23 @@
-local Character = require('trpc/shared/utils/Character')
+local Character = require("trpc/shared/utils/Character")
 local Logger = require("trpc/core/Logger")
 
 local ClientSend = {}
 
 function ClientSendCommand(commandName, args)
-    sendClientCommand('TRPC', commandName, args)
+    sendClientCommand("TRPC", commandName, args)
 end
 
 local function FormatCharacterName(player)
     local first, last = Character.getFirstAndLastName(player)
-    return first .. ' ' .. last
+    return first .. " " .. last
 end
 
 function ClientSend.sendChatMessage(message, language, playerColor, type, pitch, disableVerb)
-    if not isClient() then return end
+    if not isClient() then
+        return
+    end
     local player = getPlayer()
-    ClientSendCommand('ChatMessage', {
+    ClientSendCommand("ChatMessage", {
         author = player:getUsername(),
         characterName = FormatCharacterName(player),
         message = message,
@@ -28,14 +30,16 @@ function ClientSend.sendChatMessage(message, language, playerColor, type, pitch,
 end
 
 function ClientSend.sendPrivateMessage(message, language, playerColor, target, pitch)
-    if not isClient() then return end
+    if not isClient() then
+        return
+    end
     local player = getPlayer()
-    ClientSendCommand('ChatMessage', {
+    ClientSendCommand("ChatMessage", {
         author = getPlayer():getUsername(),
         characterName = FormatCharacterName(player),
         message = message,
         language = language,
-        type = 'pm',
+        type = "pm",
         target = target,
         color = playerColor,
         pitch = pitch,
@@ -43,50 +47,54 @@ function ClientSend.sendPrivateMessage(message, language, playerColor, target, p
 end
 
 function ClientSend.sendTyping(author, type)
-    if not isClient() then return end
-    ClientSendCommand('Typing', {
+    if not isClient() then
+        return
+    end
+    ClientSendCommand("Typing", {
         author = author,
         type = type,
     })
 end
 
 function ClientSend.sendAskSandboxVars()
-    if not isClient() then return end
-    ClientSendCommand('AskSandboxVars', {})
+    if not isClient() then
+        return
+    end
+    ClientSendCommand("AskSandboxVars", {})
 end
 
 function ClientSend.sendMuteRadio(radio, state)
-    if not isClient() then return end
+    if not isClient() then
+        return
+    end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        Logger.error('ClientSend', 'TRPC error: ClientSend.sendMuteRadio: no radioData found')
+        Logger.error("ClientSend", "TRPC error: ClientSend.sendMuteRadio: no radioData found")
         return
     end
     if radioData:isIsoDevice() then
-        ClientSendCommand('MuteSquareRadio', {
+        ClientSendCommand("MuteSquareRadio", {
             mute = state,
             x = radio:getX(),
             y = radio:getY(),
             z = radio:getZ(),
         })
-    elseif instanceof(radio, 'Radio') then -- is an inventoryItem radio
+    elseif instanceof(radio, "Radio") then -- is an inventoryItem radio
         local id = radio:getID()
         local player = getPlayer()
         local primary = player:getPrimaryHandItem()
         local secondary = player:getSecondaryHandItem()
         local beltType = nil
-        if (primary == nil or primary:getID() ~= id)
-            and (secondary == nil or secondary:getID() ~= id)
-        then
+        if (primary == nil or primary:getID() ~= id) and (secondary == nil or secondary:getID() ~= id) then
             -- the ID is unreliable for non-in-hand items so we're going with the type
             -- and pray to find the right radio, or (un)mute the wrong one...
             beltType = radio:getType()
         end
         if id == nil then
-            Logger.error('ClientSend', 'TRPC error: ClientSend.sendMuteRadio: no id found')
+            Logger.error("ClientSend", "TRPC error: ClientSend.sendMuteRadio: no id found")
             return
         end
-        ClientSendCommand('MuteInHandRadio', {
+        ClientSendCommand("MuteInHandRadio", {
             mute = state,
             id = id,
             belt = beltType,
@@ -97,28 +105,28 @@ end
 
 -- only for belt items
 function ClientSend.sendGiveRadioState(radio)
-    if not isClient() then return end
+    if not isClient() then
+        return
+    end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        Logger.error('ClientSend', 'TRPC error: ClientSend.sendTellRadioState: no radioData found')
+        Logger.error("ClientSend", "TRPC error: ClientSend.sendTellRadioState: no radioData found")
         return
     end
 
-    if instanceof(radio, 'Radio') then -- is an inventoryItem radio
+    if instanceof(radio, "Radio") then -- is an inventoryItem radio
         local player = getPlayer()
         local primary = player:getPrimaryHandItem()
         local secondary = player:getSecondaryHandItem()
         local beltType = nil
         local id = radio:getID()
         -- is not in-hand (so the server is not sync with it already)
-        if (primary == nil or primary:getID() ~= id)
-            and (secondary == nil or secondary:getID() ~= id)
-        then
+        if (primary == nil or primary:getID() ~= id) and (secondary == nil or secondary:getID() ~= id) then
             -- the ID is unreliable for non-in-hand items so we're going with the type
             -- and pray to find the right radio, or sync the wrong one...
             beltType = radio:getType()
 
-            ClientSendCommand('GiveBeltRadioState', {
+            ClientSendCommand("GiveBeltRadioState", {
                 belt = beltType,
                 player = getPlayer():getUsername(),
                 turnedOn = radioData:getIsTurnedOn(),
@@ -135,36 +143,36 @@ function ClientSend.sendGiveRadioState(radio)
 end
 
 function ClientSend.sendAskRadioState(radio)
-    if not isClient() then return end
+    if not isClient() then
+        return
+    end
     local radioData = radio:getDeviceData()
     if radioData == nil then
-        Logger.error('ClientSend', 'TRPC error: ClientSend.sendAskRadioState: no radioData found')
+        Logger.error("ClientSend", "TRPC error: ClientSend.sendAskRadioState: no radioData found")
         return
     end
     if radioData:isIsoDevice() then
-        ClientSendCommand('AskSquareRadioState', {
+        ClientSendCommand("AskSquareRadioState", {
             x = radio:getX(),
             y = radio:getY(),
             z = radio:getZ(),
         })
-    elseif instanceof(radio, 'Radio') then -- is an inventoryItem radio
+    elseif instanceof(radio, "Radio") then -- is an inventoryItem radio
         local id = radio:getID()
         local player = getPlayer()
         local primary = player:getPrimaryHandItem()
         local secondary = player:getSecondaryHandItem()
         local beltType = nil
-        if (primary == nil or primary:getID() ~= id)
-            and (secondary == nil or secondary:getID() ~= id)
-        then
+        if (primary == nil or primary:getID() ~= id) and (secondary == nil or secondary:getID() ~= id) then
             -- the ID is unreliable for non-in-hand items so we're going with the type
             -- and pray to find the right radio, or (un)mute the wrong one...
             beltType = radio:getType()
         end
         if id == nil then
-            Logger.error('ClientSend', 'TRPC error: ClientSend.sendAskRadioState: no id found')
+            Logger.error("ClientSend", "TRPC error: ClientSend.sendAskRadioState: no id found")
             return
         end
-        ClientSendCommand('AskInHandRadioState', {
+        ClientSendCommand("AskInHandRadioState", {
             id = id,
             belt = beltType,
             player = getPlayer():getUsername(),
@@ -173,17 +181,17 @@ function ClientSend.sendAskRadioState(radio)
 end
 
 function ClientSend.sendKnownAvatars(knownAvatars)
-    ClientSendCommand('KnownAvatars', {
+    ClientSendCommand("KnownAvatars", {
         avatars = knownAvatars,
     })
 end
 
 function ClientSend.sendAvatarRequest(avatarRequest)
-    ClientSendCommand('AvatarRequest', avatarRequest)
+    ClientSendCommand("AvatarRequest", avatarRequest)
 end
 
 function ClientSend.sendApprovePendingAvatar(username, firstName, lastName, checksum)
-    ClientSendCommand('ApproveAvatar', {
+    ClientSendCommand("ApproveAvatar", {
         username = username,
         firstName = firstName,
         lastName = lastName,
@@ -192,7 +200,7 @@ function ClientSend.sendApprovePendingAvatar(username, firstName, lastName, chec
 end
 
 function ClientSend.sendRejectPendingAvatar(username, firstName, lastName, checksum)
-    ClientSendCommand('RejectAvatar', {
+    ClientSendCommand("RejectAvatar", {
         username = username,
         firstName = firstName,
         lastName = lastName,
@@ -201,7 +209,7 @@ function ClientSend.sendRejectPendingAvatar(username, firstName, lastName, check
 end
 
 function ClientSend.sendRoll(diceCount, diceType, addCount)
-    ClientSendCommand('Roll', {
+    ClientSendCommand("Roll", {
         diceCount = diceCount,
         diceType = diceType,
         addCount = addCount,
