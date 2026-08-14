@@ -2,6 +2,7 @@ local AvatarManager = require("trpc/server/AvatarManager")
 local Logger = require("trpc/core/Logger")
 local Character = require("trpc/shared/utils/Character")
 local ChatMessage = require("trpc/server/ChatMessage")
+local ChatDomain = require("trpc/server/domain/ChatDomain")
 local ServerSend = require("trpc/server/network/ServerSend")
 local Radio = require("trpc/server/radio/Radio")
 local RadioManager = require("trpc/server/radio/RadioManager")
@@ -93,7 +94,7 @@ RecvServer["Typing"] = function(player, args)
 end
 
 RecvServer["AskSandboxVars"] = function(player, args)
-    ServerSend.Command(player, "SendSandboxVars", ChatMessage.MessageTypeSettings)
+    ServerSend.Command(player, "SendSandboxVars", ChatDomain.MessageTypeSettings)
 end
 
 RecvServer["GiveBeltRadioState"] = function(player, args)

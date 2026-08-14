@@ -2,8 +2,8 @@ local Character = require("trpc/shared/utils/Character")
 local Logger = require("trpc/core/Logger")
 local RadioManager = require("trpc/server/radio/RadioManager")
 local ServerSend = require("trpc/server/network/ServerSend")
-local StringParser = require("trpc/shared/utils/StringParser")
 local World = require("trpc/shared/utils/World")
+local ChatDomain = require("trpc/server/domain/ChatDomain")
 
 local ChatMessage = {}
 
@@ -12,300 +12,6 @@ local function PlayersDistance(source, target)
     local accurateDistance = math.max(stupidDistance - 1, 0)
     return math.floor(accurateDistance + 0.5)
 end
-
-local function GetColorFromString(colorString)
-    local defaultColor = { 255, 0, 255 }
-    local rgb = StringParser.hexaStringToRGB(colorString)
-    if rgb == nil then
-        Logger.error("ChatMessage", 'TRPC error: invalid color string: "' .. colorString .. '"')
-        return defaultColor
-    end
-    return rgb
-end
-
-local function GetColorSandbox(name)
-    local colorString = SandboxVars.TRPC[name .. "Color"]
-    return GetColorFromString(colorString)
-end
-
-ChatMessage.MessageTypeSettings = nil
-
-local function SetMessageTypeSettings()
-    ChatMessage.MessageTypeSettings = {
-        ["markdown"] = {
-            ["italic"] = {
-                ["color"] = GetColorSandbox("MarkdownOneAsterisk"),
-            },
-            ["bold"] = {
-                ["color"] = GetColorSandbox("MarkdownTwoAsterisks"),
-            },
-        },
-        ["whisper"] = {
-            ["range"] = SandboxVars.TRPC.WhisperRange,
-            ["zombieRange"] = SandboxVars.TRPC.WhisperZombieRange,
-            ["enabled"] = SandboxVars.TRPC.WhisperEnabled,
-            ["color"] = GetColorSandbox("Whisper"),
-            ["radio"] = true,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-        },
-        ["low"] = {
-            ["range"] = SandboxVars.TRPC.LowRange,
-            ["zombieRange"] = SandboxVars.TRPC.LowZombieRange,
-            ["enabled"] = SandboxVars.TRPC.LowEnabled,
-            ["color"] = GetColorSandbox("Low"),
-            ["radio"] = true,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-        },
-        ["say"] = {
-            ["range"] = SandboxVars.TRPC.SayRange,
-            ["zombieRange"] = SandboxVars.TRPC.SayZombieRange,
-            ["enabled"] = SandboxVars.TRPC.SayEnabled,
-            ["color"] = GetColorSandbox("Say"),
-            ["radio"] = true,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-        },
-        ["yell"] = {
-            ["range"] = SandboxVars.TRPC.YellRange,
-            ["zombieRange"] = SandboxVars.TRPC.YellZombieRange,
-            ["enabled"] = SandboxVars.TRPC.YellEnabled,
-            ["color"] = GetColorSandbox("Yell"),
-            ["radio"] = true,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-        },
-        ["pm"] = {
-            ["range"] = -1,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.PrivateMessageEnabled,
-            ["color"] = GetColorSandbox("PrivateMessage"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["bubble"] = false,
-        },
-        ["me"] = {
-            ["range"] = SandboxVars.TRPC.MeRange,
-            ["zombieRange"] = 0,
-            ["enabled"] = SandboxVars.TRPC.MeEnabled,
-            ["color"] = GetColorSandbox("Me"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-        },
-        ["do"] = {
-            ["range"] = SandboxVars.TRPC.DoRange,
-            ["zombieRange"] = 0,
-            ["enabled"] = SandboxVars.TRPC.DoEnabled,
-            ["color"] = GetColorSandbox("Do"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["bubble"] = true,
-            ["adminOnly"] = SandboxVars.TRPC.DoAdminOnly,
-        },
-        ["faction"] = {
-            ["range"] = -1,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.FactionMessageEnabled,
-            ["color"] = GetColorSandbox("FactionMessage"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["bubble"] = false,
-        },
-        ["safehouse"] = {
-            ["range"] = -1,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.SafeHouseMessageEnabled,
-            ["color"] = GetColorSandbox("SafeHouseMessage"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["bubble"] = false,
-        },
-        ["general"] = {
-            ["range"] = -1,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.GeneralMessageEnabled,
-            ["color"] = GetColorSandbox("GeneralMessage"),
-            ["radio"] = false,
-            ["aliveOnly"] = true,
-            ["discord"] = SandboxVars.TRPC.GeneralDiscordEnabled,
-            ["bubble"] = false,
-        },
-        ["admin"] = {
-            ["range"] = -1,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.AdminMessageEnabled,
-            ["color"] = GetColorSandbox("AdminMessage"),
-            ["radio"] = false,
-            ["aliveOnly"] = false,
-            ["bubble"] = false,
-        },
-        ["ooc"] = {
-            ["range"] = SandboxVars.TRPC.OutOfCharacterMessageRange,
-            ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.OutOfCharacterMessageEnabled,
-            ["color"] = GetColorSandbox("OutOfCharacterMessage"),
-            ["radio"] = false,
-            ["bubble"] = true,
-        },
-        ["server"] = {
-            ["color"] = { 255, 86, 64 },
-        },
-        ["scriptedRadio"] = {
-            ["enabled"] = true,
-            ["color"] = GetColorFromString(SandboxVars.TRPC.RadioColor),
-        },
-        ["options"] = {
-            ["showCharacterName"] = SandboxVars.TRPC.ShowCharacterName,
-            ["boredomReduction"] = SandboxVars.TRPC.BoredomReduction,
-            ["languages"] = SandboxVars.TRPC.Languages,
-            ["verb"] = SandboxVars.TRPC.VerbEnabled,
-            ["capitalize"] = SandboxVars.TRPC.Capitalize,
-            ["bubble"] = {
-                ["timer"] = SandboxVars.TRPC.BubbleTimerInSeconds,
-                ["opacity"] = SandboxVars.TRPC.BubbleOpacity,
-            },
-            ["radio"] = {
-                ["discord"] = SandboxVars.TRPC.RadioDiscordEnabled,
-                ["frequency"] = SandboxVars.TRPC.RadioDiscordFrequency,
-                ["soundMaxRange"] = SandboxVars.TRPC.RadioSoundMaxRange,
-            },
-            ["hideCallout"] = SandboxVars.TRPC.HideCallout,
-            ["isVoiceEnabled"] = SandboxVars.TRPC.VoiceEnabled,
-            ["portrait"] = SandboxVars.TRPC.BubblePortrait,
-        },
-    }
-end
-
-local AuthorHasAccessByType = {
-    ["whisper"] = function(author, args, sendError)
-        return true
-    end,
-    ["low"] = function(author, args, sendError)
-        return true
-    end,
-
-    ["say"] = function(author, args, sendError)
-        return true
-    end,
-
-    ["yell"] = function(author, args, sendError)
-        return true
-    end,
-    ["pm"] = function(author, args, sendError)
-        if args.target == nil or World.getPlayerByUsername(args.target) == nil then
-            if args.target ~= nil then
-                if sendError then
-                    ServerSend.ChatErrorMessage(author, args.type, 'unknown player "' .. args.target .. '".')
-                end
-            else
-                Logger.error("ChatMessage", 
-                    'TRPC error: Received a private message from "'
-                        .. author:getUsername()
-                        .. '" without a contact name'
-                )
-            end
-            return false
-        end
-        return true
-    end,
-    ["faction"] = function(author, args, sendError)
-        local hasFaction = Faction.getPlayerFaction(author) ~= nil
-        if not hasFaction and sendError then
-            ServerSend.ChatErrorMessage(author, args.type, "you are not part of a faction.")
-        end
-        return hasFaction
-    end,
-    ["safehouse"] = function(author, args, sendError)
-        local hasSafeHouse = SafeHouse.hasSafehouse(author) ~= nil
-        if not hasSafeHouse and sendError then
-            ServerSend.ChatErrorMessage(author, args.type, "you are not part of a safe house.")
-        end
-        return hasSafeHouse
-    end,
-    ["general"] = function(author, args, sendError)
-        return true
-    end,
-    ["admin"] = function(author, args, sendError)
-        return author:getAccessLevel() == "Admin"
-    end,
-    ["ooc"] = function(author, args, sendError)
-        return true
-    end,
-    ["me"] = function(author, args, sendError)
-        return true
-    end,
-    ["do"] = function(author, args, sendError)
-        if
-            ChatMessage.MessageTypeSettings
-            and (
-                not ChatMessage.MessageTypeSettings["do"]["adminOnly"]
-                or author:getAccessLevel() == "Admin"
-                or author:getAccessLevel() == "Moderator"
-            )
-        then
-            return true
-        else
-            if sendError then
-                ServerSend.ChatErrorMessage(author, args.type, "requires admin privileges.")
-            end
-            return false
-        end
-    end,
-}
-
-local ListenerHasAccessByType = {
-    ["whisper"] = function(author, player, args)
-        return true
-    end,
-    ["low"] = function(author, player, args)
-        return true
-    end,
-
-    ["say"] = function(author, player, args)
-        return true
-    end,
-
-    ["yell"] = function(author, player, args)
-        return true
-    end,
-    ["pm"] = function(author, player, args)
-        return args.target ~= nil
-            and args.author ~= nil
-            and (
-                player:getUsername():lower() == args.target:lower()
-                or player:getUsername():lower() == args.author:lower()
-            )
-    end,
-    ["faction"] = function(author, player, args)
-        local authorFaction = Faction.getPlayerFaction(author)
-        local playerFaction = Faction.getPlayerFaction(player)
-        return playerFaction ~= nil and authorFaction ~= nil and playerFaction:getName() == authorFaction:getName()
-    end,
-    ["safehouse"] = function(author, player, args)
-        local playerSafeHouse = SafeHouse.hasSafehouse(player)
-        local authorSafeHouse = SafeHouse.hasSafehouse(author)
-        return playerSafeHouse ~= nil
-            and authorSafeHouse ~= nil
-            and playerSafeHouse:getTitle() == authorSafeHouse:getTitle()
-    end,
-    ["general"] = function(author, player, args)
-        return true
-    end,
-    ["admin"] = function(author, player, args)
-        return player:getAccessLevel() == "Admin"
-    end,
-    ["ooc"] = function(author, player, args)
-        return true
-    end,
-    ["me"] = function(author, args, sendError)
-        return true
-    end,
-    ["do"] = function(author, args, sendError)
-        return true
-    end,
-}
 
 local SandboxVarsCopy = nil
 local function CopyTrpcSandboxVars()
@@ -328,7 +34,7 @@ local function HasTrpcSandboxVarsChanged()
 end
 
 local function DetectMessageTypeSettingsUpdate()
-    if ChatMessage.MessageTypeSettings == nil then
+    if ChatDomain.MessageTypeSettings == nil then
         return
     end
     if SandboxVarsCopy == nil then
@@ -337,9 +43,9 @@ local function DetectMessageTypeSettingsUpdate()
     end
     if HasTrpcSandboxVarsChanged() then
         CopyTrpcSandboxVars()
-        SetMessageTypeSettings()
+        ChatDomain.SetMessageTypeSettings()
         World.forAllPlayers(function(player)
-            ServerSend.Command(player, "SendSandboxVars", ChatMessage.MessageTypeSettings)
+            ServerSend.Command(player, "SendSandboxVars", ChatDomain.MessageTypeSettings)
         end)
     end
 end
@@ -353,45 +59,6 @@ local function GetPlayerRadio(player)
         end
     end
     return radio
-end
-
-local function GetRangeForMessageType(type)
-    local messageSettings = ChatMessage.MessageTypeSettings[type]
-    if messageSettings ~= nil then
-        return messageSettings["range"]
-    end
-    error('unknown message type "' .. type .. '"')
-    return nil
-end
-
-local function IsAllowedToTalk(author, args, sendError)
-    if args.type == nil then
-        Logger.error("ChatMessage", "TRPC error: args.type is null")
-        return false
-    end
-    if AuthorHasAccessByType[args.type] == nil then
-        Logger.error("ChatMessage", "TRPC error: AuthorHasAccessByType has no method for type " .. args.type)
-        return false
-    end
-    if ChatMessage.MessageTypeSettings[args.type] == nil then
-        Logger.error("ChatMessage", "TRPC error: ChatMessage.MessageTypeSettings of " .. args.type .. " is null")
-        return false
-    end
-    if AuthorHasAccessByType[args.type] == nil then
-        Logger.error("ChatMessage", "TRPC error: AuthorHasAccessByType has no method for " .. args.type)
-        return false
-    end
-    return ChatMessage.MessageTypeSettings[args.type]["enabled"] == true
-        and (not ChatMessage.MessageTypeSettings[args.type]["aliveOnly"] or author:getBodyDamage():getHealth() > 0)
-        and AuthorHasAccessByType[args.type](author, args, sendError)
-end
-
-local function IsAllowedToListen(author, player, args)
-    if ListenerHasAccessByType[args.type] == nil then
-        Logger.error("ChatMessage", "TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type)
-        return false
-    end
-    return ListenerHasAccessByType[args.type](author, player, args)
 end
 
 local function IsInRadioEmittingRange(radioEmitters, receiver)
@@ -412,11 +79,11 @@ local function IsInRadioEmittingRange(radioEmitters, receiver)
 end
 
 local function GetSquaresRadios(player, args, radioFrequencies, range)
-    if ChatMessage.MessageTypeSettings == nil then
+    if ChatDomain.MessageTypeSettings == nil then
         Logger.error("ChatMessage", "TRPC error: GetSquaresRadios: tried to get radios before server settings were initialized")
         return {}, false
     end
-    local maxSoundRange = ChatMessage.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
+    local maxSoundRange = ChatDomain.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
     local radiosByFrequency = {}
     local radios = World.getItemsInRangeByGroup(player, range, "IsoRadio")
     local found = false
@@ -486,11 +153,11 @@ local function GetPlayerRadios(player, args, radioFrequencies, range)
 end
 
 local function GetVehiclesRadios(player, args, radioFrequencies, range)
-    if ChatMessage.MessageTypeSettings == nil then
+    if ChatDomain.MessageTypeSettings == nil then
         Logger.error("ChatMessage", "TRPC error: GetVehiclesRadios: tried to get radios before server settings were initialized")
         return {}, false
     end
-    local maxSoundRange = ChatMessage.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
+    local maxSoundRange = ChatDomain.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
     local vehiclesByFrequency = {}
     local vehicles = World.getVehiclesInRange(player, range)
     local found = false
@@ -525,7 +192,7 @@ local function GetVehiclesRadios(player, args, radioFrequencies, range)
 end
 
 local function SendRadioPackets(author, player, args, sourceRadioByFrequencies)
-    local range = ChatMessage.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
+    local range = ChatDomain.MessageTypeSettings["options"]["radio"]["soundMaxRange"]
     local squaresRadios, squaresRadiosFound = GetSquaresRadios(player, args, sourceRadioByFrequencies, range)
     local playersRadios, playersRadiosFound = GetPlayerRadios(player, args, sourceRadioByFrequencies, range)
     local vehiclesRadios, vehiclesRadiosFound = GetVehiclesRadios(player, args, sourceRadioByFrequencies, range)
@@ -561,8 +228,8 @@ local function GetEmittingRadios(player, packetType, messageType, range)
     local radioEmission = false
     local radioFrequencies = {}
     if
-        ChatMessage.MessageTypeSettings[messageType]
-        and ChatMessage.MessageTypeSettings[messageType]["radio"] == true
+        ChatDomain.MessageTypeSettings[messageType]
+        and ChatDomain.MessageTypeSettings[messageType]["radio"] == true
         and packetType == "ChatMessage"
         and range > 0
     then
@@ -610,9 +277,9 @@ end
 local function SendRadioEmittingPackets(player, args, radioFrequencies)
     for frequency, _ in pairs(radioFrequencies) do
         if
-            ChatMessage.MessageTypeSettings
-            and ChatMessage.MessageTypeSettings["options"]["radio"]["discord"]
-            and frequency == ChatMessage.MessageTypeSettings["options"]["radio"]["frequency"]
+            ChatDomain.MessageTypeSettings
+            and ChatDomain.MessageTypeSettings["options"]["radio"]["discord"]
+            and frequency == ChatDomain.MessageTypeSettings["options"]["radio"]["frequency"]
         then
             ServerSend.Command(player, "DiscordMessage", {
                 message = args.message,
@@ -637,14 +304,14 @@ function ChatMessage.ProcessMessage(player, args, packetType, sendError)
         return
     end
 
-    if not IsAllowedToTalk(player, args, sendError) then
+    if not ChatDomain.IsAllowedToTalk(player, args, sendError) then
         return
     end
 
     if
         args.type == "general"
-        and ChatMessage.MessageTypeSettings
-        and ChatMessage.MessageTypeSettings["general"]["discord"]
+        and ChatDomain.MessageTypeSettings
+        and ChatDomain.MessageTypeSettings["general"]["discord"]
         and packetType ~= "Typing"
     then
         ServerSend.Command(player, "DiscordMessage", {
@@ -652,7 +319,7 @@ function ChatMessage.ProcessMessage(player, args, packetType, sendError)
         })
     end
 
-    local range = GetRangeForMessageType(args.type)
+    local range = ChatDomain.GetRangeForMessageType(args.type)
     if range == nil then
         error('TRPC error: No range for message type "' .. args.type .. '".')
         return
@@ -671,7 +338,7 @@ function ChatMessage.ProcessMessage(player, args, packetType, sendError)
     local connectedPlayers = getOnlinePlayers()
     for i = 0, connectedPlayers:size() - 1 do
         local connectedPlayer = connectedPlayers:get(i)
-        if IsAllowedToListen(player, connectedPlayer, args) then
+        if ChatDomain.IsAllowedToListen(player, connectedPlayer, args) then
             if
                 connectedPlayer:getOnlineID() == player:getOnlineID()
                 or range == -1
@@ -706,11 +373,11 @@ function ChatMessage.RollDice(player, diceCount, diceType, addCount)
     local characterName = firstName .. " " .. lastName
     local messageRange = 20
     if
-        ChatMessage.MessageTypeSettings
-        and ChatMessage.MessageTypeSettings["say"]
-        and ChatMessage.MessageTypeSettings["say"]["range"]
+        ChatDomain.MessageTypeSettings
+        and ChatDomain.MessageTypeSettings["say"]
+        and ChatDomain.MessageTypeSettings["say"]["range"]
     then
-        messageRange = ChatMessage.MessageTypeSettings["say"]["range"]
+        messageRange = ChatDomain.MessageTypeSettings["say"]["range"]
     end
     World.forAllPlayers(function(targetPlayer)
         if PlayersDistance(player, targetPlayer) < messageRange then
@@ -719,7 +386,6 @@ function ChatMessage.RollDice(player, diceCount, diceType, addCount)
     end)
 end
 
-Events.OnServerStarted.Add(SetMessageTypeSettings)
 Events.EveryOneMinute.Add(DetectMessageTypeSettingsUpdate)
 
 return ChatMessage
