@@ -1,485 +1,485 @@
 VERSION = 1,
 
-option TICS.ShowCharacterName
+option TRPC.ShowCharacterName
 {
 	type = boolean,
 	default = true,
 
-	page = TICS,
-	translation = TICS_ShowCharacterName,
+	page = TRPC,
+	translation = TRPC_ShowCharacterName,
 }
 
-option TICS.BoredomReduction
+option TRPC.BoredomReduction
 {
 	type = double,
 	min = 0.0,
 	max = 50.0,
 	default = 1.2,
 
-	page = TICS,
-	translation = TICS_BoredomReduction,
+	page = TRPC,
+	translation = TRPC_BoredomReduction,
 }
 
-option TICS.Languages
+option TRPC.Languages
 {
 	type = boolean,
 	default = false,
 
-	page = TICS,
-	translation = TICS_Languages,
+	page = TRPC,
+	translation = TRPC_Languages,
 }
 
-option TICS.BubblePortrait
+option TRPC.BubblePortrait
 {
 	type = enum,
 	numValues = 3,
 	default = 2,
 
-	page = TICS,
-	translation = TICS_BubblePortrait,
-	valueTranslation = TICS_BubblePortrait_Values,
+	page = TRPC,
+	translation = TRPC_BubblePortrait,
+	valueTranslation = TRPC_BubblePortrait_Values,
 }
-option TICS.BubbleTimerInSeconds
+option TRPC.BubbleTimerInSeconds
 {
 	type = integer,
 	min = 1,
 	max = 20,
 	default = 8,
 
-	page = TICS,
-	translation = TICS_BubbleTimerInSeconds,
+	page = TRPC,
+	translation = TRPC_BubbleTimerInSeconds,
 }
-option TICS.BubbleOpacity
+option TRPC.BubbleOpacity
 {
 	type = integer,
 	min = 0,
 	max = 100,
 	default = 75,
 
-	page = TICS,
-	translation = TICS_BubbleOpacity,
+	page = TRPC,
+	translation = TRPC_BubbleOpacity,
 }
 
-option TICS.VoiceEnabled
+option TRPC.VoiceEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICS,
-	translation = TICS_VoiceEnabled,
+	page = TRPC,
+	translation = TRPC_VoiceEnabled,
 }
 
 
-option TICS.VerbEnabled
+option TRPC.VerbEnabled
 {
 	type = boolean,
 	default = false,
 
-	page = TICS,
-	translation = TICS_VerbEnabled,
+	page = TRPC,
+	translation = TRPC_VerbEnabled,
 }
 
-option TICS.Capitalize
+option TRPC.Capitalize
 {
 	type = boolean,
 	default = false,
 
-	page = TICS,
-	translation = TICS_Capitalize,
+	page = TRPC,
+	translation = TRPC_Capitalize,
 }
 
-option TICS.HideCallout
+option TRPC.HideCallout
 {
 	type = boolean,
 	default = true,
 
-	page = TICS,
-	translation = TICS_HideCallout,
+	page = TRPC,
+	translation = TRPC_HideCallout,
 }
 
-option TICS.MarkdownOneAsteriskColor
+option TRPC.MarkdownOneAsteriskColor
 {
 	type = string,
 	default = #F676FF,
 
-	page = TICS,
-	translation = TICS_MarkdownOneAsteriskColor,
+	page = TRPC,
+	translation = TRPC_MarkdownOneAsteriskColor,
 }
-option TICS.MarkdownTwoAsterisksColor
+option TRPC.MarkdownTwoAsterisksColor
 {
 	type = string,
 	default = #D2D200,
 
-	page = TICS,
-	translation = TICS_MarkdownTwoAsterisksColor,
+	page = TRPC,
+	translation = TRPC_MarkdownTwoAsterisksColor,
 }
 
-option TICS.GeneralDiscordEnabled
+option TRPC.GeneralDiscordEnabled
 {
 	type = boolean,
 	default = false,
 
-	page = TICS,
-	translation = TICS_GeneralDiscordEnabled,
+	page = TRPC,
+	translation = TRPC_GeneralDiscordEnabled,
 }
-option TICS.RadioDiscordEnabled
+option TRPC.RadioDiscordEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICS,
-	translation = TICS_RadioDiscordEnabled,
+	page = TRPC,
+	translation = TRPC_RadioDiscordEnabled,
 }
 
-option TICS.RadioDiscordFrequency
+option TRPC.RadioDiscordFrequency
 {
 	type = integer,
 	min = 200,
 	max = 1000000,
 	default = 100000,
 
-	page = TICS,
-	translation = TICS_RadioDiscordFrequency,
+	page = TRPC,
+	translation = TRPC_RadioDiscordFrequency,
 }
 
-option TICS.RadioColor
+option TRPC.RadioColor
 {
 	type = string,
 	default = #ABF08C,
 
-	page = TICS,
-	translation = TICS_RadioColor,
+	page = TRPC,
+	translation = TRPC_RadioColor,
 }
 
-option TICS.RadioSoundMaxRange
+option TRPC.RadioSoundMaxRange
 {
 	type = integer,
 	min = 1,
 	max = 15,
 	default = 6,
 
-	page = TICS,
-	translation = TICS_RadioSoundMaxRange,
+	page = TRPC,
+	translation = TRPC_RadioSoundMaxRange,
 }
 
-option TICS.WhisperEnabled
+option TRPC.WhisperEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_WhisperEnabled,
+	page = TRPCChannels,
+	translation = TRPC_WhisperEnabled,
 }
-option TICS.WhisperRange
+option TRPC.WhisperRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 3,
 
-	page = TICSChannels,
-	translation = TICS_WhisperRange,
+	page = TRPCChannels,
+	translation = TRPC_WhisperRange,
 }
-option TICS.WhisperZombieRange
+option TRPC.WhisperZombieRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 3,
 
-	page = TICSChannels,
-	translation = TICS_WhisperZombieRange,
+	page = TRPCChannels,
+	translation = TRPC_WhisperZombieRange,
 }
-option TICS.WhisperColor
+option TRPC.WhisperColor
 {
 	type = string,
 	default = #B4FFC5,
 
-	page = TICSChannels,
-	translation = TICS_WhisperColor,
+	page = TRPCChannels,
+	translation = TRPC_WhisperColor,
 }
 
-option TICS.LowEnabled
+option TRPC.LowEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_LowEnabled,
+	page = TRPCChannels,
+	translation = TRPC_LowEnabled,
 }
-option TICS.LowRange
+option TRPC.LowRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 10,
 
-	page = TICSChannels,
-	translation = TICS_LowRange,
+	page = TRPCChannels,
+	translation = TRPC_LowRange,
 }
-option TICS.LowZombieRange
+option TRPC.LowZombieRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 10,
 
-	page = TICSChannels,
-	translation = TICS_LowZombieRange,
+	page = TRPCChannels,
+	translation = TRPC_LowZombieRange,
 }
-option TICS.LowColor
+option TRPC.LowColor
 {
 	type = string,
 	default = #B4FFFF,
 
-	page = TICSChannels,
-	translation = TICS_LowColor,
+	page = TRPCChannels,
+	translation = TRPC_LowColor,
 }
 
-option TICS.SayEnabled
+option TRPC.SayEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_SayEnabled,
+	page = TRPCChannels,
+	translation = TRPC_SayEnabled,
 }
-option TICS.SayRange
+option TRPC.SayRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 30,
 
-	page = TICSChannels,
-	translation = TICS_SayRange,
+	page = TRPCChannels,
+	translation = TRPC_SayRange,
 }
-option TICS.SayZombieRange
+option TRPC.SayZombieRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 30,
 
-	page = TICSChannels,
-	translation = TICS_SayZombieRange,
+	page = TRPCChannels,
+	translation = TRPC_SayZombieRange,
 }
-option TICS.SayColor
+option TRPC.SayColor
 {
 	type = string,
 	default = #F5F5F5,
 
-	page = TICSChannels,
-	translation = TICS_SayColor,
+	page = TRPCChannels,
+	translation = TRPC_SayColor,
 }
 
-option TICS.YellEnabled
+option TRPC.YellEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_YellEnabled,
+	page = TRPCChannels,
+	translation = TRPC_YellEnabled,
 }
-option TICS.YellRange
+option TRPC.YellRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 60,
 
-	page = TICSChannels,
-	translation = TICS_YellRange,
+	page = TRPCChannels,
+	translation = TRPC_YellRange,
 }
-option TICS.YellZombieRange
+option TRPC.YellZombieRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 60,
 
-	page = TICSChannels,
-	translation = TICS_YellZombieRange,
+	page = TRPCChannels,
+	translation = TRPC_YellZombieRange,
 }
-option TICS.YellColor
+option TRPC.YellColor
 {
 	type = string,
 	default = #E69696,
 
-	page = TICSChannels,
-	translation = TICS_YellColor,
+	page = TRPCChannels,
+	translation = TRPC_YellColor,
 }
 
-option TICS.PrivateMessageEnabled
+option TRPC.PrivateMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_PrivateMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_PrivateMessageEnabled,
 }
-option TICS.PrivateMessageColor
+option TRPC.PrivateMessageColor
 {
 	type = string,
 	default = #FFB8DA,
 
-	page = TICSChannels,
-	translation = TICS_PrivateMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_PrivateMessageColor,
 }
 
-option TICS.MeEnabled
+option TRPC.MeEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_MeEnabled,
+	page = TRPCChannels,
+	translation = TRPC_MeEnabled,
 }
-option TICS.MeRange
+option TRPC.MeRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 30,
 
-	page = TICSChannels,
-	translation = TICS_MeRange,
+	page = TRPCChannels,
+	translation = TRPC_MeRange,
 }
-option TICS.MeColor
+option TRPC.MeColor
 {
 	type = string,
 	default = #B8F0FF,
 
-	page = TICSChannels,
-	translation = TICS_MeColor,
+	page = TRPCChannels,
+	translation = TRPC_MeColor,
 }
 
-option TICS.DoEnabled
+option TRPC.DoEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_DoEnabled,
+	page = TRPCChannels,
+	translation = TRPC_DoEnabled,
 }
-option TICS.DoRange
+option TRPC.DoRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 30,
 
-	page = TICSChannels,
-	translation = TICS_DoRange,
+	page = TRPCChannels,
+	translation = TRPC_DoRange,
 }
-option TICS.DoColor
+option TRPC.DoColor
 {
 	type = string,
 	default = #B8F0FF,
 
-	page = TICSChannels,
-	translation = TICS_DoColor,
+	page = TRPCChannels,
+	translation = TRPC_DoColor,
 }
-option TICS.DoAdminOnly
+option TRPC.DoAdminOnly
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_DoAdminOnly,
+	page = TRPCChannels,
+	translation = TRPC_DoAdminOnly,
 }
 
-option TICS.FactionMessageEnabled
+option TRPC.FactionMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_FactionMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_FactionMessageEnabled,
 }
-option TICS.FactionMessageColor
+option TRPC.FactionMessageColor
 {
 	type = string,
 	default = #AAFFAA,
 
-	page = TICSChannels,
-	translation = TICS_FactionMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_FactionMessageColor,
 }
 
-option TICS.SafeHouseMessageEnabled
+option TRPC.SafeHouseMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_SafeHouseMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_SafeHouseMessageEnabled,
 }
-option TICS.SafeHouseMessageColor
+option TRPC.SafeHouseMessageColor
 {
 	type = string,
 	default = #F5F580,
 
-	page = TICSChannels,
-	translation = TICS_SafeHouseMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_SafeHouseMessageColor,
 }
 
-option TICS.GeneralMessageEnabled
+option TRPC.GeneralMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_GeneralMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_GeneralMessageEnabled,
 }
-option TICS.GeneralMessageColor
+option TRPC.GeneralMessageColor
 {
 	type = string,
 	default = #BEBEFF,
 
-	page = TICSChannels,
-	translation = TICS_GeneralMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_GeneralMessageColor,
 }
 
-option TICS.AdminMessageEnabled
+option TRPC.AdminMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_AdminMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_AdminMessageEnabled,
 }
-option TICS.AdminMessageColor
+option TRPC.AdminMessageColor
 {
 	type = string,
 	default = #FFAAAA,
 
-	page = TICSChannels,
-	translation = TICS_AdminMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_AdminMessageColor,
 }
 
-option TICS.OutOfCharacterMessageEnabled
+option TRPC.OutOfCharacterMessageEnabled
 {
 	type = boolean,
 	default = true,
 
-	page = TICSChannels,
-	translation = TICS_OutOfCharacterMessageEnabled,
+	page = TRPCChannels,
+	translation = TRPC_OutOfCharacterMessageEnabled,
 }
-option TICS.OutOfCharacterMessageRange
+option TRPC.OutOfCharacterMessageRange
 {
 	type = integer,
 	min = 1,
 	max = 10000,
 	default = 120,
 
-	page = TICSChannels,
-	translation = TICS_OutOfCharacterMessageRange,
+	page = TRPCChannels,
+	translation = TRPC_OutOfCharacterMessageRange,
 }
-option TICS.OutOfCharacterMessageColor
+option TRPC.OutOfCharacterMessageColor
 {
 	type = string,
 	default = #92FF94,
 
-	page = TICSChannels,
-	translation = TICS_OutOfCharacterMessageColor,
+	page = TRPCChannels,
+	translation = TRPC_OutOfCharacterMessageColor,
 }

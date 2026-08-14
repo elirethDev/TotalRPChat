@@ -1,5 +1,4 @@
-name=Total Immersive Chat System b42 (dev)
-poster=poster.png
-id=TICSDev
+name=TotalRPChat (b42)
+id=TotalRPChat
 versionMin=42.18.0
 description=A full rework of the chat system and radio system made with RP servers in mind
