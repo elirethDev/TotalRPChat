@@ -30,6 +30,7 @@ local BubbleFactory = require("trpc/client/ui/bubble/Factory")
 local Tabs = require("trpc/client/ui/Tabs")
 local RangeController = require("trpc/client/ui/RangeController")
 local ChatState = require("trpc/client/ui/ChatState")
+local BubbleState = require("trpc/client/ui/bubble/BubbleState")
 local EventBus = require("trpc/core/EventBus")
 local Logger = require("trpc/core/Logger")
 
@@ -503,7 +504,8 @@ function ISChat.onMessagePacket(
             voicePitch,
             type == "me",
             name,
-            color
+            color,
+            ISChat.instance.isPortraitEnabled
         )
     end
     local formattedMessage, parsedMessage =
@@ -571,7 +573,7 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
     for _, info in pairs(squaresInfo) do
         local position = info["position"]
         if position ~= nil then
-            BubbleFactory.createSquareRadioBubble(position, message, messageColor, voicePitch)
+            BubbleFactory.createSquareRadioBubble(position, message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
             local square = getSquare(position["x"], position["y"], position["z"])
             if square ~= nil then
                 local radio = World.getFirstSquareItem(square, "IsoRadio")
@@ -610,7 +612,7 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
     for _, info in pairs(playersInfo) do
         local username = info["username"]
         if username ~= nil then
-            BubbleFactory.createPlayerRadioBubble(getPlayer():getUsername(), message, messageColor, voicePitch)
+            BubbleFactory.createPlayerRadioBubble(getPlayer():getUsername(), message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
             if username:upper() == getPlayer():getUsername():upper() then
                 local radio = Character.getFirstHandOrBeltItemByGroup(getPlayer(), "Radio")
                 if radio ~= nil then
@@ -650,7 +652,7 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
         if vehicleKeyId ~= nil then
             local vehicle = vehicles[vehicleKeyId]
             if vehicle ~= nil then
-                BubbleFactory.createVehicleRadioBubble(vehicle, message, messageColor, voicePitch)
+                BubbleFactory.createVehicleRadioBubble(vehicle, message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
                 local radio = vehicle:getPartById("Radio")
                 if radio ~= nil then
                     local radioData = radio:getDeviceData()
@@ -1052,28 +1054,22 @@ function ISChat:prerender()
         end
     end
 
-    local allBubbles = {
-        instance.radioBubble,
-        instance.vehicleRadioBubble,
-        instance.playerRadioBubble,
-        instance.bubble,
-        ChatState.getTypingDots(),
-    }
-    for _, bubbles in pairs(allBubbles) do
-        local indexToDelete = {}
-        for index, bubble in pairs(bubbles) do
-            if bubble.dead then
-                table.insert(indexToDelete, index)
-            else
-                bubble:render()
-            end
-        end
-        for _, index in pairs(indexToDelete) do
-            bubbles[index] = nil
+    -- Render all living bubbles (player, radio, playerRadio, vehicleRadio,
+    -- context) via the unified BubbleState render loop.
+    BubbleState.renderAll()
+
+    -- Typing dots are tracked separately in ChatState and rendered here.
+    local typingDots = ChatState.getTypingDots()
+    local indexToDelete = {}
+    for index, bubble in pairs(typingDots) do
+        if bubble.dead then
+            table.insert(indexToDelete, index)
+        else
+            bubble:render()
         end
     end
-    if instance.contextBubble then
-        instance.contextBubble:render()
+    for _, index in pairs(indexToDelete) do
+        typingDots[index] = nil
     end
     ChatUI.prerender(self)
 end
