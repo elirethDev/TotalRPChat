@@ -5,7 +5,6 @@ local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
 local StringBuilder = require("trpc/client/parser/StringBuilder")
 
-local KeyboardSound = require("trpc/client/voice/KeyboardSound")
 local PlayerVoice = require("trpc/client/voice/PlayerVoice")
 
 local PlayerBubble = ABubble:derive("PlayerBubble")
@@ -175,12 +174,8 @@ function PlayerBubble:new(
     setmetatable(o, PlayerBubble)
     o.isAction = isAction
     o.player = player
-    if isVoicesEnabled then
-        if isAction then
-            o.voice = KeyboardSound:new(rawMessage, player, voicePitch)
-        else
-            o.voice = PlayerVoice:new(rawMessage, player, voicePitch)
-        end
+    if isVoicesEnabled and not isAction then
+        o.voice = PlayerVoice:new(rawMessage, player, voicePitch)
     end
     o.portrait = portrait
     return o
