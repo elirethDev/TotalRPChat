@@ -46,7 +46,9 @@ function ABubble:parseMessage(length)
     if self.showPlayerName then
         local nameLength = length and (#self.playerName + 1) or nil -- + 1 for the trailing space
         local truncatedName = self.playerName .. " "
-        truncatedName = length >= nameLength and truncatedName or truncatedName:sub(1, length)
+        if length ~= nil then
+            truncatedName = length >= nameLength and truncatedName or truncatedName:sub(1, length)
+        end
         rawMessage = truncatedName .. rawMessage
         bubbleMessage = BuildPlayerNameString(truncatedName, self.playerColor) .. " " .. bubbleMessage
     end
