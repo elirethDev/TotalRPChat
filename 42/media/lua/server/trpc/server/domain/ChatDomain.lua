@@ -10,8 +10,15 @@
 local StringParser = require("trpc/shared/utils/StringParser")
 local Logger = require("trpc/core/Logger")
 local World = require("trpc/shared/utils/World")
+local Settings = require("trpc/shared/Settings")
 
 local ChatDomain = {}
+
+-- Fuente de opciones del servidor: SandboxVars.TRPC es el lector canónico.
+-- Los defaults del catálogo (sandbox-options.txt) cubren opciones ausentes.
+Settings.setSource(function(name)
+    return SandboxVars.TRPC[name]
+end)
 
 local function GetColorFromString(colorString)
     local defaultColor = { 255, 0, 255 }
@@ -24,7 +31,7 @@ local function GetColorFromString(colorString)
 end
 
 local function GetColorSandbox(name)
-    local colorString = SandboxVars.TRPC[name .. "Color"]
+    local colorString = Settings.get(name .. "Color")
     return GetColorFromString(colorString)
 end
 
@@ -41,36 +48,36 @@ local function SetMessageTypeSettings()
             },
         },
         ["whisper"] = {
-            ["range"] = SandboxVars.TRPC.WhisperRange,
-            ["zombieRange"] = SandboxVars.TRPC.WhisperZombieRange,
-            ["enabled"] = SandboxVars.TRPC.WhisperEnabled,
+            ["range"] = Settings.get("WhisperRange"),
+            ["zombieRange"] = Settings.get("WhisperZombieRange"),
+            ["enabled"] = Settings.get("WhisperEnabled"),
             ["color"] = GetColorSandbox("Whisper"),
             ["radio"] = true,
             ["aliveOnly"] = true,
             ["bubble"] = true,
         },
         ["low"] = {
-            ["range"] = SandboxVars.TRPC.LowRange,
-            ["zombieRange"] = SandboxVars.TRPC.LowZombieRange,
-            ["enabled"] = SandboxVars.TRPC.LowEnabled,
+            ["range"] = Settings.get("LowRange"),
+            ["zombieRange"] = Settings.get("LowZombieRange"),
+            ["enabled"] = Settings.get("LowEnabled"),
             ["color"] = GetColorSandbox("Low"),
             ["radio"] = true,
             ["aliveOnly"] = true,
             ["bubble"] = true,
         },
         ["say"] = {
-            ["range"] = SandboxVars.TRPC.SayRange,
-            ["zombieRange"] = SandboxVars.TRPC.SayZombieRange,
-            ["enabled"] = SandboxVars.TRPC.SayEnabled,
+            ["range"] = Settings.get("SayRange"),
+            ["zombieRange"] = Settings.get("SayZombieRange"),
+            ["enabled"] = Settings.get("SayEnabled"),
             ["color"] = GetColorSandbox("Say"),
             ["radio"] = true,
             ["aliveOnly"] = true,
             ["bubble"] = true,
         },
         ["yell"] = {
-            ["range"] = SandboxVars.TRPC.YellRange,
-            ["zombieRange"] = SandboxVars.TRPC.YellZombieRange,
-            ["enabled"] = SandboxVars.TRPC.YellEnabled,
+            ["range"] = Settings.get("YellRange"),
+            ["zombieRange"] = Settings.get("YellZombieRange"),
+            ["enabled"] = Settings.get("YellEnabled"),
             ["color"] = GetColorSandbox("Yell"),
             ["radio"] = true,
             ["aliveOnly"] = true,
@@ -79,35 +86,35 @@ local function SetMessageTypeSettings()
         ["pm"] = {
             ["range"] = -1,
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.PrivateMessageEnabled,
+            ["enabled"] = Settings.get("PrivateMessageEnabled"),
             ["color"] = GetColorSandbox("PrivateMessage"),
             ["radio"] = false,
             ["aliveOnly"] = true,
             ["bubble"] = false,
         },
         ["me"] = {
-            ["range"] = SandboxVars.TRPC.MeRange,
+            ["range"] = Settings.get("MeRange"),
             ["zombieRange"] = 0,
-            ["enabled"] = SandboxVars.TRPC.MeEnabled,
+            ["enabled"] = Settings.get("MeEnabled"),
             ["color"] = GetColorSandbox("Me"),
             ["radio"] = false,
             ["aliveOnly"] = true,
             ["bubble"] = true,
         },
         ["do"] = {
-            ["range"] = SandboxVars.TRPC.DoRange,
+            ["range"] = Settings.get("DoRange"),
             ["zombieRange"] = 0,
-            ["enabled"] = SandboxVars.TRPC.DoEnabled,
+            ["enabled"] = Settings.get("DoEnabled"),
             ["color"] = GetColorSandbox("Do"),
             ["radio"] = false,
             ["aliveOnly"] = true,
             ["bubble"] = true,
-            ["adminOnly"] = SandboxVars.TRPC.DoAdminOnly,
+            ["adminOnly"] = Settings.get("DoAdminOnly"),
         },
         ["faction"] = {
             ["range"] = -1,
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.FactionMessageEnabled,
+            ["enabled"] = Settings.get("FactionMessageEnabled"),
             ["color"] = GetColorSandbox("FactionMessage"),
             ["radio"] = false,
             ["aliveOnly"] = true,
@@ -116,7 +123,7 @@ local function SetMessageTypeSettings()
         ["safehouse"] = {
             ["range"] = -1,
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.SafeHouseMessageEnabled,
+            ["enabled"] = Settings.get("SafeHouseMessageEnabled"),
             ["color"] = GetColorSandbox("SafeHouseMessage"),
             ["radio"] = false,
             ["aliveOnly"] = true,
@@ -125,26 +132,26 @@ local function SetMessageTypeSettings()
         ["general"] = {
             ["range"] = -1,
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.GeneralMessageEnabled,
+            ["enabled"] = Settings.get("GeneralMessageEnabled"),
             ["color"] = GetColorSandbox("GeneralMessage"),
             ["radio"] = false,
             ["aliveOnly"] = true,
-            ["discord"] = SandboxVars.TRPC.GeneralDiscordEnabled,
+            ["discord"] = Settings.get("GeneralDiscordEnabled"),
             ["bubble"] = false,
         },
         ["admin"] = {
             ["range"] = -1,
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.AdminMessageEnabled,
+            ["enabled"] = Settings.get("AdminMessageEnabled"),
             ["color"] = GetColorSandbox("AdminMessage"),
             ["radio"] = false,
             ["aliveOnly"] = false,
             ["bubble"] = false,
         },
         ["ooc"] = {
-            ["range"] = SandboxVars.TRPC.OutOfCharacterMessageRange,
+            ["range"] = Settings.get("OutOfCharacterMessageRange"),
             ["zombieRange"] = -1,
-            ["enabled"] = SandboxVars.TRPC.OutOfCharacterMessageEnabled,
+            ["enabled"] = Settings.get("OutOfCharacterMessageEnabled"),
             ["color"] = GetColorSandbox("OutOfCharacterMessage"),
             ["radio"] = false,
             ["bubble"] = true,
@@ -154,26 +161,26 @@ local function SetMessageTypeSettings()
         },
         ["scriptedRadio"] = {
             ["enabled"] = true,
-            ["color"] = GetColorFromString(SandboxVars.TRPC.RadioColor),
+            ["color"] = GetColorFromString(Settings.get("RadioColor")),
         },
         ["options"] = {
-            ["showCharacterName"] = SandboxVars.TRPC.ShowCharacterName,
-            ["boredomReduction"] = SandboxVars.TRPC.BoredomReduction,
-            ["languages"] = SandboxVars.TRPC.Languages,
-            ["verb"] = SandboxVars.TRPC.VerbEnabled,
-            ["capitalize"] = SandboxVars.TRPC.Capitalize,
+            ["showCharacterName"] = Settings.get("ShowCharacterName"),
+            ["boredomReduction"] = Settings.get("BoredomReduction"),
+            ["languages"] = Settings.get("Languages"),
+            ["verb"] = Settings.get("VerbEnabled"),
+            ["capitalize"] = Settings.get("Capitalize"),
             ["bubble"] = {
-                ["timer"] = SandboxVars.TRPC.BubbleTimerInSeconds,
-                ["opacity"] = SandboxVars.TRPC.BubbleOpacity,
+                ["timer"] = Settings.get("BubbleTimerInSeconds"),
+                ["opacity"] = Settings.get("BubbleOpacity"),
             },
             ["radio"] = {
-                ["discord"] = SandboxVars.TRPC.RadioDiscordEnabled,
-                ["frequency"] = SandboxVars.TRPC.RadioDiscordFrequency,
-                ["soundMaxRange"] = SandboxVars.TRPC.RadioSoundMaxRange,
+                ["discord"] = Settings.get("RadioDiscordEnabled"),
+                ["frequency"] = Settings.get("RadioDiscordFrequency"),
+                ["soundMaxRange"] = Settings.get("RadioSoundMaxRange"),
             },
-            ["hideCallout"] = SandboxVars.TRPC.HideCallout,
-            ["isVoiceEnabled"] = SandboxVars.TRPC.VoiceEnabled,
-            ["portrait"] = SandboxVars.TRPC.BubblePortrait,
+            ["hideCallout"] = Settings.get("HideCallout"),
+            ["isVoiceEnabled"] = Settings.get("VoiceEnabled"),
+            ["portrait"] = Settings.get("BubblePortrait"),
         },
     }
 end

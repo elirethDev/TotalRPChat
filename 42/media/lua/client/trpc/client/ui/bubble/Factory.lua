@@ -20,28 +20,43 @@ local World = require("trpc/shared/utils/World")
 local Logger = require("trpc/core/Logger")
 local ChatState = require("trpc/client/ui/ChatState")
 local BubbleState = require("trpc/client/ui/bubble/BubbleState")
+local Settings = require("trpc/shared/Settings")
 
 local BubbleFactory = {}
 
---- Read bubble config, overriding defaults with TrpcServerSettings if present.
--- Es el único punto de contacto con TrpcServerSettings del módulo.
+-- Fuente de opciones del lado cliente: el payload wire TrpcServerSettings
+-- (enviado por el servidor vía SendSandboxVars). El closure se evalúa en
+-- cada get(): mientras TrpcServerSettings es nil (ventana ≤2s pre-primer
+-- payload) devuelve nil y Settings.get cae a los defaults del catálogo.
+Settings.setSource(function(name)
+    if TrpcServerSettings == nil then
+        return nil
+    end
+    local options = TrpcServerSettings["options"] or {}
+    if name == "BubbleTimerInSeconds" then
+        local bubble = options["bubble"] or {}
+        return bubble["timer"]
+    end
+    if name == "BubbleOpacity" then
+        local bubble = options["bubble"] or {}
+        return bubble["opacity"]
+    end
+    if name == "BubblePortrait" then
+        return options["portrait"]
+    end
+    return nil
+end)
+
+--- Read bubble config, overriding catalog defaults with the wire payload
+-- (TrpcServerSettings) when present. Los defaults provienen del catálogo
+-- compartido: timer=8, opacity=75, portrait=2 (sandbox-options.txt).
 -- @return table { timer, opacity, portrait }
 local function getBubbleConfig()
-    local config = { timer = 10, opacity = 70, portrait = 1 }
-    if TrpcServerSettings then
-        local options = TrpcServerSettings["options"] or {}
-        local bubble = options["bubble"] or {}
-        if bubble["timer"] ~= nil then
-            config.timer = bubble["timer"]
-        end
-        if bubble["opacity"] ~= nil then
-            config.opacity = bubble["opacity"]
-        end
-        if options["portrait"] ~= nil then
-            config.portrait = options["portrait"]
-        end
-    end
-    return config
+    return {
+        timer = Settings.get("BubbleTimerInSeconds"),
+        opacity = Settings.get("BubbleOpacity"),
+        portrait = Settings.get("BubblePortrait"),
+    }
 end
 
 -- Registry channel->config de burbujas de jugador. Los canales de acción
