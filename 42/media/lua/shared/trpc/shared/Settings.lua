@@ -2,7 +2,7 @@
 -- ------------------------------
 -- Catálogo central de opciones de sandbox TRPC (patrón ChannelRegistry).
 -- Los nombres y defaults son byte-idénticos a 42/media/sandbox-options.txt
--- (53 opciones: 17 page TRPC + 36 page TRPCChannels). Cada lado registra su
+-- (52 opciones: 16 page TRPC + 36 page TRPCChannels). Cada lado registra su
 -- lector vía setSource(fn): el servidor lee SandboxVars.TRPC, el cliente lee
 -- el payload wire TrpcServerSettings (solo opciones de burbuja).
 --
@@ -13,14 +13,13 @@
 local Settings = {}
 
 local OPTIONS = {
-    -- page TRPC (17)
+    -- page TRPC (16)
     ["ShowCharacterName"] = { type = "boolean", default = true },
     ["BoredomReduction"] = { type = "double", default = 1.2 },
     ["Languages"] = { type = "boolean", default = false },
     ["BubblePortrait"] = { type = "enum", default = 2 },
     ["BubbleTimerInSeconds"] = { type = "integer", default = 8 },
     ["BubbleOpacity"] = { type = "integer", default = 75 },
-    ["VoiceEnabled"] = { type = "boolean", default = true },
     ["VerbEnabled"] = { type = "boolean", default = false },
     ["Capitalize"] = { type = "boolean", default = false },
     ["HideCallout"] = { type = "boolean", default = true },

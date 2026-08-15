@@ -2,7 +2,7 @@
 -- ------------------------------
 -- Módulo ChatCommands del Core TRPC.
 -- Parsing y ejecución de comandos de chat: streams (/say, /whisper...) y
--- slash commands (/color, /pitch, /roll, /language).
+-- slash commands (/color, /roll, /language).
 --
 -- Dependencias:
 --   - Globals de PZ en runtime: getPlayer, getText, addSound, ISChat,
@@ -24,7 +24,7 @@ local Commands = {}
 
 -- Handler functions (defined before dispatch tables)
 
-local function HandlePM(command, language, playerColor, pitch)
+local function HandlePM(command, language, playerColor)
     local targetStart, targetEnd = command:find('^%s*"%a+%s?%a+"')
     if targetStart == nil then
         targetStart, targetEnd = command:find("^%s*%a+")
@@ -34,7 +34,7 @@ local function HandlePM(command, language, playerColor, pitch)
     end
     local target = command:sub(targetStart, targetEnd)
     local pmBody = command:sub(targetEnd + 2)
-    ClientSend.sendPrivateMessage(pmBody, language, playerColor, target, pitch)
+    ClientSend.sendPrivateMessage(pmBody, language, playerColor, target)
     ISChat.instance.chatText.lastChatCommand = ISChat.instance.chatText.lastChatCommand .. target .. " "
     return true
 end
@@ -54,25 +54,6 @@ local function ProcessColorCommand(arguments)
         "player color updated to " .. StringFormat.color(newColor) .. " from " .. StringFormat.color(currentColor)
     )
     return true
-end
-
-local function ProcessPitchCommand(arguments)
-    if arguments == nil then
-        ISChat.sendInfoToCurrentTab("pitch value is " .. ISChat.instance.trpcModData["voicePitch"])
-        return true
-    end
-    local regex = "^(%d+.?%d*) *$"
-    local valueAsText = arguments:match(regex)
-    if valueAsText then
-        local value = tonumber(valueAsText)
-        if value ~= nil and value >= 0.85 and value <= 1.45 then
-            local currentPitch = ISChat.instance.trpcModData["voicePitch"]
-            PlayerData.SetPlayerPitch(value)
-            ISChat.sendInfoToCurrentTab("pitch value updated to " .. value .. " from " .. currentPitch)
-            return true
-        end
-    end
-    return false
 end
 
 local function ProcessRollCommand(arguments)
@@ -186,10 +167,6 @@ local TrpcDispatch = {
         fn = ProcessColorCommand,
         hint = 'color command expects the format: "/color value" with value as 255, 255, 255 or #FFFFFF',
     },
-    pitch = {
-        fn = ProcessPitchCommand,
-        hint = 'pitch command expects the format: "/pitch value" with value from 0.85 to 1.45',
-    },
     roll = {
         fn = ProcessRollCommand,
         hint = 'roll command expects the format: "/roll xdy" with x and y numbers and x from 1 to 20',
@@ -206,7 +183,6 @@ local function ProcessChatCommand(stream, command)
     if TrpcServerSettings and TrpcServerSettings[stream.name] == false then
         return false
     end
-    local pitch = ISChat.instance.trpcModData["voicePitch"]
     local trpcCommand = Parser.ParseTrpcMessage(command)
     local playerColor = ISChat.instance.trpcModData["playerColor"]
     if trpcCommand == nil then
@@ -218,11 +194,11 @@ local function ProcessChatCommand(stream, command)
         return false
     end
     if entry.handler then
-        if entry.handler(command, language, playerColor, pitch) == false then
+        if entry.handler(command, language, playerColor) == false then
             return false
         end
     else
-        ClientSend.sendChatMessage(command, language, playerColor, entry.type, pitch, entry.disableVerb)
+        ClientSend.sendChatMessage(command, language, playerColor, entry.type, entry.disableVerb)
     end
     if
         TrpcServerSettings ~= nil

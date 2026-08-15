@@ -1,7 +1,6 @@
 local ABubble = require("trpc/client/ui/bubble/ABubble")
 local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
-local RadioVoice = require("trpc/client/voice/RadioVoice")
 
 local RadioBubble = ABubble:derive("RadioBubble")
 
@@ -56,7 +55,7 @@ RadioBubble.types = {
     vehicle = 3,
 }
 
-function RadioBubble:new(object, message, messageColor, timer, opacity, type, isVoicesEnabled, voicePitch, offsetY)
+function RadioBubble:new(object, message, messageColor, timer, opacity, type, offsetY)
     local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 20, 200)
     local textLength = getTextManager():MeasureStringX(UIFont.medium, parsedMessages["rawMessage"])
     local width = math.min(textLength * 1.25, 162) + 40
@@ -86,9 +85,6 @@ function RadioBubble:new(object, message, messageColor, timer, opacity, type, is
     setmetatable(o, RadioBubble)
     o.type = type
     o.object = object
-    if isVoicesEnabled then
-        o.voice = RadioVoice:new(parsedMessages["rawMessage"], object, voicePitch)
-    end
     o.message = message
     o.color = messageColor
     o.offsetY = offsetY or 0

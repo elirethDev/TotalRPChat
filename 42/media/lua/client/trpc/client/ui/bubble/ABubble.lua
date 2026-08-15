@@ -57,29 +57,14 @@ end
 
 function ABubble:updateText(x, y)
     local time = Calendar.getInstance():getTimeInMillis()
-    local elapsedTime = time - self.startTime
     local delta = time - self.previousTime
 
-    local length = nil
-    if self.voice ~= nil then
-        length = self.voice:currentMessageIndex()
-        if not self.messageFinishedScrolling and length == self.fullMessageLength then
-            self.messageFinishedScrolling = true
-            -- if the bubble is following the voice speed we want it to stay alive at least
-            -- until 2s after all the text appeared
-            self.timer = math.max(elapsedTime + 2000, self.timer)
-        end
-    else
-        self.messageFinishedScrolling = true
-    end
-    local rawMessage, bubbleMessage = self:parseMessage(length)
+    self.messageFinishedScrolling = true
+    local rawMessage, bubbleMessage = self:parseMessage(nil)
     self.text = StringBuilder.BuildFontSizeString("medium") .. bubbleMessage
     self.rawText = rawMessage
     self:paginate()
 
-    if self.voice then
-        self.voice:subscribe()
-    end
     if not self.texturesLoaded then
         self:loadTextures()
         self.texturesLoaded = true
@@ -117,9 +102,6 @@ function ABubble:drawBubble()
         self.alpha = self.fadingProgression * self.opacity
     else
         self.dead = true
-        if self.voice then
-            self.voice:unsubscribe()
-        end
         return
     end
 

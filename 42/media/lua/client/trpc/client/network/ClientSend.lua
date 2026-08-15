@@ -12,7 +12,7 @@ local function FormatCharacterName(player)
     return first .. " " .. last
 end
 
-function ClientSend.sendChatMessage(message, language, playerColor, type, pitch, disableVerb)
+function ClientSend.sendChatMessage(message, language, playerColor, type, disableVerb)
     if not isClient() then
         return
     end
@@ -24,12 +24,11 @@ function ClientSend.sendChatMessage(message, language, playerColor, type, pitch,
         language = language,
         type = type,
         color = playerColor,
-        pitch = pitch,
         disableVerb = disableVerb,
     })
 end
 
-function ClientSend.sendPrivateMessage(message, language, playerColor, target, pitch)
+function ClientSend.sendPrivateMessage(message, language, playerColor, target)
     if not isClient() then
         return
     end
@@ -42,7 +41,6 @@ function ClientSend.sendPrivateMessage(message, language, playerColor, target, p
         type = "pm",
         target = target,
         color = playerColor,
-        pitch = pitch,
     })
 end
 

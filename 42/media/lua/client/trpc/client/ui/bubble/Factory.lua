@@ -6,9 +6,8 @@
 -- channel->constructor y delega el almacenamiento en BubbleState.
 --
 -- Este módulo NO referencia al singleton ISChat directamente: los valores que
--- antes leía (isVoiceEnabled, isPortraitEnabled) se reciben como parámetros, y
--- la configuración global (timer/opacity) se resuelve de forma centralizada en
--- getBubbleConfig().
+-- antes leía (isPortraitEnabled) se reciben como parámetros, y la configuración
+-- global (timer/opacity) se resuelve de forma centralizada en getBubbleConfig().
 --
 -- Globals de PZ en runtime: TrpcServerSettings, getSquare
 -- Requires propios: PlayerBubble, RadioBubble, World, Logger, ChatState,
@@ -85,18 +84,7 @@ local radioChannelRegistry = {
     },
 }
 
-local function CreatePlayerBubble(
-    author,
-    channel,
-    message,
-    color,
-    voiceEnabled,
-    voicePitch,
-    showPlayerName,
-    authorName,
-    authorColor,
-    portraitEnabled
-)
+local function CreatePlayerBubble(author, channel, message, color, showPlayerName, authorName, authorColor, portraitEnabled)
     ChatState.setTypingDots(ChatState.getTypingDots() or {})
     if author == nil then
         Logger.error("BubbleFactory", "TRPC error: CreatePlayerBubble: author is null")
@@ -117,8 +105,6 @@ local function CreatePlayerBubble(
         color,
         config.timer,
         config.opacity,
-        voiceEnabled,
-        voicePitch,
         portrait,
         showPlayerName,
         authorName,
@@ -133,7 +119,7 @@ end
 
 --- Build and store a radio bubble for a given channel. Marks the previous
 -- bubble at (stateKind, key) as dead via BubbleState.add.
-local function BuildRadioBubble(channel, object, message, messageColor, voicePitch, voiceEnabled, key, offsetY)
+local function BuildRadioBubble(channel, object, message, messageColor, key, offsetY)
     local entry = radioChannelRegistry[channel]
     if entry == nil then
         return
@@ -146,14 +132,12 @@ local function BuildRadioBubble(channel, object, message, messageColor, voicePit
         config.timer,
         config.opacity,
         entry.type,
-        voiceEnabled,
-        voicePitch,
         offsetY
     )
     BubbleState.add(entry.stateKind, key, bubble)
 end
 
-local function CreateSquareRadioBubble(position, message, messageColor, voicePitch, voiceEnabled)
+local function CreateSquareRadioBubble(position, message, messageColor)
     if position ~= nil then
         local x, y, z = position["x"], position["y"], position["z"]
         if x == nil or y == nil or z == nil then
@@ -168,11 +152,11 @@ local function CreateSquareRadioBubble(position, message, messageColor, voicePit
         if radios ~= nil and #radios > 0 then
             offsetY = radios[1]:getRenderYOffset()
         end
-        BuildRadioBubble("square", square, message, messageColor, voicePitch, voiceEnabled, key, offsetY)
+        BuildRadioBubble("square", square, message, messageColor, key, offsetY)
     end
 end
 
-local function CreatePlayerRadioBubble(author, message, messageColor, voicePitch, voiceEnabled)
+local function CreatePlayerRadioBubble(author, message, messageColor)
     if author == nil then
         Logger.error("BubbleFactory", "TRPC error: CreatePlayerRadioBubble: author is null")
         return
@@ -182,16 +166,16 @@ local function CreatePlayerRadioBubble(author, message, messageColor, voicePitch
         Logger.error("BubbleFactory", "TRPC error: CreatePlayerRadioBubble: author not found " .. author)
         return
     end
-    BuildRadioBubble("player", authorObj, message, messageColor, voicePitch, voiceEnabled, author)
+    BuildRadioBubble("player", authorObj, message, messageColor, author)
 end
 
-local function CreateVehicleRadioBubble(vehicle, message, messageColor, voicePitch, voiceEnabled)
+local function CreateVehicleRadioBubble(vehicle, message, messageColor)
     local keyId = vehicle:getKeyId()
     if keyId == nil then
         Logger.error("BubbleFactory", "TRPC error: CreateVehicleBubble: key id is null")
         return
     end
-    BuildRadioBubble("vehicle", vehicle, message, messageColor, voicePitch, voiceEnabled, keyId)
+    BuildRadioBubble("vehicle", vehicle, message, messageColor, keyId)
 end
 
 -- API pública

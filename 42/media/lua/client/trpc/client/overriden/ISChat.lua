@@ -107,7 +107,6 @@ local function SetupEventBusSubscriptions()
             args["hideInChat"],
             args["target"],
             false,
-            args["pitch"],
             args["disableVerb"]
         )
     end)
@@ -121,7 +120,6 @@ local function SetupEventBusSubscriptions()
             args["language"],
             args["color"],
             args["radios"],
-            args["pitch"],
             args["disableVerb"]
         )
     end)
@@ -467,7 +465,6 @@ function ISChat.onMessagePacket(
     hideInChat,
     target,
     isFromDiscord,
-    voicePitch,
     disableVerb
 )
     if author ~= getPlayer():getUsername() then
@@ -488,19 +485,15 @@ function ISChat.onMessagePacket(
     ISChat.instance.chatFont = ISChat.instance.chatFont or "medium"
     local showLanguage = TrpcServerSettings and TrpcServerSettings["options"]["languages"]
     local showBubble = TrpcServerSettings and TrpcServerSettings[type] and TrpcServerSettings[type]["bubble"]
-    if not isFromDiscord and voicePitch ~= nil and showBubble then
+    if not isFromDiscord and showBubble then
         if showLanguage and not LanguageManager:isKnown(language) and type ~= "me" and type ~= "do" then
             updatedMessage = LanguageManager:getRandomMessage(updatedMessage)
         end
-        -- ooc should not distract the RP with voices
-        local voiceEnabled = ISChat.instance.isVoiceEnabled and type ~= "ooc"
         BubbleFactory.createPlayerBubble(
             author,
             type,
             updatedMessage,
             Formatting.buildColorFromMessageType(type),
-            voiceEnabled,
-            voicePitch,
             type == "me",
             name,
             color,
@@ -564,7 +557,7 @@ function ISChat.onServerMessage(message)
     AddMessageToTab(stream["tabID"], nil, time, parsedMessage.body, line, "server")
 end
 
-local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, voicePitch)
+local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo)
     if squaresInfo == nil then
         Logger.error("ISChat", "TRPC error: CreateSquaresRadiosBubbles: squaresInfo table is null")
         return
@@ -572,13 +565,7 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
     for _, info in pairs(squaresInfo) do
         local position = info["position"]
         if position ~= nil then
-            BubbleFactory.createSquareRadioBubble(
-                position,
-                message,
-                messageColor,
-                voicePitch,
-                ISChat.instance.isVoiceEnabled
-            )
+            BubbleFactory.createSquareRadioBubble(position, message, messageColor)
             local square = getSquare(position["x"], position["y"], position["z"])
             if square ~= nil then
                 local radio = World.getFirstSquareItem(square, "IsoRadio")
@@ -609,7 +596,7 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
     end
 end
 
-local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, voicePitch)
+local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo)
     if playersInfo == nil then
         Logger.error("ISChat", "TRPC error: CreatePlayersRadiosBubbles: playersInfo table is null")
         return
@@ -617,13 +604,7 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
     for _, info in pairs(playersInfo) do
         local username = info["username"]
         if username ~= nil then
-            BubbleFactory.createPlayerRadioBubble(
-                getPlayer():getUsername(),
-                message,
-                messageColor,
-                voicePitch,
-                ISChat.instance.isVoiceEnabled
-            )
+            BubbleFactory.createPlayerRadioBubble(getPlayer():getUsername(), message, messageColor)
             if username:upper() == getPlayer():getUsername():upper() then
                 local radio = Character.getFirstHandOrBeltItemByGroup(getPlayer(), "Radio")
                 if radio ~= nil then
@@ -651,7 +632,7 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
     end
 end
 
-local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, voicePitch)
+local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo)
     if vehiclesInfo == nil then
         Logger.error("ISChat", "TRPC error: CreateVehiclesRadiosBubbles: vehiclesKeyIds table is null")
         return
@@ -663,13 +644,7 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
         if vehicleKeyId ~= nil then
             local vehicle = vehicles[vehicleKeyId]
             if vehicle ~= nil then
-                BubbleFactory.createVehicleRadioBubble(
-                    vehicle,
-                    message,
-                    messageColor,
-                    voicePitch,
-                    ISChat.instance.isVoiceEnabled
-                )
+                BubbleFactory.createVehicleRadioBubble(vehicle, message, messageColor)
                 local radio = vehicle:getPartById("Radio")
                 if radio ~= nil then
                     local radioData = radio:getDeviceData()
@@ -736,17 +711,7 @@ function ISChat.onRadioEmittingPacket(type, author, characterName, message, lang
     AddMessageToTab(stream["tabID"], language, time, formattedMessage, line, stream["name"])
 end
 
-function ISChat.onRadioPacket(
-    type,
-    author,
-    characterName,
-    message,
-    language,
-    color,
-    radiosInfo,
-    voicePitch,
-    disableVerb
-)
+function ISChat.onRadioPacket(type, author, characterName, message, language, color, radiosInfo, disableVerb)
     local time = Calendar.getInstance():getTimeInMillis()
     local stream = GetStreamFromType(type)
     if stream == nil then
@@ -772,9 +737,9 @@ function ISChat.onRadioPacket(
             updatedMessage = LanguageManager:getRandomMessage(updatedMessage)
         end
         local messageColor = Formatting.buildColorFromMessageType(type)
-        CreateSquaresRadiosBubbles(updatedMessage, messageColor, radios["squares"], voicePitch)
-        CreatePlayersRadiosBubbles(updatedMessage, messageColor, radios["players"], voicePitch)
-        CreateVehiclesRadiosBubbles(updatedMessage, messageColor, radios["vehicles"], voicePitch)
+        CreateSquaresRadiosBubbles(updatedMessage, messageColor, radios["squares"])
+        CreatePlayersRadiosBubbles(updatedMessage, messageColor, radios["players"])
+        CreateVehiclesRadiosBubbles(updatedMessage, messageColor, radios["vehicles"])
 
         local formattedMessage, parsedMessages =
             Formatting.buildMessageFromPacket(type, updatedMessage, name, color, frequency, disableVerb)
@@ -931,7 +896,6 @@ ISChat.addLineInChat = function(message, tabID)
             "en",
             color,
             {}, -- todo find a way to locate the radio
-            message:getRadioChannel(),
             false
         )
     else
@@ -952,7 +916,6 @@ ISChat.addLineInChat = function(message, tabID)
             TrpcServerSettings and TrpcServerSettings["options"] and TrpcServerSettings["options"]["hideCallout"] or nil,
             nil,
             false,
-            ISChat.instance.trpcModData["voicePitch"],
             false
         )
     end
@@ -1005,7 +968,6 @@ ISChat.addLineInChat = function(message, tabID)
                 false,
                 nil,
                 true,
-                1.15, -- voice pitch, should not be used anyway
                 false
             )
         end
@@ -1027,7 +989,6 @@ ISChat.addLineInChat = function(message, tabID)
                         "en",
                         discordColor,
                         radiosInfo,
-                        1.15,
                         false
                     )
                 end
@@ -1242,7 +1203,6 @@ local function UpdateInfoWindow()
         info = info .. getText("SurvivalGuide_TRPC_Ooc")
     end
     info = info .. getText("SurvivalGuide_TRPC_Color")
-    info = info .. getText("SurvivalGuide_TRPC_Pitch")
     info = info .. getText("SurvivalGuide_TRPC_Roll")
     if TrpcServerSettings["options"]["languages"] then
         info = info .. getText("SurvivalGuide_TRPC_Languages")
@@ -1296,9 +1256,6 @@ ISChat.onRecvSandboxVars = function(messageTypeSettings)
 
     RangeController.updateRangeIndicator(ISChat.defaultTabStream[ChatState.getCurrentTabID()])
     UpdateInfoWindow()
-    if ISChat.instance.trpcModData == nil or ISChat.instance.trpcModData["isVoiceEnabled"] == nil then
-        ISChat.instance.isVoiceEnabled = messageTypeSettings["options"]["isVoiceEnabled"]
-    end
     local radioMaxRange = TrpcServerSettings["options"]["radio"]["soundMaxRange"]
     if ISChat.instance.radioRangeIndicator then
         ISChat.instance.radioRangeIndicator:unsubscribe()
@@ -1812,12 +1769,6 @@ function ISChat:onGearButtonClick()
     opaqueOnFocusSubMenu:addOption(getText("UI_chat_context_enable"), ISChat.instance, ISChat.onFocusOpaqueChange, true)
     opaqueOnFocusSubMenu:setOptionChecked(opaqueOnFocusSubMenu.options[self.opaqueOnFocus and 2 or 1], true)
 
-    local voiceOptionName = getText("UI_TRPC_chat_enable_voices")
-    if self.isVoiceEnabled then
-        voiceOptionName = getText("UI_TRPC_chat_disable_voices")
-    end
-    context:addOption(voiceOptionName, ISChat.instance, ISChat.onToggleVoice)
-
     local radioIconOptionName = getText("UI_TRPC_enable_radio_icon")
     if self.isRadioIconEnabled then
         radioIconOptionName = getText("UI_TRPC_disable_radio_icon")
@@ -1831,15 +1782,6 @@ function ISChat:onGearButtonClick()
         end
         context:addOption(portraitOptionName, ISChat.instance, ISChat.onTogglePortrait)
     end
-end
-
-function ISChat.onToggleVoice()
-    ISChat.instance.isVoiceEnabled = not ISChat.instance.isVoiceEnabled
-
-    -- the player has set this option at least once, that means he is aware of its existence
-    -- we'll use this settings in the future instead of the server default behavior
-    ISChat.instance.trpcModData["isVoiceEnabled"] = ISChat.instance.isVoiceEnabled
-    ModData.add("trpc", ISChat.instance.trpcModData)
 end
 
 function ISChat.onToggleRadioIcon()

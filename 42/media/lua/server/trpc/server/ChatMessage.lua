@@ -224,7 +224,6 @@ local function SendRadioPackets(author, player, args, sourceRadioByFrequencies)
         color = args.color,
         type = args.type,
         radios = targetRadiosByFrequencies,
-        pitch = args.pitch,
         disableVerb = args.disableVerb,
         language = args.language,
     })

@@ -1,7 +1,5 @@
 {
     "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/UI.schema.json",
-    "UI_TRPC_chat_enable_voices"  : "Enable voices",
-    "UI_TRPC_chat_disable_voices" : "Disable voices",
     "UI_TRPC_enable_radio_icon"   : "Show radio icon",
     "UI_TRPC_disable_radio_icon"  : "Hide radio icon",
     "UI_TRPC_enable_portrait"     : "Show bubble portrait",

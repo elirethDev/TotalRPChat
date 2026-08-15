@@ -179,7 +179,6 @@ local function SetMessageTypeSettings()
                 ["soundMaxRange"] = Settings.get("RadioSoundMaxRange"),
             },
             ["hideCallout"] = Settings.get("HideCallout"),
-            ["isVoiceEnabled"] = Settings.get("VoiceEnabled"),
             ["portrait"] = Settings.get("BubblePortrait"),
         },
     }

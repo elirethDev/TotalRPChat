@@ -60,16 +60,6 @@ option TRPC.BubbleOpacity
 	translation = TRPC_BubbleOpacity,
 }
 
-option TRPC.VoiceEnabled
-{
-	type = boolean,
-	default = true,
-
-	page = TRPC,
-	translation = TRPC_VoiceEnabled,
-}
-
-
 option TRPC.VerbEnabled
 {
 	type = boolean,

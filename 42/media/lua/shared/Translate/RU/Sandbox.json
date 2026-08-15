@@ -16,8 +16,6 @@
     "Sandbox_TRPC_BubbleTimerInSeconds"          : "Таймер «пузырька» (в секундах)",
     "Sandbox_TRPC_BubbleOpacity"                 : "Прозрачность «пузырька»",
 
-    "Sandbox_TRPC_VoiceEnabled"                  : "Включить имитацию голосов игроков",
-
     "Sandbox_TRPC_VerbEnabled"                   : "Добавлять глагол в начале сообщения и заключать текст в кавычки",
 
     "Sandbox_TRPC_HideCallout"                   : "Скрывать призывы (Q) в окне чата",

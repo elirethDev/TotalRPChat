@@ -5,8 +5,6 @@ local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
 local StringBuilder = require("trpc/client/parser/StringBuilder")
 
-local PlayerVoice = require("trpc/client/voice/PlayerVoice")
-
 local PlayerBubble = ABubble:derive("PlayerBubble")
 
 function PlayerBubble:loadTextures()
@@ -131,8 +129,6 @@ function PlayerBubble:new(
     messageColor,
     timer,
     opacity,
-    isVoicesEnabled,
-    voicePitch,
     portrait,
     showPlayerName,
     playerName,
@@ -174,9 +170,6 @@ function PlayerBubble:new(
     setmetatable(o, PlayerBubble)
     o.isAction = isAction
     o.player = player
-    if isVoicesEnabled and not isAction then
-        o.voice = PlayerVoice:new(rawMessage, player, voicePitch)
-    end
     o.portrait = portrait
     return o
 end

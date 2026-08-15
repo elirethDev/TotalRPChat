@@ -57,9 +57,8 @@ end
 -- ---------------------------------------------------------------------------
 Streams.trpcCommand = {}
 Streams.trpcCommand[1] = { name = "color", command = "/color", shortCommand = nil }
-Streams.trpcCommand[2] = { name = "pitch", command = "/pitch", shortCommand = nil }
-Streams.trpcCommand[3] = { name = "roll", command = "/roll", shortCommand = nil }
-Streams.trpcCommand[4] = { name = "language", command = "/language", shortCommand = "/la" }
+Streams.trpcCommand[2] = { name = "roll", command = "/roll", shortCommand = nil }
+Streams.trpcCommand[3] = { name = "language", command = "/language", shortCommand = "/la" }
 
 -- ---------------------------------------------------------------------------
 -- Default/last stream per tab. These reference the same stream objects as

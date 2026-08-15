@@ -18,8 +18,6 @@
     "Sandbox_TRPC_BubbleTimerInSeconds"          : "Bubble timer (seconds)",
     "Sandbox_TRPC_BubbleOpacity"                 : "Bubble opacity",
 
-    "Sandbox_TRPC_VoiceEnabled"                  : "Enable player fake voices",
-
     "Sandbox_TRPC_VerbEnabled"                   : "Add verb prefix to messages, and quotes",
 
     "Sandbox_TRPC_Capitalize"                    : "Automatically capitalize the first letter of a message and add punctuation",

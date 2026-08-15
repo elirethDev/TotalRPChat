@@ -16,8 +16,6 @@
     "Sandbox_TRPC_BubbleTimerInSeconds"          : "Таймер «бульбашки» (у секундах)",
     "Sandbox_TRPC_BubbleOpacity"                 : "Прозорість «бульбашки»",
 
-    "Sandbox_TRPC_VoiceEnabled"                  : "Увімкнути імітацію голосів гравців",
-
     "Sandbox_TRPC_VerbEnabled"                   : "Додавати дієслово на початку повідомлення і укладати текст у лапки",
 
     "Sandbox_TRPC_HideCallout"                   : "Ховати виклики (Q) у вікні чату",
