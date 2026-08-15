@@ -1,4 +1,5 @@
 local AvatarIO = require("trpc/shared/utils/AvatarIO")
+local AvatarStore = require("trpc/shared/utils/AvatarStore")
 local Character = require("trpc/shared/utils/Character")
 local File = require("trpc/shared/utils/File")
 local ServerSend = require("trpc/server/network/ServerSend")
@@ -33,7 +34,7 @@ end
 
 function AvatarManager:loadPendingAvatarsData()
     if self.pendingAvatarsStored == nil then
-        self.pendingAvatarsStored = ModData.getOrCreate("trpcPendingAvatars")
+        self.pendingAvatarsStored = AvatarStore.getTable(AvatarStore.KEY_PENDING)
     end
 end
 
@@ -178,10 +179,8 @@ function AvatarManager:removePendingAvatar(username, firstName, lastName)
     if self.pendingAvatarsStored == nil then
         AvatarManager:loadPendingAvatarsData()
     end
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
+    AvatarStore.remove(AvatarStore.KEY_PENDING, username, firstName, lastName)
     local key = AvatarIO.createFileName(username, firstName, lastName)
-    avatars[key] = nil
-    ModData.add("trpcPendingAvatars", avatars)
     local path = nil
     if self.pendingAvatarsStored[key] then
         path = self.pendingAvatarsStored[key]["path"]
@@ -200,8 +199,10 @@ function AvatarManager:updatePendingAvatarStored(username, firstName, lastName, 
     if self.pendingAvatarsStored == nil then
         AvatarManager:loadPendingAvatarsData()
     end
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
     local path = "/pending"
+    -- NOTE: path="/pending" preserves the existing server bug: File.remove on
+    -- it zeroes bytes but never unlinks the avatar file. Fixing this is a
+    -- separate deferred change (documented in the avatar-store spec).
     AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, path)
     local key = AvatarIO.createFileName(username, firstName, lastName)
     local pendingAvatarInfo = {
@@ -212,8 +213,7 @@ function AvatarManager:updatePendingAvatarStored(username, firstName, lastName, 
         lastName = lastName,
         extension = extension,
     }
-    avatars[key] = pendingAvatarInfo
-    ModData.add("trpcPendingAvatars", avatars)
+    AvatarStore.upsert(AvatarStore.KEY_PENDING, username, firstName, lastName, pendingAvatarInfo)
     self.pendingAvatarsStored[key] = pendingAvatarInfo
     return key, pendingAvatarInfo
 end
