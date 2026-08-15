@@ -9,7 +9,6 @@
 
 local StringParser = require("trpc/shared/utils/StringParser")
 local Logger = require("trpc/core/Logger")
-local ServerSend = require("trpc/server/network/ServerSend")
 local World = require("trpc/shared/utils/World")
 
 local ChatDomain = {}
@@ -179,130 +178,147 @@ local function SetMessageTypeSettings()
     }
 end
 
-local AuthorHasAccessByType = {
-    ["whisper"] = function(author, args, sendError)
-        return true
-    end,
-    ["low"] = function(author, args, sendError)
-        return true
-    end,
-    ["say"] = function(author, args, sendError)
-        return true
-    end,
-    ["yell"] = function(author, args, sendError)
-        return true
-    end,
-    ["pm"] = function(author, args, sendError)
-        if args.target == nil or World.getPlayerByUsername(args.target) == nil then
-            if args.target ~= nil then
-                if sendError then
-                    ServerSend.ChatErrorMessage(author, args.type, 'unknown player "' .. args.target .. '".')
+-- PermissionRegistry: registro data-driven de permisos por canal (patrón ChannelRegistry).
+-- Cada canal define closures puras, sin side-effects de red (los side-effects los resuelve
+-- el caller — ChatMessage.ProcessMessage — vía errorCode):
+--   authorAccess(author, args)            -> (ok: bool, errorCode: string?)   — sin side-effects
+--   listenerAccess(author, player, args)  -> bool                            — sin side-effects
+local PermissionRegistry = {
+    ["whisper"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["low"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["say"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["yell"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["pm"] = {
+        authorAccess = function(author, args)
+            if args.target == nil or World.getPlayerByUsername(args.target) == nil then
+                if args.target ~= nil then
+                    return false, "UNKNOWN_PLAYER"
                 end
-            else
                 Logger.error(
                     "ChatDomain",
                     'TRPC error: Received a private message from "'
                         .. author:getUsername()
                         .. '" without a contact name'
                 )
+                return false
             end
-            return false
-        end
-        return true
-    end,
-    ["faction"] = function(author, args, sendError)
-        local hasFaction = Faction.getPlayerFaction(author) ~= nil
-        if not hasFaction and sendError then
-            ServerSend.ChatErrorMessage(author, args.type, "you are not part of a faction.")
-        end
-        return hasFaction
-    end,
-    ["safehouse"] = function(author, args, sendError)
-        local hasSafeHouse = SafeHouse.hasSafehouse(author) ~= nil
-        if not hasSafeHouse and sendError then
-            ServerSend.ChatErrorMessage(author, args.type, "you are not part of a safe house.")
-        end
-        return hasSafeHouse
-    end,
-    ["general"] = function(author, args, sendError)
-        return true
-    end,
-    ["admin"] = function(author, args, sendError)
-        return author:getAccessLevel() == "Admin"
-    end,
-    ["ooc"] = function(author, args, sendError)
-        return true
-    end,
-    ["me"] = function(author, args, sendError)
-        return true
-    end,
-    ["do"] = function(author, args, sendError)
-        if
-            ChatDomain.MessageTypeSettings
-            and (
-                not ChatDomain.MessageTypeSettings["do"]["adminOnly"]
-                or author:getAccessLevel() == "Admin"
-                or author:getAccessLevel() == "Moderator"
-            )
-        then
             return true
-        else
-            if sendError then
-                ServerSend.ChatErrorMessage(author, args.type, "requires admin privileges.")
+        end,
+        listenerAccess = function(author, player, args)
+            return args.target ~= nil
+                and args.author ~= nil
+                and (
+                    player:getUsername():lower() == args.target:lower()
+                    or player:getUsername():lower() == args.author:lower()
+                )
+        end,
+    },
+    ["faction"] = {
+        authorAccess = function(author, args)
+            if Faction.getPlayerFaction(author) == nil then
+                return false, "NO_FACTION"
             end
-            return false
-        end
-    end,
-}
-
-local ListenerHasAccessByType = {
-    ["whisper"] = function(author, player, args)
-        return true
-    end,
-    ["low"] = function(author, player, args)
-        return true
-    end,
-    ["say"] = function(author, player, args)
-        return true
-    end,
-    ["yell"] = function(author, player, args)
-        return true
-    end,
-    ["pm"] = function(author, player, args)
-        return args.target ~= nil
-            and args.author ~= nil
-            and (
-                player:getUsername():lower() == args.target:lower()
-                or player:getUsername():lower() == args.author:lower()
-            )
-    end,
-    ["faction"] = function(author, player, args)
-        local authorFaction = Faction.getPlayerFaction(author)
-        local playerFaction = Faction.getPlayerFaction(player)
-        return playerFaction ~= nil and authorFaction ~= nil and playerFaction:getName() == authorFaction:getName()
-    end,
-    ["safehouse"] = function(author, player, args)
-        local playerSafeHouse = SafeHouse.hasSafehouse(player)
-        local authorSafeHouse = SafeHouse.hasSafehouse(author)
-        return playerSafeHouse ~= nil
-            and authorSafeHouse ~= nil
-            and playerSafeHouse:getTitle() == authorSafeHouse:getTitle()
-    end,
-    ["general"] = function(author, player, args)
-        return true
-    end,
-    ["admin"] = function(author, player, args)
-        return player:getAccessLevel() == "Admin"
-    end,
-    ["ooc"] = function(author, player, args)
-        return true
-    end,
-    ["me"] = function(author, args, sendError)
-        return true
-    end,
-    ["do"] = function(author, args, sendError)
-        return true
-    end,
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            local authorFaction = Faction.getPlayerFaction(author)
+            local playerFaction = Faction.getPlayerFaction(player)
+            return playerFaction ~= nil and authorFaction ~= nil and playerFaction:getName() == authorFaction:getName()
+        end,
+    },
+    ["safehouse"] = {
+        authorAccess = function(author, args)
+            if SafeHouse.hasSafehouse(author) == nil then
+                return false, "NO_SAFEHOUSE"
+            end
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            local playerSafeHouse = SafeHouse.hasSafehouse(player)
+            local authorSafeHouse = SafeHouse.hasSafehouse(author)
+            return playerSafeHouse ~= nil
+                and authorSafeHouse ~= nil
+                and playerSafeHouse:getTitle() == authorSafeHouse:getTitle()
+        end,
+    },
+    ["general"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["admin"] = {
+        authorAccess = function(author, args)
+            return author:getAccessLevel() == "Admin"
+        end,
+        listenerAccess = function(author, player, args)
+            return player:getAccessLevel() == "Admin"
+        end,
+    },
+    ["ooc"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["me"] = {
+        authorAccess = function(author, args)
+            return true
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
+    ["do"] = {
+        authorAccess = function(author, args)
+            if
+                ChatDomain.MessageTypeSettings
+                and (
+                    not ChatDomain.MessageTypeSettings["do"]["adminOnly"]
+                    or author:getAccessLevel() == "Admin"
+                    or author:getAccessLevel() == "Moderator"
+                )
+            then
+                return true
+            end
+            return false, "ADMIN_ONLY"
+        end,
+        listenerAccess = function(author, player, args)
+            return true
+        end,
+    },
 }
 
 function ChatDomain.GetRangeForMessageType(type)
@@ -314,33 +330,40 @@ function ChatDomain.GetRangeForMessageType(type)
     return nil
 end
 
-function ChatDomain.IsAllowedToTalk(author, args, sendError)
+function ChatDomain.IsAllowedToTalk(author, args)
     if args.type == nil then
         Logger.error("ChatDomain", "TRPC error: args.type is null")
         return false
     end
-    if AuthorHasAccessByType[args.type] == nil then
-        Logger.error("ChatDomain", "TRPC error: AuthorHasAccessByType has no method for type " .. args.type)
+    local permission = PermissionRegistry[args.type]
+    if permission == nil then
+        Logger.error("ChatDomain", "TRPC error: PermissionRegistry has no method for type " .. args.type)
         return false
     end
     if ChatDomain.MessageTypeSettings[args.type] == nil then
         Logger.error("ChatDomain", "TRPC error: ChatDomain.MessageTypeSettings of " .. args.type .. " is null")
         return false
     end
-    return ChatDomain.MessageTypeSettings[args.type]["enabled"] == true
-        and (not ChatDomain.MessageTypeSettings[args.type]["aliveOnly"] or author:getBodyDamage():getHealth() > 0)
-        and AuthorHasAccessByType[args.type](author, args, sendError)
+    local settings = ChatDomain.MessageTypeSettings[args.type]
+    if settings["enabled"] ~= true then
+        return false
+    end
+    if settings["aliveOnly"] and author:getBodyDamage():getHealth() <= 0 then
+        return false
+    end
+    return permission.authorAccess(author, args)
 end
 
 function ChatDomain.IsAllowedToListen(author, player, args)
-    if ListenerHasAccessByType[args.type] == nil then
+    local permission = PermissionRegistry[args.type]
+    if permission == nil then
         Logger.error(
             "ChatDomain",
-            "TRPC error: IsAllowedToListen: MessageHasAccessByType has no method for " .. args.type
+            "TRPC error: IsAllowedToListen: PermissionRegistry has no method for " .. args.type
         )
         return false
     end
-    return ListenerHasAccessByType[args.type](author, player, args)
+    return permission.listenerAccess(author, player, args)
 end
 
 -- API pública

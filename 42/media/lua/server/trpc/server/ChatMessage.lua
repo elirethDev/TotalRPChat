@@ -304,13 +304,32 @@ local function SendRadioEmittingPackets(player, args, radioFrequencies)
     end
 end
 
+local PermissionErrorMessages = {
+    ["UNKNOWN_PLAYER"] = function(args)
+        return 'unknown player "' .. args.target .. '".'
+    end,
+    ["NO_FACTION"] = function()
+        return "you are not part of a faction."
+    end,
+    ["NO_SAFEHOUSE"] = function()
+        return "you are not part of a safe house."
+    end,
+    ["ADMIN_ONLY"] = function()
+        return "requires admin privileges."
+    end,
+}
+
 function ChatMessage.ProcessMessage(player, args, packetType, sendError)
     if args.type == nil then
         Logger.error("ChatMessage", 'TRPC error: Received a message from "' .. player:getUsername() .. '" with no type')
         return
     end
 
-    if not ChatDomain.IsAllowedToTalk(player, args, sendError) then
+    local ok, errorCode = ChatDomain.IsAllowedToTalk(player, args)
+    if not ok then
+        if sendError and errorCode ~= nil then
+            ServerSend.ChatErrorMessage(player, args.type, PermissionErrorMessages[errorCode](args))
+        end
         return
     end
 
