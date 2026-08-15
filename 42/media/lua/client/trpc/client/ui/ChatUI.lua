@@ -71,10 +71,22 @@ function ChatUI:render()
         local rh = self:resizeWidgetHeight()
         -- self:drawRectBorder(0, height - rh - 1, self:getWidth(), rh + 1, self.borderColor.a, self.borderColor.r,
         --    self.borderColor.g, self.borderColor.b)
-        local r, g, b, a = 20 / 255, 20 / 255, 20 / 255, 0.8
+        local r, g, b, a = 30 / 255, 30 / 255, 34 / 255, 0.9
         -- self:drawTextureScaled(self.statusbarbkg, 2, height - rh, self:getWidth() - 4, rh - 1, a, r, g, b)
         self:drawRect(2, height - rh, self:getWidth() - 4, rh - 1, a, r, g, b)
-        self:drawTexture(self.resizeimage, self:getWidth() - 9, height - rh, a, r, g, b)
+        -- Scale the resize arrow to the corner widget (like vanilla) and brighten it
+        -- so it is clearly visible against the dark resize bar.
+        self:drawTextureScaled(
+            self.resizeimage,
+            self:getWidth() - rh + 1,
+            height - rh + 1,
+            rh - 2,
+            rh - 2,
+            0.95,
+            1,
+            1,
+            1
+        )
     end
 
     if self.clearStentil then

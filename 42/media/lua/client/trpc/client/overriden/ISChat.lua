@@ -1457,6 +1457,7 @@ function ISChat:createChildren()
     resizeWidget:initialise()
     resizeWidget.onMouseDown = ISChat.onMouseDown
     resizeWidget.onMouseUp = ISChat.onMouseUp
+    resizeWidget.resizeFunction = ISChat.resizeFunction
     resizeWidget:setVisible(self.resizable)
     resizeWidget:bringToTop()
     resizeWidget:setUIName(ISChat.xyResizeWidgetName)
@@ -1470,6 +1471,7 @@ function ISChat:createChildren()
     resizeWidget2:initialise()
     resizeWidget2.onMouseDown = ISChat.onMouseDown
     resizeWidget2.onMouseUp = ISChat.onMouseUp
+    resizeWidget2.resizeFunction = ISChat.resizeFunction
     resizeWidget2:setVisible(self.resizable)
     resizeWidget2:setUIName(ISChat.yResizeWidgetName)
     self:addChild(resizeWidget2)
@@ -1633,6 +1635,11 @@ function ISChat:createChildren()
 
     self:bringToTop()
     self.textEntry:bringToTop()
+    -- The text entry's bottom edge overlaps the resize widgets' top strip (~2.5px),
+    -- turning the arrow's top edge into a dead zone. Re-raise the resize widgets
+    -- so the arrow is fully clickable.
+    self.resizeWidget:bringToTop()
+    self.resizeWidget2:bringToTop()
     self.minimumWidth = self.panel:getWidthOfAllTabs() + 2 * inset
     self.minimumHeight = self.textEntry:getHeight()
         + self:titleBarHeight()
@@ -1644,8 +1651,94 @@ function ISChat:createChildren()
     self.mutedUsers = {}
 end
 
+-- Mod-side resize dispatchers. They mirror the vanilla ISChat.onMouseDown/onMouseUp
+-- exactly, EXCEPT the corner/bottom resize branches are NOT guarded by `locked`.
+-- The chat is always resizable; `locked` now only disables drag-move via the titlebar.
+ISChat.onMouseDown = function(target, x, y)
+    -- titlebar drag-move keeps the lock guard
+    if
+        target:getUIName() == ISChat.windowName
+        and not ISChat.instance.locked
+        and ISChat.instance:isCursorOnTitlebar(x, y)
+    then
+        ISCollapsableWindow.onMouseDown(ISChat.instance, x, y)
+        return true
+    end
+    if target:getUIName() == ISChat.textPanelName then
+        return ISChat.focused
+    end
+    if target:getUIName() == ISChat.tabPanelName then
+        ISChat.ISTabPanelOnMouseDown(ISChat.instance.panel, x, y)
+        return ISChat.focused
+    end
+    if target:getUIName() == ISChat.textEntryName then
+        return ISChat.focused
+    end
+    -- resize is allowed whether locked or not
+    if target:getUIName() == ISChat.yResizeWidgetName then
+        ISResizeWidget.onMouseDown(ISChat.instance.resizeWidget2, x, y)
+        return true
+    end
+    if target:getUIName() == ISChat.xyResizeWidgetName then
+        ISResizeWidget.onMouseDown(ISChat.instance.resizeWidget, x, y)
+        return true
+    end
+    return ISChat.focused
+end
+
+ISChat.onMouseUp = function(target, x, y)
+    if target:getUIName() == ISChat.windowName and ISChat.instance.moving then
+        ISCollapsableWindow.onMouseUp(ISChat.instance, x, y)
+        return true
+    end
+    if target:getUIName() == ISChat.textPanelName then
+        return ISChat.focused
+    end
+    if target:getUIName() == ISChat.tabPanelName then
+        ISTabPanel.onMouseUp(ISChat.instance.panel, x, y)
+        return ISChat.focused
+    end
+    if target:getUIName() == ISChat.textEntryName then
+        return ISChat.focused
+    end
+    -- resize is allowed whether locked or not
+    if target:getUIName() == ISChat.yResizeWidgetName then
+        ISResizeWidget.onMouseUp(ISChat.instance.resizeWidget2, x, y)
+        return true
+    end
+    if target:getUIName() == ISChat.xyResizeWidgetName then
+        ISResizeWidget.onMouseUp(ISChat.instance.resizeWidget, x, y)
+        return true
+    end
+    return ISChat.focused
+end
+
+-- Installed as resizeFunction on both ISResizeWidget children. Runs after the window
+-- size changes and reflows + re-paginates EVERY tab deterministically, instead of
+-- relying on the engine's anchor/onResize timing for hidden tabs.
+ISChat.resizeFunction = function(target, width, height)
+    target:setWidth(width)
+    target:setHeight(height)
+    local pos = target:calcTabPos()
+    local size = target:calcTabSize()
+    for _, chatText in pairs(ChatState.getTabs()) do
+        if chatText then
+            chatText:setX(pos.x)
+            chatText:setY(pos.y)
+            chatText:setWidth(size.width)
+            chatText:setHeight(size.height)
+            chatText.textDirty = true
+            chatText:paginate()
+        end
+    end
+    if target.chatText then
+        target.chatText.textDirty = true
+    end
+end
+
 function ISChat:focus()
     self:setVisible(true)
+    ISChat.focused = true -- keep the vanilla static flag in sync so the dispatcher consumes clicks
     ChatState.setFocused(true)
     self.textEntry:setEditable(true)
     self.textEntry:focus()
@@ -1664,6 +1757,7 @@ function ISChat:unfocus()
         self.fade:reset() -- to begin fade. unfocus called when element was unfocused also.
     end
     ChatState.setFocused(false)
+    ISChat.focused = false -- keep the vanilla static flag in sync
     self.textEntry:setEditable(false)
 end
 
