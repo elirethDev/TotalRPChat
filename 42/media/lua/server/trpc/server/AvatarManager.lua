@@ -200,13 +200,14 @@ function AvatarManager:updatePendingAvatarStored(username, firstName, lastName, 
         AvatarManager:loadPendingAvatarsData()
     end
     local path = "/pending"
-    -- NOTE: path="/pending" preserves the existing server bug: File.remove on
-    -- it zeroes bytes but never unlinks the avatar file. Fixing this is a
-    -- separate deferred change (documented in the avatar-store spec).
-    AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, path)
+    -- El path guardado en el registro es el fullPath REAL del archivo devuelto
+    -- por AvatarIO.savePlayerAvatar. Antes se guardaba "/pending" (un
+    -- directorio), por lo que File.remove("/pending") solo vaciaba el
+    -- directorio y los PNG pending rechazados quedaban huérfanos en disco.
+    local fullPath = AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, path)
     local key = AvatarIO.createFileName(username, firstName, lastName)
     local pendingAvatarInfo = {
-        path = path,
+        path = fullPath,
         checksum = checksum,
         username = username,
         firstName = firstName,
