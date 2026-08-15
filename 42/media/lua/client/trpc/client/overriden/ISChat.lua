@@ -3,7 +3,6 @@ local TRPC_VERSION = require("trpc/shared/Version")
 local ChatUI = require("trpc/client/ui/ChatUI")
 local ChatText = require("trpc/client/ui/Chat/ChatText")
 
-local ContextBubble = require("trpc/client/ui/bubble/ContextBubble")
 local PlayerBubble = require("trpc/client/ui/bubble/PlayerBubble")
 local RadioBubble = require("trpc/client/ui/bubble/RadioBubble")
 
@@ -1072,8 +1071,8 @@ function ISChat:prerender()
         end
     end
 
-    -- Render all living bubbles (player, radio, playerRadio, vehicleRadio,
-    -- context) via the unified BubbleState render loop.
+    -- Render all living bubbles (player, radio, playerRadio, vehicleRadio)
+    -- via the unified BubbleState render loop.
     BubbleState.renderAll()
 
     -- Typing dots are tracked separately in ChatState and rendered here.
