@@ -1,4 +1,5 @@
 local AvatarIO = require("trpc/shared/utils/AvatarIO")
+local AvatarStore = require("trpc/shared/utils/AvatarStore")
 local Character = require("trpc/shared/utils/Character")
 local File = require("trpc/shared/utils/File")
 local Logger = require("trpc/core/Logger")
@@ -6,25 +7,20 @@ local Logger = require("trpc/core/Logger")
 local AvatarManager = {}
 
 function AvatarManager:getKnownAvatars()
-    local toDelete = {}
-    local somethingToDelete = false
     local toSend = {}
-    local avatars = ModData.getOrCreate("trpcApprovedAvatars")
-    for username, avatar in pairs(avatars) do
-        local path = avatar["path"]
-        local checksum = avatar["checksum"]
-        if path == nil or checksum == nil or not serverFileExists("../Lua/" .. avatar["path"]) then
-            table.insert(toDelete, username)
-            somethingToDelete = true
-        else
-            toSend[username] = checksum
+    local survivors, removed = AvatarStore.pruneInvalid(
+        AvatarStore.getTable(AvatarStore.KEY_APPROVED),
+        function(key, avatar)
+            local path = avatar["path"]
+            local checksum = avatar["checksum"]
+            return path ~= nil and checksum ~= nil and serverFileExists("../Lua/" .. avatar["path"])
         end
+    )
+    for _, survivor in ipairs(survivors) do
+        toSend[survivor.key] = survivor.avatar["checksum"]
     end
-    if somethingToDelete then
-        for _, username in pairs(toDelete) do
-            avatars[username] = nil
-        end
-        ModData.add("trpcApprovedAvatars", avatars)
+    if #removed > 0 then
+        AvatarStore.removeMany(AvatarStore.KEY_APPROVED, removed)
     end
     return toSend
 end
@@ -55,19 +51,16 @@ function AvatarManager:loadAvatarRequest()
     return avatar
 end
 
-local function SaveAvatar(username, firstName, lastName, extension, checksum, data, directory, modDataPath)
-    local avatars = ModData.getOrCreate(modDataPath)
+local function SaveAvatar(modDataKey, username, firstName, lastName, extension, checksum, data, directory)
     local path = getPlayer():getUsername() .. "/" .. directory
     local fullPath = AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, path)
-    local key = AvatarIO.createFileName(username, firstName, lastName)
-    avatars[key] = {
+    AvatarStore.upsert(modDataKey, username, firstName, lastName, {
         path = fullPath,
         checksum = checksum,
         username = username,
         firstName = firstName,
         lastName = lastName,
-    }
-    ModData.add(modDataPath, avatars)
+    })
     local texture = getTextureFromSaveDir(fullPath, "../Lua")
     if texture then
         Texture.reload(texture:getName())
@@ -75,34 +68,28 @@ local function SaveAvatar(username, firstName, lastName, extension, checksum, da
 end
 
 function AvatarManager:saveApprovedAvatar(username, firstName, lastName, extension, checksum, data)
-    SaveAvatar(username, firstName, lastName, extension, checksum, data, "", "trpcApprovedAvatars")
+    SaveAvatar(AvatarStore.KEY_APPROVED, username, firstName, lastName, extension, checksum, data, "")
 end
 
 function AvatarManager:savePendingAvatar(username, firstName, lastName, extension, checksum, data)
-    SaveAvatar(username, firstName, lastName, extension, checksum, data, "pending", "trpcPendingAvatars")
+    SaveAvatar(AvatarStore.KEY_PENDING, username, firstName, lastName, extension, checksum, data, "pending")
 end
 
 function AvatarManager:getPendingAvatarData(username, firstName, lastName)
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
-    local key = AvatarIO.createFileName(username, firstName, lastName)
-    return avatars[key]
+    return AvatarStore.get(AvatarStore.KEY_PENDING, username, firstName, lastName)
 end
 
 function AvatarManager:getAvatarData(username, firstName, lastName)
-    local avatars = ModData.getOrCreate("trpcApprovedAvatars")
-    local key = AvatarIO.createFileName(username, firstName, lastName)
-    if avatars[key] and not File.exists(avatars[key]["path"]) then
-        avatars[key] = nil
-        ModData.add("trpcApprovedAvatars", avatars)
+    local avatar = AvatarStore.get(AvatarStore.KEY_APPROVED, username, firstName, lastName)
+    if avatar ~= nil and not File.exists(avatar["path"]) then
+        AvatarStore.remove(AvatarStore.KEY_APPROVED, username, firstName, lastName)
+        return nil
     end
-    return avatars[key]
+    return avatar
 end
 
 function AvatarManager:removeAvatarData(username, firstName, lastName)
-    local avatars = ModData.getOrCreate("trpcApprovedAvatars")
-    local key = AvatarIO.createFileName(username, firstName, lastName)
-    avatars[key] = nil
-    ModData.add("trpcApprovedAvatars", avatars)
+    AvatarStore.remove(AvatarStore.KEY_APPROVED, username, firstName, lastName)
 end
 
 function AvatarManager:getRequestAvatar()
@@ -162,10 +149,9 @@ function AvatarManager:removeAvatarPending(username, firstName, lastName, checks
     assert(type(firstName) == "string", "TRPC error: rejectAvatar: missing firstName")
     assert(type(lastName) == "string", "TRPC error: rejectAvatar: missing lastName")
     assert(type(checksum) == "number", "TRPC error: rejectAvatar: missing checksum")
-    local key = AvatarIO.createFileName(username, firstName, lastName)
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
-    if avatars[key] ~= nil and avatars[key]["checksum"] == checksum then
-        local path = avatars[key]["path"]
+    local avatar = AvatarStore.get(AvatarStore.KEY_PENDING, username, firstName, lastName)
+    if avatar ~= nil and avatar["checksum"] == checksum then
+        local path = avatar["path"]
         assert(
             type(path) == "string",
             'TRPC error: removeAvatarPending: avatar path not found for username "'
@@ -176,8 +162,7 @@ function AvatarManager:removeAvatarPending(username, firstName, lastName, checks
                 .. lastName
                 .. '"'
         )
-        avatars[key] = nil
-        ModData.add("trpcPendingAvatars", avatars)
+        AvatarStore.remove(AvatarStore.KEY_PENDING, username, firstName, lastName)
         File.remove(path)
     end
 end
@@ -191,157 +176,103 @@ function AvatarManager:isPendingAvatarAlive(username, firstName, lastName, check
     return avatar ~= nil and avatar["checksum"] == checksum
 end
 
-function AvatarManager:getFirstAvatarPending()
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
-    local toRemove = {}
-    local avatarResult = nil
-    for key, avatar in pairs(avatars) do
-        local path = avatar["path"]
-        local texture = getTextureFromSaveDir(path, "../Lua")
-        local checksum = avatar["checksum"]
-        local username = avatar["username"]
-        local firstName = avatar["firstName"]
-        local lastName = avatar["lastName"]
-        if path == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache'
-            )
-            table.insert(toRemove, key)
-        elseif texture == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar texture for "'
-                    .. key
-                    .. '" at "'
-                    .. path
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif checksum == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar checksum for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif username == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar username for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif firstName == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar first name for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif lastName == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar last name for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        else
-            avatarResult = {
-                username = username,
-                texture = texture,
-                checksum = checksum,
-                firstName = firstName,
-                lastName = lastName,
-            }
-            break
-        end
+--- Shared pending-avatar validity predicate used by both getFirstAvatarPending
+--- and getAvatarsPending. Emits the same per-field errors the two original
+--- duplicated loops emitted.
+local function isPendingAvatarUsable(key, avatar)
+    local path = avatar["path"]
+    local texture = getTextureFromSaveDir(path, "../Lua")
+    local checksum = avatar["checksum"]
+    local username = avatar["username"]
+    local firstName = avatar["firstName"]
+    local lastName = avatar["lastName"]
+    if path == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache'
+        )
+        return false
+    elseif texture == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: failed to load the unapproved avatar texture for "'
+                .. key
+                .. '" at "'
+                .. path
+                .. '", removing texture from cache'
+        )
+        return false
+    elseif checksum == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: failed to load the unapproved avatar checksum for "' .. key .. '", removing texture from cache'
+        )
+        return false
+    elseif username == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: failed to load the unapproved avatar username for "' .. key .. '", removing texture from cache'
+        )
+        return false
+    elseif firstName == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: failed to load the unapproved avatar first name for "'
+                .. key
+                .. '", removing texture from cache'
+        )
+        return false
+    elseif lastName == nil then
+        Logger.error(
+            "AvatarManager",
+            'TRPC error: failed to load the unapproved avatar last name for "'
+                .. key
+                .. '", removing texture from cache'
+        )
+        return false
     end
-    for _, key in pairs(toRemove) do
-        avatars[key] = nil
-        ModData.add("trpcPendingAvatars", avatars)
+    return true
+end
+
+function AvatarManager:getFirstAvatarPending()
+    local survivors, removed =
+        AvatarStore.pruneInvalid(AvatarStore.getTable(AvatarStore.KEY_PENDING), isPendingAvatarUsable)
+    if #removed > 0 then
+        AvatarStore.removeMany(AvatarStore.KEY_PENDING, removed)
+    end
+    local avatarResult = nil
+    local survivor = survivors[1]
+    if survivor ~= nil then
+        local avatar = survivor.avatar
+        avatarResult = {
+            username = avatar["username"],
+            texture = getTextureFromSaveDir(avatar["path"], "../Lua"),
+            checksum = avatar["checksum"],
+            firstName = avatar["firstName"],
+            lastName = avatar["lastName"],
+        }
     end
     return avatarResult
 end
 
 function AvatarManager:getAvatarsPending()
-    local avatars = ModData.getOrCreate("trpcPendingAvatars")
+    local survivors, removed =
+        AvatarStore.pruneInvalid(AvatarStore.getTable(AvatarStore.KEY_PENDING), isPendingAvatarUsable)
+    if #removed > 0 then
+        AvatarStore.removeMany(AvatarStore.KEY_PENDING, removed)
+    end
     local avatarsToApprove = {}
     local count = 0
-    local toRemove = {}
-    for key, avatar in pairs(avatars) do
-        local path = avatar["path"]
-        local texture = getTextureFromSaveDir(path, "../Lua")
-        local checksum = avatar["checksum"]
-        local username = avatar["username"]
-        local firstName = avatar["firstName"]
-        local lastName = avatar["lastName"]
-        if path == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: no path set for unapproved avatar "' .. key .. '", removing avatar from cache'
-            )
-            table.insert(toRemove, key)
-        elseif texture == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar texture for "'
-                    .. key
-                    .. '" at "'
-                    .. path
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif checksum == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar checksum for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif username == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar username for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif firstName == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar first name for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        elseif lastName == nil then
-            Logger.error(
-                "AvatarManager",
-                'TRPC error: failed to load the unapproved avatar last name for "'
-                    .. key
-                    .. '", removing texture from cache'
-            )
-            table.insert(toRemove, key)
-        else
-            table.insert(avatarsToApprove, {
-                username = username,
-                texture = texture,
-                checksum = checksum,
-                firstName = firstName,
-                lastName = lastName,
-            })
-            count = count + 1
-        end
-    end
-    for _, key in pairs(toRemove) do
-        avatars[key] = nil
-        ModData.add("trpcPendingAvatars", avatars)
+    for _, survivor in ipairs(survivors) do
+        local avatar = survivor.avatar
+        table.insert(avatarsToApprove, {
+            username = avatar["username"],
+            texture = getTextureFromSaveDir(avatar["path"], "../Lua"),
+            checksum = avatar["checksum"],
+            firstName = avatar["firstName"],
+            lastName = avatar["lastName"],
+        })
+        count = count + 1
     end
     return avatarsToApprove, count
 end
