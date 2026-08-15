@@ -573,7 +573,13 @@ local function CreateSquaresRadiosBubbles(message, messageColor, squaresInfo, vo
     for _, info in pairs(squaresInfo) do
         local position = info["position"]
         if position ~= nil then
-            BubbleFactory.createSquareRadioBubble(position, message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
+            BubbleFactory.createSquareRadioBubble(
+                position,
+                message,
+                messageColor,
+                voicePitch,
+                ISChat.instance.isVoiceEnabled
+            )
             local square = getSquare(position["x"], position["y"], position["z"])
             if square ~= nil then
                 local radio = World.getFirstSquareItem(square, "IsoRadio")
@@ -612,7 +618,13 @@ local function CreatePlayersRadiosBubbles(message, messageColor, playersInfo, vo
     for _, info in pairs(playersInfo) do
         local username = info["username"]
         if username ~= nil then
-            BubbleFactory.createPlayerRadioBubble(getPlayer():getUsername(), message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
+            BubbleFactory.createPlayerRadioBubble(
+                getPlayer():getUsername(),
+                message,
+                messageColor,
+                voicePitch,
+                ISChat.instance.isVoiceEnabled
+            )
             if username:upper() == getPlayer():getUsername():upper() then
                 local radio = Character.getFirstHandOrBeltItemByGroup(getPlayer(), "Radio")
                 if radio ~= nil then
@@ -652,7 +664,13 @@ local function CreateVehiclesRadiosBubbles(message, messageColor, vehiclesInfo, 
         if vehicleKeyId ~= nil then
             local vehicle = vehicles[vehicleKeyId]
             if vehicle ~= nil then
-                BubbleFactory.createVehicleRadioBubble(vehicle, message, messageColor, voicePitch, ISChat.instance.isVoiceEnabled)
+                BubbleFactory.createVehicleRadioBubble(
+                    vehicle,
+                    message,
+                    messageColor,
+                    voicePitch,
+                    ISChat.instance.isVoiceEnabled
+                )
                 local radio = vehicle:getPartById("Radio")
                 if radio ~= nil then
                     local radioData = radio:getDeviceData()

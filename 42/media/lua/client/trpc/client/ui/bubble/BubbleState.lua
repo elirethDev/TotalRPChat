@@ -13,11 +13,11 @@
 local BubbleState = {}
 
 local bubbles = {
-    player = {},         -- author -> PlayerBubble
-    radio = {},          -- "xXyYzZ" -> RadioBubble(square)
-    playerRadio = {},    -- author -> RadioBubble(player)
-    vehicleRadio = {},   -- keyId -> RadioBubble(vehicle)
-    context = nil,       -- single ContextBubble (or nil)
+    player = {}, -- author -> PlayerBubble
+    radio = {}, -- "xXyYzZ" -> RadioBubble(square)
+    playerRadio = {}, -- author -> RadioBubble(player)
+    vehicleRadio = {}, -- keyId -> RadioBubble(vehicle)
+    context = nil, -- single ContextBubble (or nil)
 }
 
 local dead = {}
