@@ -10,8 +10,8 @@ local AvatarUploadWindow = ISModalRichText:derive("AvatarUploadWindow")
 local FONT_HGT_NORMAL = getTextManager():getFontHeight(UIFont.Normal)
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 
-local AVATAR_WIDTH = 60
-local AVATAR_HEIGHT = 80
+local AVATAR_WIDTH = AvatarIO.AVATAR_WIDTH
+local AVATAR_HEIGHT = AvatarIO.AVATAR_HEIGHT
 local lineSpace = 2
 local textHeight = (FONT_HGT_NORMAL + lineSpace) * 2
 local WIDTH = 200
@@ -197,7 +197,6 @@ function AvatarUploadWindow:drawAvatarTexture()
         return
     end
     local texture = self._avatar
-    -- TODO: invalidate bad size
     local x = (WIDTH - AVATAR_WIDTH) / 2
     local y = 44 + topMargin -- magic number I'm really lazy
     self:drawTexture(texture, x, y, 1)

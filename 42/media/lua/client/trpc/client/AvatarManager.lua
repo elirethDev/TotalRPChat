@@ -202,6 +202,9 @@ local function isPendingAvatarUsable(key, avatar)
                 .. '", removing texture from cache'
         )
         return false
+    elseif texture:getWidth() ~= AvatarIO.AVATAR_WIDTH or texture:getHeight() ~= AvatarIO.AVATAR_HEIGHT then
+        Logger.error("AvatarManager", 'TRPC error: invalid pending avatar dimensions for "' .. key .. '"')
+        return false
     elseif checksum == nil then
         Logger.error(
             "AvatarManager",

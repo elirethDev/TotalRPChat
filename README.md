@@ -33,12 +33,14 @@ Key patterns used throughout:
 
 ## Requirements
 
-- Project Zomboid **B42** (multi-build: root `mod.info` for B41, `42/mod.info` for B42)
+- Project Zomboid **B42** only; the package descriptor is `42/mod.info` and the implementation is under `42/`
 - Server with the mod enabled for full multiplayer features
 
 ## Versioning and releases
 
-The runtime version is maintained in [`Version.lua`](42/media/lua/shared/trpc/shared/Version.lua). See [`CHANGELOG.md`](CHANGELOG.md) for public release history and [`docs/release-template.md`](docs/release-template.md) for the manual release checklist.
+The runtime version is maintained in [`Version.lua`](42/media/lua/shared/trpc/shared/Version.lua), separately from the B42 `versionMin` in [`42/mod.info`](42/mod.info). See [`CHANGELOG.md`](CHANGELOG.md) for public release history and [`docs/release-template.md`](docs/release-template.md) for the manual release checklist.
+
+Avatar moderation validates the configured `60x80` PNG/JPEG dimensions on the server before retaining a pending request or approving it. The server validates image headers rather than performing a full image decode because Project Zomboid does not expose a safe server-side texture decoder; materialized pending files are rechecked before approval.
 
 ## Credits
 

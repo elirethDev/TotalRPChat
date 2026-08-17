@@ -238,8 +238,6 @@ function RadioManager:makeNoise(frequency, range)
             if radioData ~= nil then
                 local radioFrequency = radioData:getChannel()
                 local turnedOn = radioData:getIsTurnedOn()
-                -- TODO
-                -- local volume = radioData:getDeviceVolume()
 
                 -- -1 nothing
                 --  0 headphones

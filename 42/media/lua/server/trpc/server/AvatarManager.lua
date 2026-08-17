@@ -14,6 +14,15 @@ function AvatarManager:loadPlayerAvatar(player)
         return nil
     end
     local key = AvatarIO.createFileNameFromPlayer(player)
+    if not AvatarIO.hasExpectedDimensions(avatar["data"], avatar["extension"]) then
+        local path = AvatarIO.getAvatarPath("approved/" .. key)
+        if path ~= nil then
+            File.remove(path)
+        end
+        self.avatars[key] = nil
+        Logger.error("AvatarManager", "TRPC error: removing approved avatar with invalid dimensions")
+        return
+    end
     self.avatars[key] = avatar
 end
 
@@ -58,6 +67,11 @@ function AvatarManager:loadPendingAvatar(key, avatar)
                     .. "upload an avatar on the server through FTP you should move it "
                     .. 'directly in the "approved" directory'
             )
+            self:removePendingAvatar(playerAvatar["username"], playerAvatar["firstName"], playerAvatar["lastName"])
+            return
+        end
+        if not AvatarIO.hasExpectedDimensions(playerAvatar["data"], playerAvatar["extension"]) then
+            Logger.error("AvatarManager", "TRPC error: rejecting pending avatar with invalid dimensions")
             self:removePendingAvatar(playerAvatar["username"], playerAvatar["firstName"], playerAvatar["lastName"])
             return
         end
@@ -222,6 +236,10 @@ end
 -- we could additionally store the data in a table directly, but we could not
 -- guarantee the image was successfully saved
 function AvatarManager:registerAvatarRequest(username, firstName, lastName, extension, checksum, data)
+    if not AvatarIO.hasExpectedDimensions(data, extension) then
+        Logger.error("AvatarManager", "TRPC error: rejecting avatar request with invalid dimensions")
+        return
+    end
     local key, pendingAvatarInfo =
         self:updatePendingAvatarStored(username, firstName, lastName, extension, checksum, data)
     self:loadPendingAvatar(key, pendingAvatarInfo)
@@ -316,6 +334,12 @@ function AvatarManager:approveAvatar(admin, username, firstName, lastName, check
             .. checksum
             .. ")"
     )
+    if not AvatarIO.hasExpectedDimensions(data, extension) then
+        Logger.error("AvatarManager", "TRPC error: rejecting approval for avatar with invalid dimensions")
+        self:removePendingAvatarAndDeleteFile(username, firstName, lastName)
+        self:notifyAvatarProcessed(username, firstName, lastName, checksum)
+        return
+    end
     AvatarIO.savePlayerAvatar(username, firstName, lastName, extension, data, "approved")
     if self.connectedPlayers[username] then -- players is online so we load the avatar
         local player = self.connectedPlayers[username]

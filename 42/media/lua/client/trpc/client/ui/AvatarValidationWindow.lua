@@ -134,7 +134,6 @@ function AvatarValidationWindow:drawAvatarChoice()
         return
     end
     local texture = self._avatar["texture"]
-    -- TODO: invalidate bad size
     local x = 20 + leftMargin
     local y = 44 + topMargin -- magic number I'm really lazy
     self:drawTexture(texture, x, y, 1)

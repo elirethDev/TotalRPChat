@@ -4,7 +4,7 @@ All notable changes to TotalRPChat are documented here. This changelog follows t
 
 ## [Unreleased]
 
-## [3.0.0] - 2026-08-17
+## [3.0.0] - Unreleased
 
 Validated changes since the previous published commit.
 
@@ -21,6 +21,7 @@ Validated changes since the previous published commit.
 - Fixed chat messages containing a single character.
 - Fixed hand-item radio detection and belt-radio update handling.
 - Fixed switching to a chat stream with no enabled streams.
+- Added server-side validation for the configured 60x80 avatar dimensions.
 
 ### Security
 
