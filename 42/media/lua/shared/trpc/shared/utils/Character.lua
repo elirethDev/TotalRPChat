@@ -60,7 +60,8 @@ function Character.getAllHandItemsByGroup(player, group)
     local secondary = player:getSecondaryHandItem()
     if primary and instanceof(primary, group) then
         table.insert(items, primary)
-    elseif secondary and instanceof(secondary, group) then
+    end
+    if secondary and secondary ~= primary and instanceof(secondary, group) then
         table.insert(items, secondary)
     end
     return items
@@ -180,25 +181,32 @@ local function GetSquaresRadios(player, range, frequency)
     return radiosResult, found
 end
 
--- TODO check other player radio without headphones
 local function GetPlayerRadios(player, range, frequency)
     local radiosResult = {}
-    local radio = Character.getFirstHandItemByGroup(player, "Radio")
     local found = false
-    if radio == nil then
-        return radiosResult
-    end
-    local radioData = radio and radio:getDeviceData() or nil
-    if radioData then
-        local radioFrequency = radioData:getChannel()
-        if radioData:getIsTurnedOn() and (frequency == nil or radioFrequency == frequency) then
-            table.insert(radiosResult, {
-                player = player,
-                radio = radio,
-            })
-            found = true
+
+    World.forAllPlayers(function(connectedPlayer)
+        if World.distanceManhatten(player, connectedPlayer) <= range then
+            local radio = Character.getFirstHandOrBeltItemByGroup(connectedPlayer, "Radio")
+            local radioData = radio and radio:getDeviceData() or nil
+            if radioData then
+                local radioFrequency = radioData:getChannel()
+                local hasHeadphones = radioData:getHeadphoneType() >= 0
+                if
+                    radioData:getIsTurnedOn()
+                    and not hasHeadphones
+                    and (frequency == nil or radioFrequency == frequency)
+                then
+                    table.insert(radiosResult, {
+                        player = connectedPlayer,
+                        radio = radio,
+                    })
+                    found = true
+                end
+            end
         end
-    end
+    end)
+
     return radiosResult, found
 end
 

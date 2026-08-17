@@ -10,6 +10,15 @@ local World = require("trpc/shared/utils/World")
 
 local RecvServer = {}
 
+local function IsAuthorizedAvatarModerator(player, action)
+    local accessLevel = player and player:getAccessLevel()
+    if accessLevel == "Admin" or accessLevel == "Moderator" then
+        return true
+    end
+    Logger.error("ServerRecv", "TRPC error: unauthorized " .. action .. " request")
+    return false
+end
+
 RecvServer["MuteInHandRadio"] = function(player, args)
     local playerName = args["player"]
     if playerName == nil then
@@ -274,6 +283,9 @@ RecvServer["AvatarRequest"] = function(player, args)
 end
 
 RecvServer["ApproveAvatar"] = function(player, args)
+    if not IsAuthorizedAvatarModerator(player, "ApproveAvatar") then
+        return
+    end
     local username = args["username"]
     local firstName = args["firstName"]
     local lastName = args["lastName"]
@@ -298,6 +310,9 @@ RecvServer["ApproveAvatar"] = function(player, args)
 end
 
 RecvServer["RejectAvatar"] = function(player, args)
+    if not IsAuthorizedAvatarModerator(player, "RejectAvatar") then
+        return
+    end
     local username = args["username"]
     local firstName = args["firstName"]
     local lastName = args["lastName"]

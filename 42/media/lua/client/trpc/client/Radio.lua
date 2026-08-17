@@ -112,23 +112,22 @@ local function Update()
             local primary = player:getPrimaryHandItem()
             local secondary = player:getSecondaryHandItem()
             -- radios in hand already decrease the battery level
-            if (primary and primary:getID() == id) or (secondary and secondary:getID() == id) then
-                return
-            end
-            local radioData = item:getDeviceData()
-            if radioData then
-                if radioData:getIsTurnedOn() then
-                    local useDelta = radioData:getUseDelta()
-                    local power = radioData:getPower()
-                    local newPower = math.max(0, power - useDelta)
-                    radioData:setPower(newPower)
-                    if newPower <= 0 and power > 0 and radioData:getIsTurnedOn() then
-                        radioData:setIsTurnedOn(false)
+            if not ((primary and primary:getID() == id) or (secondary and secondary:getID() == id)) then
+                local radioData = item:getDeviceData()
+                if radioData then
+                    if radioData:getIsTurnedOn() then
+                        local useDelta = radioData:getUseDelta()
+                        local power = radioData:getPower()
+                        local newPower = math.max(0, power - useDelta)
+                        radioData:setPower(newPower)
+                        if newPower <= 0 and power > 0 and radioData:getIsTurnedOn() then
+                            radioData:setIsTurnedOn(false)
+                        end
                     end
+                    -- we could only send it when the battery reach 0 but every 1 game-time minute
+                    -- is really not that much and it will protect us from any sync error
+                    TrpcClientSendCommands.sendGiveRadioState(item)
                 end
-                -- we could only send it when the battery reach 0 but every 1 game-time minute
-                -- is really not that much and it will protect us from any sync error
-                TrpcClientSendCommands.sendGiveRadioState(item)
             end
         end
     end

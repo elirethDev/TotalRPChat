@@ -68,6 +68,9 @@ ISChat.onSwitchStream = function()
             return
         end
         local chatStreams = curTxtPanel.chatStreams
+        if #chatStreams == 0 then
+            return
+        end
         curTxtPanel.streamID = curTxtPanel.streamID % #chatStreams + 1
         local stream = chatStreams[curTxtPanel.streamID]
         ISChat.lastTabStream[ChatState.getCurrentTabID()] = stream

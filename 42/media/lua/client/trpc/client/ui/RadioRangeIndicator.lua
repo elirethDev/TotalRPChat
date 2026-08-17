@@ -18,46 +18,78 @@ local NextColorIndex = 1
 
 function RadioRangeIndicator:freeIndicators()
     for _, indicator in pairs(self.indicators) do
-        indicator:unsubscribe()
+        if indicator ~= nil then
+            indicator:unsubscribe()
+        end
     end
     self.indicators = {}
     self.radios = {}
     NextColorIndex = 1
 end
 
-function RadioRangeIndicator:registerRadio(object, radio)
+function RadioRangeIndicator:registerRadio(object, radio, radios)
     local radioData = radio:getDeviceData()
     if radioData ~= nil then
         if radioData:getIsTurnedOn() then
             local range = Character.getRadioRange(radioData, self.radioMaxRange)
-            local indicator = RangeIndicator:new(object, range, Colors[NextColorIndex])
-            NextColorIndex = NextColorIndex % #Colors + 1
-            indicator:subscribe()
-            table.insert(self.indicators, indicator)
-            table.insert(self.radios, { object = object, radio = radio, range = range })
+            if radios[object] == nil then
+                radios[object] = { object = object, radio = radio, range = range }
+            end
         end
+    end
+end
+
+function RadioRangeIndicator:reconcileRadios(desiredRadios)
+    local removedRadios = {}
+    for object, info in pairs(self.radios) do
+        local desired = desiredRadios[object]
+        if desired == nil then
+            removedRadios[object] = info
+        else
+            info.radio = desired.radio
+            if info.range ~= desired.range then
+                info.range = desired.range
+                info.indicator.range = desired.range
+            end
+            desiredRadios[object] = nil
+        end
+    end
+
+    for object, info in pairs(removedRadios) do
+        info.indicator:unsubscribe()
+        self.indicators[object] = nil
+        self.radios[object] = nil
+    end
+
+    for object, info in pairs(desiredRadios) do
+        local indicator = RangeIndicator:new(object, info.range, Colors[NextColorIndex])
+        NextColorIndex = NextColorIndex % #Colors + 1
+        info.indicator = indicator
+        self.indicators[object] = indicator
+        self.radios[object] = info
+        indicator:subscribe()
     end
 end
 
 function RadioRangeIndicator:discoverRadios()
     local radios = Character.getRunningRadiosInRange(self.player, self.range)
-    if radios == nil then
-        return
+    local desiredRadios = {}
+    if radios ~= nil then
+        for _, radio in pairs(radios.squares) do
+            self:registerRadio(radio, radio, desiredRadios)
+        end
+        for _, info in pairs(radios.players) do
+            local player = info["player"]
+            local radio = info["radio"]
+            self:registerRadio(player, radio, desiredRadios)
+        end
+        for _, info in pairs(radios.vehicles) do
+            local vehicle = info["vehicle"]
+            local radio = info["radio"]
+            self:registerRadio(vehicle, radio, desiredRadios)
+        end
     end
-    for _, radio in pairs(radios.squares) do
-        self:registerRadio(radio, radio)
-    end
-    -- TODO: hear radio from other players with no headphones
-    -- for _, info in pairs(radios.players) do
-    --     local player = info['player']
-    --     local radio = info['radio']
-    --     self:registerRadio(player, radio)
-    -- end
-    for _, info in pairs(radios.vehicles) do
-        local vehicle = info["vehicle"]
-        local radio = info["radio"]
-        self:registerRadio(vehicle, radio)
-    end
+    self:reconcileRadios(desiredRadios)
 end
 
 function RadioRangeIndicator:update()
@@ -66,7 +98,6 @@ function RadioRangeIndicator:update()
     if elapsed < 500 then
         return
     end
-    self:freeIndicators()
     self:discoverRadios()
     self.previousTime = currentTime
 end
@@ -113,10 +144,10 @@ end
 
 function RadioRangeIndicator:unsubscribe()
     self:unsubscribeIndicators()
+    self:freeIndicators()
     if not self.event then
         return
     end
-    self:freeIndicators()
     Events.OnTick.Remove(self.event)
     self.event = nil
     Events.OnPreUIDraw.Remove(self.iconEvent)
