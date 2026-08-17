@@ -147,6 +147,7 @@ local function BuildMessageFromPacket(type, message, name, playerColor, frequenc
         .. messageColorString
         .. quote
         .. parsedMessage.body
+        .. " "
         .. messageColorString
         .. quote
     return formatedMessage, parsedMessage

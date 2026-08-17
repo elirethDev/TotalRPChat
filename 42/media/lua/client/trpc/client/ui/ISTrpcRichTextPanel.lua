@@ -3,6 +3,7 @@ local ISTrpcRichTextPanel = ISRichTextPanel:derive("ISTrpcRichTextPanel")
 function ISTrpcRichTextPanel:paginate()
     local lines = 1
     self.textDirty = false
+    self.firstPrintableLine = 1
     self.imageCount = 1
     self.font = self.defaultFont
     self.fonts = {}
