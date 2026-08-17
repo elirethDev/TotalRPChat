@@ -36,6 +36,10 @@ Key patterns used throughout:
 - Project Zomboid **B42** (multi-build: root `mod.info` for B41, `42/mod.info` for B42)
 - Server with the mod enabled for full multiplayer features
 
+## Versioning and releases
+
+The runtime version is maintained in [`Version.lua`](42/media/lua/shared/trpc/shared/Version.lua). See [`CHANGELOG.md`](CHANGELOG.md) for public release history and [`docs/release-template.md`](docs/release-template.md) for the manual release checklist.
+
 ## Credits
 
 This project is derived from **Total Immersive Chat System (TICS)** by [Phibonacci](https://github.com/Phibonacci/Total-Immersive-Chat-System). The base commit retains its original authorship.
