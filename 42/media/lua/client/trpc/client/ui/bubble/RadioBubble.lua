@@ -1,20 +1,34 @@
 local ABubble = require("trpc/client/ui/bubble/ABubble")
 local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
+local BubbleSkin = require("trpc/client/ui/bubble/BubbleSkin")
 
 local RadioBubble = ABubble:derive("RadioBubble")
 
 function RadioBubble:loadTextures()
-    self.bubbleTop = getTexture("media/ui/trpc/bubble/radio/bubble-top.png")
-    self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/radio/bubble-top-left.png")
-    self.bubbleTopRight = getTexture("media/ui/trpc/bubble/radio/bubble-top-right.png")
-    self.bubbleCenter = getTexture("media/ui/trpc/bubble/radio/bubble-center.png")
-    self.bubbleCenterLeft = getTexture("media/ui/trpc/bubble/radio/bubble-left.png")
-    self.bubbleCenterRight = getTexture("media/ui/trpc/bubble/radio/bubble-right.png")
-    self.bubbleBot = getTexture("media/ui/trpc/bubble/radio/bubble-bot.png")
-    self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/radio/bubble-bot-left.png")
-    self.bubbleBotRight = getTexture("media/ui/trpc/bubble/radio/bubble-bot-right.png")
-    self.bubbleArrow = getTexture("media/ui/trpc/bubble/radio/bubble-arrow.png")
+    -- Radio bubbles keep the base lifecycle hook without loading legacy PNGs.
+end
+
+function RadioBubble:drawBubbleFrame(leftX, leftW, centerW, centerX, rightX, rightW, topH, centerY, botH, centerH, botY)
+    BubbleSkin.drawFrame(
+        self,
+        leftX,
+        leftW,
+        centerW,
+        centerX,
+        rightX,
+        rightW,
+        topH,
+        centerY,
+        botH,
+        centerH,
+        botY,
+        false
+    )
+end
+
+function RadioBubble:drawBubbleArrow(x, y, width, height)
+    BubbleSkin.drawArrow(self, x, y, width, height)
 end
 
 function RadioBubble:render()
@@ -56,7 +70,7 @@ RadioBubble.types = {
 }
 
 function RadioBubble:new(object, message, messageColor, timer, opacity, type, offsetY)
-    local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 20, 200)
+    local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, ABubble.BUBBLE_WRAP_WORDS, 200)
     local textLength = getTextManager():MeasureStringX(UIFont.medium, parsedMessages["rawMessage"])
     local width = math.min(textLength * 1.25, 162) + 40
     local height = 0

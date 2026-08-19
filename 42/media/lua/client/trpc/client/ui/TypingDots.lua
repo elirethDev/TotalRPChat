@@ -1,12 +1,25 @@
 local Coordinates = require("trpc/client/utils/Coordinates")
 
 local TypingDots = ISUIElement:derive("TypingDots")
+local DotColors = {
+    outline = { r = 0.025, g = 0.03, b = 0.035 },
+    idle = { r = 0.16, g = 0.17, b = 0.18 },
+    active = { r = 0.38, g = 0.41, b = 0.44 },
+}
+local DOT_SIZE = 5
+local DOT_CORE_SIZE = 3
+local DOT_INSET = 1
+local DOT_Y = 0
+
+local function drawDot(self, x, color)
+    local outline = DotColors.outline
+    self:drawRect(x + DOT_INSET, DOT_Y, DOT_CORE_SIZE, 1, 1, outline.r, outline.g, outline.b)
+    self:drawRect(x, DOT_Y + DOT_INSET, DOT_SIZE, DOT_CORE_SIZE, 1, outline.r, outline.g, outline.b)
+    self:drawRect(x + DOT_INSET, DOT_Y + DOT_SIZE - DOT_INSET, DOT_CORE_SIZE, 1, 1, outline.r, outline.g, outline.b)
+    self:drawRect(x + DOT_INSET, DOT_Y + DOT_INSET, DOT_CORE_SIZE, DOT_CORE_SIZE, 1, color.r, color.g, color.b)
+end
 
 function TypingDots:render()
-    local typingDots1 = getTexture("media/ui/trpc/typing-dots/typing-dots-1.png")
-    local typingDots2 = getTexture("media/ui/trpc/typing-dots/typing-dots-2.png")
-    local typingDots3 = getTexture("media/ui/trpc/typing-dots/typing-dots-3.png")
-
     local time = Calendar.getInstance():getTimeInMillis()
     if time - self.startingTime > self.timer then
         self.dead = true
@@ -17,21 +30,27 @@ function TypingDots:render()
         self.lastStepTime = time
         self.step = self.step % 3 + 1
     end
-    local texture
+
+    local firstDot = DotColors.idle
+    local secondDot = DotColors.idle
+    local thirdDot = DotColors.idle
     if self.step == 1 then
-        texture = typingDots1
+        firstDot = DotColors.active
     elseif self.step == 2 then
-        texture = typingDots2
+        secondDot = DotColors.active
     else
-        texture = typingDots3
+        thirdDot = DotColors.active
     end
+
     local x, y = Coordinates.CenterTopOfPlayer(self.player, 20, 6)
     if x == nil then
         return
     end
     self:setX(x)
     self:setY(y - 6)
-    self:drawTexture(texture, 0, 0, 1)
+    drawDot(self, 0, firstDot)
+    drawDot(self, 7, secondDot)
+    drawDot(self, 14, thirdDot)
 end
 
 function TypingDots:refresh()

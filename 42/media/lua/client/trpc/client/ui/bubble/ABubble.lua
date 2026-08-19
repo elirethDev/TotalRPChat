@@ -4,6 +4,8 @@ local StringBuilder = require("trpc/client/parser/StringBuilder")
 
 local ABubble = ISTrpcRichTextPanel:derive("ABubble")
 
+ABubble.BUBBLE_WRAP_WORDS = 16
+
 function ABubble:loadTextures()
     error("loadTextures not implemented in child class")
 end
@@ -40,7 +42,7 @@ function ABubble:parseMessage(length)
             messageLength = 0
         end
     end
-    local parsedMessages = Parser.ParseTrpcMessage(self.message, self.color, 20, messageLength)
+    local parsedMessages = Parser.ParseTrpcMessage(self.message, self.color, ABubble.BUBBLE_WRAP_WORDS, messageLength)
     local rawMessage = parsedMessages["rawMessage"]
     local bubbleMessage = parsedMessages["bubble"]
     if self.showPlayerName then
@@ -85,6 +87,14 @@ function ABubble:updateText(x, y)
     self.currentY = self:getY()
 end
 
+function ABubble:drawBubbleFrame(leftX, leftW, centerW, centerX, rightX, rightW, topH, centerY, botH, centerH, botY)
+    error("drawBubbleFrame not implemented in child class")
+end
+
+function ABubble:drawBubbleArrow(x, y, width, height)
+    error("drawBubbleArrow not implemented in child class")
+end
+
 function ABubble:drawBubble()
     if self.dead then
         return
@@ -112,26 +122,13 @@ function ABubble:drawBubble()
     local centerX = leftX + leftW
     local rightX = centerX + centerW
     local topH = math.floor(10 * 1 / scale)
-    self:drawTextureScaled(self.bubbleTopLeft, leftX, 0, leftW, topH, self.alpha)
-    self:drawTextureScaled(self.bubbleTop, centerX, 0, centerW, topH, self.alpha)
-    self:drawTextureScaled(self.bubbleTopRight, rightX, 0, rightW, topH, self.alpha)
 
     local centerY = topH
     local botH = math.floor(10 * 1 / scale)
     local centerH = math.floor(self:getHeight()) - botH - topH
     local botY = centerY + centerH
 
-    self:drawTextureScaled(self.bubbleCenterLeft, leftX, centerY, leftW, centerH, self.alpha)
-    self:drawTextureScaled(self.bubbleCenter, centerX, centerY, centerW, centerH, self.alpha)
-    self:drawTextureScaled(self.bubbleCenterRight, rightX, centerY, rightW, centerH, self.alpha)
-
-    if self.playerAvatar or self.playerModel then
-        self:drawTextureScaled(self.bubbleBotLeftSquare, leftX, botY, leftW, botH, self.alpha)
-    else
-        self:drawTextureScaled(self.bubbleBotLeft, leftX, botY, leftW, botH, self.alpha)
-    end
-    self:drawTextureScaled(self.bubbleBot, centerX, botY, centerW, botH, self.alpha)
-    self:drawTextureScaled(self.bubbleBotRight, rightX, botY, rightW, botH, self.alpha)
+    self:drawBubbleFrame(leftX, leftW, centerW, centerX, rightX, rightW, topH, centerY, botH, centerH, botY)
 
     if
         self.showArrow
@@ -140,13 +137,11 @@ function ABubble:drawBubble()
         and self.currentX + self:getWidth() < getCore():getScreenWidth()
         and self.currentY + self:getHeight() < getCore():getScreenHeight()
     then
-        self:drawTextureScaled(
-            self.bubbleArrow,
+        self:drawBubbleArrow(
             centerX + centerW / 2 + 5,
             botY + 4 * botH / 5,
             7 / scale,
-            9 / scale,
-            self.alpha
+            9 / scale
         )
     end
 

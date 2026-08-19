@@ -100,7 +100,6 @@ local function CreatePlayerBubble(author, channel, message, color, showPlayerNam
     local channelConfig = playerChannelRegistry[channel] or { isAction = false }
     local bubble = PlayerBubble:new(
         authorObj,
-        channel,
         channelConfig.isAction,
         message,
         color,

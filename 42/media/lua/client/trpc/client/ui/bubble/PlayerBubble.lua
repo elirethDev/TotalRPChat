@@ -4,87 +4,11 @@ local Character = require("trpc/shared/utils/Character")
 local Coordinates = require("trpc/client/utils/Coordinates")
 local Parser = require("trpc/client/parser/Parser")
 local StringBuilder = require("trpc/client/parser/StringBuilder")
+local BubbleSkin = require("trpc/client/ui/bubble/BubbleSkin")
 
 local PlayerBubble = ABubble:derive("PlayerBubble")
 
-local function GetBadgeKind(channel, isAction)
-    if isAction or channel == "me" or channel == "do" then
-        return "action"
-    elseif channel == "whisper" or channel == "low" then
-        return "quiet"
-    elseif channel == "yell" then
-        return "yell"
-    elseif channel == "say" then
-        return "speech"
-    end
-    return "neutral"
-end
-
-function PlayerBubble:drawChannelBadge()
-    local badgeKind = GetBadgeKind(self.channel, self.isAction)
-    local badgeX = self.marginLeft - 13
-    if self.playerModel then
-        badgeX = self.marginLeft + 2
-    end
-    local badgeY = 2
-    local alpha = self.alpha
-    local dark = { r = 0.08, g = 0.09, b = 0.08 }
-    local colors = {
-        speech = { r = 0.72, g = 0.68, b = 0.47 },
-        quiet = { r = 0.43, g = 0.55, b = 0.60 },
-        yell = { r = 0.72, g = 0.45, b = 0.30 },
-        action = { r = 0.65, g = 0.48, b = 0.66 },
-        neutral = { r = 0.52, g = 0.52, b = 0.49 },
-    }
-    local color = colors[badgeKind]
-
-    -- Keep the badge in the header strip, outside the text and portrait margins.
-    self:drawRect(badgeX + 1, badgeY, 7, 1, alpha, dark.r, dark.g, dark.b)
-    self:drawRect(badgeX, badgeY + 1, 9, 5, alpha, dark.r, dark.g, dark.b)
-    self:drawRect(badgeX + 1, badgeY + 6, 5, 1, alpha, dark.r, dark.g, dark.b)
-
-    if badgeKind == "speech" then
-        self:drawRect(badgeX + 2, badgeY + 2, 5, 3, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 3, badgeY + 5, 2, 1, alpha, color.r, color.g, color.b)
-    elseif badgeKind == "quiet" then
-        self:drawRect(badgeX + 2, badgeY + 2, 4, 1, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 3, badgeY + 4, 3, 1, alpha, color.r, color.g, color.b)
-    elseif badgeKind == "yell" then
-        self:drawRect(badgeX + 4, badgeY + 1, 1, 4, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 4, badgeY + 6, 1, 1, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 2, badgeY + 2, 1, 1, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 6, badgeY + 2, 1, 1, alpha, color.r, color.g, color.b)
-    elseif badgeKind == "action" then
-        self:drawRect(badgeX + 4, badgeY + 1, 1, 5, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 2, badgeY + 3, 5, 1, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 3, badgeY + 2, 3, 3, alpha, color.r, color.g, color.b)
-    else
-        self:drawRect(badgeX + 3, badgeY + 2, 3, 3, alpha, color.r, color.g, color.b)
-        self:drawRect(badgeX + 2, badgeY + 5, 5, 1, alpha, color.r, color.g, color.b)
-    end
-end
-
 function PlayerBubble:loadTextures()
-    if self.isAction then
-        self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/simple/bubble-top-left-square.png")
-        self.bubbleTopRight = getTexture("media/ui/trpc/bubble/simple/bubble-top-right-square.png")
-        self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left-square.png")
-        self.bubbleBotRight = getTexture("media/ui/trpc/bubble/simple/bubble-bot-right-square.png")
-    else
-        self.bubbleTopLeft = getTexture("media/ui/trpc/bubble/simple/bubble-top-left.png")
-        self.bubbleTopRight = getTexture("media/ui/trpc/bubble/simple/bubble-top-right.png")
-        self.bubbleBotLeft = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left.png")
-        self.bubbleBotRight = getTexture("media/ui/trpc/bubble/simple/bubble-bot-right.png")
-    end
-    self.bubbleTop = getTexture("media/ui/trpc/bubble/simple/bubble-top.png")
-    self.bubbleCenter = getTexture("media/ui/trpc/bubble/simple/bubble-center.png")
-    self.bubbleCenterLeft = getTexture("media/ui/trpc/bubble/simple/bubble-left.png")
-    self.bubbleCenterRight = getTexture("media/ui/trpc/bubble/simple/bubble-right.png")
-    self.bubbleBot = getTexture("media/ui/trpc/bubble/simple/bubble-bot.png")
-    self.bubbleArrow = getTexture("media/ui/trpc/bubble/simple/bubble-arrow.png")
-
-    self.bubbleBotLeftSquare = getTexture("media/ui/trpc/bubble/simple/bubble-bot-left-square.png")
-
     if self.portrait == 3 then
         self.avatarWidth = 33
         self.avatarHeight = 32
@@ -146,7 +70,6 @@ function PlayerBubble:render()
     if self.dead then
         return
     end
-    self:drawChannelBadge()
     if self.playerAvatar and (self.portrait == 3 or self.portrait == 2) then
         self:drawTextureScaled(
             self.playerAvatar,
@@ -179,13 +102,38 @@ function PlayerBubble:render()
     end
 end
 
+function PlayerBubble:drawBubbleFrame(leftX, leftW, centerW, centerX, rightX, rightW, topH, centerY, botH, centerH, botY)
+    BubbleSkin.drawFrame(
+        self,
+        leftX,
+        leftW,
+        centerW,
+        centerX,
+        rightX,
+        rightW,
+        topH,
+        centerY,
+        botH,
+        centerH,
+        botY,
+        self.isAction
+    )
+end
+
+function PlayerBubble:drawBubbleArrow(x, y, width, height)
+    if self.isAction then
+        return
+    end
+
+    BubbleSkin.drawArrow(self, x, y, width, height)
+end
+
 local function BuildPlayerNameString(playerName, playerColor)
     return StringBuilder.BuildBracketColorString(playerColor) .. playerName
 end
 
 function PlayerBubble:new(
     player,
-    channel,
     isAction,
     message,
     messageColor,
@@ -196,7 +144,7 @@ function PlayerBubble:new(
     playerName,
     playerColor
 )
-    local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, 20, 200)
+    local parsedMessages = Parser.ParseTrpcMessage(message, messageColor, ABubble.BUBBLE_WRAP_WORDS, 200)
     local rawMessage = parsedMessages["rawMessage"]
     local bubbleMessage = parsedMessages["bubble"]
     if showPlayerName then
@@ -230,7 +178,6 @@ function PlayerBubble:new(
         self.dead = true
     end
     setmetatable(o, PlayerBubble)
-    o.channel = channel
     o.isAction = isAction
     o.player = player
     o.portrait = portrait

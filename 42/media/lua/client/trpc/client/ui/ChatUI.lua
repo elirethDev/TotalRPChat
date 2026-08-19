@@ -1,5 +1,29 @@
 local ChatUI = {}
 local ChatState = require("trpc/client/ui/ChatState")
+
+local Palette = {
+    frame = { r = 0.10, g = 0.105, b = 0.11 },
+    header = { r = 0.115, g = 0.12, b = 0.125 },
+    headerInset = { r = 0.15, g = 0.155, b = 0.165 },
+    body = { r = 0.07, g = 0.075, b = 0.08 },
+    panel = { r = 0.115, g = 0.12, b = 0.125 },
+    panelInset = { r = 0.065, g = 0.07, b = 0.075 },
+    tab = { r = 0.15, g = 0.16, b = 0.17 },
+    tabActive = { r = 0.25, g = 0.27, b = 0.29 },
+    tabHover = { r = 0.21, g = 0.225, b = 0.24 },
+    tabAlert = { r = 0.32, g = 0.12, b = 0.095 },
+    accent = { r = 0.58, g = 0.61, b = 0.64 },
+    text = { r = 0.88, g = 0.89, b = 0.90 },
+    mutedText = { r = 0.68, g = 0.70, b = 0.72 },
+    footer = { r = 0.06, g = 0.065, b = 0.07 },
+    input = { r = 0.05, g = 0.055, b = 0.06 },
+    inputEdge = { r = 0.28, g = 0.31, b = 0.34 },
+    textSurface = { r = 0.055, g = 0.06, b = 0.065 },
+    textInset = { r = 0.08, g = 0.085, b = 0.09 },
+    textEdge = { r = 0.26, g = 0.29, b = 0.32 },
+}
+
+ChatUI.palette = Palette
 ChatUI.tabPanel = {}
 ChatUI.textEntry = {}
 
@@ -14,41 +38,50 @@ function ChatUI:prerender()
     end
     self:makeFade(self.fade:fraction())
 
-    -- local a = self.backgroundColor.a
-    local titleBar = {
-        r = 20 / 255,
-        g = 20 / 255,
-        b = 20 / 255,
-    }
-    local background = {
-        r = 42 / 255,
-        g = 42 / 255,
-        b = 42 / 255,
-    }
-    local titlebarAlpha = self:calcAlpha(ISChat.minControlOpaque, ISChat.maxGeneralOpaque, self.fade:fraction())
-    self:drawRect(
-        0,
-        0,
-        self:getWidth(),
-        self:titleBarHeight(),
-        math.max(titlebarAlpha + 0.3, 1),
-        titleBar.r,
-        titleBar.g,
-        titleBar.b
-    )
-    self:drawRect(
-        0,
-        self:titleBarHeight(),
-        self:getWidth(),
-        self:getHeight() - self:titleBarHeight(),
-        titlebarAlpha,
-        background.r,
-        background.g,
-        background.b
-    )
+    local width = self:getWidth()
+    local height = self:getHeight()
     local th = self:titleBarHeight()
-    -- self:drawRect(2, 1, self:getWidth() - 4, th - 2, titlebarAlpha, r, g, b)
-    -- self:drawTextureScaled(self.titlebarbkg, 2, 1, self:getWidth() - 4, th - 2, titlebarAlpha, 1, 1, 1)
+    local titlebarAlpha = self:calcAlpha(ISChat.minControlOpaque, ISChat.maxGeneralOpaque, self.fade:fraction())
+    local headerAlpha = math.max(titlebarAlpha + 0.3, 1)
+    local header = Palette.header
+    local headerInset = Palette.headerInset
+    local body = Palette.body
+
+    self:drawRect(
+        0,
+        0,
+        width,
+        th,
+        headerAlpha,
+        header.r,
+        header.g,
+        header.b
+    )
+
+    if width > 2 and th > 2 then
+        self:drawRect(1, 1, width - 2, th - 2, headerAlpha, headerInset.r, headerInset.g, headerInset.b)
+    end
+
+    local bodyHeight = height - th
+    if bodyHeight > 0 then
+        self:drawRect(0, th, width, bodyHeight, titlebarAlpha, body.r, body.g, body.b)
+        if width > 2 and bodyHeight > 2 then
+            self:drawRect(
+                1,
+                th + 1,
+                width - 2,
+                bodyHeight - 2,
+                titlebarAlpha,
+                Palette.panelInset.r,
+                Palette.panelInset.g,
+                Palette.panelInset.b
+            )
+        end
+        if width > 2 then
+            self:drawRect(1, th - 1, width - 2, 1, titlebarAlpha, Palette.accent.r, Palette.accent.g, Palette.accent.b)
+        end
+    end
+
     if self.servermsg then
         local x = getCore():getScreenWidth() / 2 - self:getX()
         local y = getCore():getScreenHeight() / 4 - self:getY()
@@ -62,6 +95,7 @@ function ChatUI:prerender()
 end
 
 function ChatUI:render()
+    local width = self:getWidth()
     local height = self:getHeight()
     local th = self:titleBarHeight()
     if self.isCollapsed then
@@ -69,16 +103,15 @@ function ChatUI:render()
     end
     if not self.isCollapsed and self.resizable and self.drawFrame and self.resizeWidget:getIsVisible() then
         local rh = self:resizeWidgetHeight()
-        -- self:drawRectBorder(0, height - rh - 1, self:getWidth(), rh + 1, self.borderColor.a, self.borderColor.r,
-        --    self.borderColor.g, self.borderColor.b)
-        local r, g, b, a = 30 / 255, 30 / 255, 34 / 255, 0.9
-        -- self:drawTextureScaled(self.statusbarbkg, 2, height - rh, self:getWidth() - 4, rh - 1, a, r, g, b)
-        self:drawRect(2, height - rh, self:getWidth() - 4, rh - 1, a, r, g, b)
+        local footer = Palette.footer
+        local a = 0.9
+        self:drawRect(2, height - rh, width - 4, rh - 1, a, footer.r, footer.g, footer.b)
+        self:drawRect(2, height - rh, width - 4, 1, a, Palette.accent.r, Palette.accent.g, Palette.accent.b)
         -- Scale the resize arrow to the corner widget (like vanilla) and brighten it
         -- so it is clearly visible against the dark resize bar.
         self:drawTextureScaled(
             self.resizeimage,
-            self:getWidth() - rh + 1,
+            width - rh + 1,
             height - rh + 1,
             rh - 2,
             rh - 2,
@@ -96,13 +129,16 @@ function ChatUI:render()
         self:drawRectBorder(
             0,
             0,
-            self:getWidth(),
+            width,
             height,
             self.borderColor.a,
             self.borderColor.r,
             self.borderColor.g,
             self.borderColor.b
         )
+        if width > 2 and height > 2 then
+            self:drawRectBorder(1, 1, width - 2, height - 2, 0.85, Palette.frame.r, Palette.frame.g, Palette.frame.b)
+        end
     end
 
     if self.drawJoypadFocus then
@@ -158,31 +194,55 @@ function ChatUI.tabPanel:render()
         -- in wich tab slot are we dragging our tab
         tabDragSelected = self:getTabIndexAtX(self:getMouseX()) - 1
         tabDragSelected = math.min(#self.viewList - 1, math.max(tabDragSelected, 0))
-        -- we draw a white rectangle to show where our tab is going to be
-        self:drawRectBorder(inset + (tabDragSelected * (tabWidth + gap)), 0, tabWidth, self.tabHeight - 1, 1, 1, 1, 1)
+        -- we draw a warm outline to show where our tab is going to be
+        self:drawRectBorder(
+            inset + (tabDragSelected * (tabWidth + gap)),
+            0,
+            tabWidth,
+            self.tabHeight - 1,
+            1,
+            Palette.accent.r,
+            Palette.accent.g,
+            Palette.accent.b
+        )
     else -- no dragging, we display all our tabs
         newViewList = self.viewList
     end
     -- our principal rect, wich display our different view
+    local contentHeight = self.height - self.tabHeight
+    local panel = Palette.panel
+    local panelAlpha = self.backgroundColor.a
     self:drawRect(
         0,
         self.tabHeight,
         self.width,
-        self.height - self.tabHeight,
-        self.backgroundColor.a,
-        self.backgroundColor.r,
-        self.backgroundColor.g,
-        self.backgroundColor.b
+        contentHeight,
+        panelAlpha,
+        panel.r,
+        panel.g,
+        panel.b
     )
+    if self.width > 2 and contentHeight > 2 then
+        self:drawRect(
+            1,
+            self.tabHeight + 1,
+            self.width - 2,
+            contentHeight - 2,
+            panelAlpha,
+            Palette.panelInset.r,
+            Palette.panelInset.g,
+            Palette.panelInset.b
+        )
+    end
     self:drawRectBorder(
         0,
         self.tabHeight,
         self.width,
-        self.height - self.tabHeight,
-        self.borderColor.a,
-        self.borderColor.r,
-        self.borderColor.g,
-        self.borderColor.b
+        contentHeight,
+        panelAlpha * 0.85,
+        Palette.textEdge.r,
+        Palette.textEdge.g,
+        Palette.textEdge.b
     )
     local x = inset
     if self.centerTabs and (self:getWidth() >= self:getWidthOfAllTabs()) then
@@ -203,12 +263,15 @@ function ChatUI.tabPanel:render()
         if tabDragSelected ~= -1 and i == (tabDragSelected + 1) then
             x = x + tabWidth + gap
         end
+        local tabText = Palette.mutedText
         -- if this tab is the active one, we make the tab btn lighter
         if viewObject.name == self.activeView.name and not self.isDragging and not ISTabPanel.mouseOut then
             -- self:drawTextureScaled(ISTabPanel.tabSelected, x, 0, tabWidth, self.tabHeight - 1, self.tabTransparency, 1, 1,
             --     1)
-            local r, g, b = 90 / 255, 90 / 255, 110 / 255
-            self:drawRect(x, 0, tabWidth, self.tabHeight - 1, self.tabTransparency, r, g, b)
+            local active = Palette.tabActive
+            tabText = Palette.text
+            self:drawRect(x, 0, tabWidth, self.tabHeight - 1, self.tabTransparency, active.r, active.g, active.b)
+            self:drawRect(x, self.tabHeight - 2, tabWidth, 2, self.tabTransparency, Palette.accent.r, Palette.accent.g, Palette.accent.b)
         else
             local alpha = self.tabTransparency
             local shouldBlink = false
@@ -242,8 +305,8 @@ function ChatUI.tabPanel:render()
                     end
                 end
                 alpha = self.blinkTabAlpha
-                local r, g, b = 70 / 255, 40 / 255, 40 / 255
-                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, r, g, b)
+                local alert = Palette.tabAlert
+                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, alert.r, alert.g, alert.b)
                 -- self:drawTextureScaled(ISTabPanel.tabUnSelected, x, 0, tabWidth, self.tabHeight - 1, self
                 --     .tabTransparency, 1, 1, 1)
                 -- self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, 1, 1, 1)
@@ -252,11 +315,12 @@ function ChatUI.tabPanel:render()
                 -- self:drawTextureScaled(ISTabPanel.tabUnSelected, x, 0, tabWidth, self.tabHeight - 1, self
                 --     .tabTransparency, 1, 1, 1)
                 -- self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, 1, 1, 1)
-                local r, g, b = 70 / 255, 40 / 255, 40 / 255
-                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, r, g, b)
+                local alert = Palette.tabAlert
+                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, alpha, alert.r, alert.g, alert.b)
             else
                 -- self:drawTextureScaled(ISTabPanel.tabUnSelected, x, 0, tabWidth, self.tabHeight - 1, self
                 --     .tabTransparency, 1, 1, 1)
+                local tab = Palette.tab
                 if
                     self:getMouseY() >= 0
                     and self:getMouseY() < self.tabHeight
@@ -264,33 +328,60 @@ function ChatUI.tabPanel:render()
                     and self:getTabIndexAtX(self:getMouseX()) == i
                 then
                     viewObject.fade:setFadeIn(true)
+                    tab = Palette.tabHover
                 else
                     viewObject.fade:setFadeIn(false)
                 end
                 viewObject.fade:update()
                 -- self:drawTextureScaled(ISTabPanel.tabSelected, x, 0, tabWidth, self.tabHeight - 1,
                 --     0.2 * viewObject.fade:fraction(), 1, 1, 1)
-                local r, g, b = 60 / 255, 60 / 255, 80 / 255
-                local a = 0.7 -- 0.2 * viewObject.fade:fraction()
-                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, a, r, g, b)
+                local a = 0.72 -- 0.2 * viewObject.fade:fraction()
+                self:drawRect(x, 0, tabWidth, self.tabHeight - 1, a, tab.r, tab.g, tab.b)
             end
         end
-        self:drawTextCentre(viewObject.name, x + (tabWidth / 2), 3, 1, 1, 1, 1, UIFont.Small)
+        self:drawTextCentre(
+            viewObject.name,
+            x + (tabWidth / 2),
+            3,
+            tabText.r,
+            tabText.g,
+            tabText.b,
+            1,
+            UIFont.Small
+        )
         x = x + tabWidth + gap
     end
     local butPadX = 3
     if overflowLeft then
         local tex = getTexture("media/ui/arrow_left.png")
         local butWid = tex:getWidthOrig() + butPadX * 2
-        self:drawRect(inset, 0, butWid, self.tabHeight, 1, 0, 0, 0)
-        self:drawRectBorder(inset, 0, butWid, self.tabHeight, 1, 1, 1, 1)
+        self:drawRect(inset, 0, butWid, self.tabHeight, 1, Palette.footer.r, Palette.footer.g, Palette.footer.b)
+        self:drawRectBorder(inset, 0, butWid, self.tabHeight, 1, Palette.accent.r, Palette.accent.g, Palette.accent.b)
         self:drawTexture(tex, inset + butPadX, (self.tabHeight - tex:getHeight()) / 2, 1, 1, 1, 1)
     end
     if overflowRight then
         local tex = getTexture("media/ui/arrow_right.png")
         local butWid = tex:getWidthOrig() + butPadX * 2
-        self:drawRect(self.width - inset - butWid, 0, butWid, self.tabHeight, 1, 0, 0, 0)
-        self:drawRectBorder(self.width - inset - butWid, 0, butWid, self.tabHeight, 1, 1, 1, 1)
+        self:drawRect(
+            self.width - inset - butWid,
+            0,
+            butWid,
+            self.tabHeight,
+            1,
+            Palette.footer.r,
+            Palette.footer.g,
+            Palette.footer.b
+        )
+        self:drawRectBorder(
+            self.width - inset - butWid,
+            0,
+            butWid,
+            self.tabHeight,
+            1,
+            Palette.accent.r,
+            Palette.accent.g,
+            Palette.accent.b
+        )
         self:drawTexture(tex, self.width - butWid + butPadX, (self.tabHeight - tex:getHeight()) / 2, 1, 1, 1, 1)
     end
     if widthOfAllTabs > self.width then
@@ -347,51 +438,19 @@ function ChatUI.tabPanel:render()
 end
 
 function ChatUI.textEntry:prerender()
-    -- self.fade:setFadeIn(self:isMouseOver() or self.javaObject:isFocused())
-    -- self.fade:update()
+    local width = self:getWidth()
+    local height = self:getHeight()
+    local input = Palette.input
+    local backgroundAlpha = self.backgroundColor and self.backgroundColor.a or 0.5
 
-    -- local r, g, b = 70 / 255, 70 / 255, 70 / 255
-    -- -- self:drawRectStatic(0, 0, self.width, self.height, self.backgroundColor.a, r, g, b)
-    -- -- if OnScreenKeyboard and not OnScreenKeyboard.IsVisible() and (self.joyfocus or self.joypadFocused) then
-    -- --     local r, g, b, a = 0.2, 1.0, 1.0, 0.4
-    -- --     if not self.joyfocus then r, g, b = 1.0, 1.0, 1.0 end
-    -- --     self:drawRectBorder(0, 0, self:getWidth(), self:getHeight(), a, r, g, b)
-    -- --     self:drawRectBorder(1, 1, self:getWidth() - 2, self:getHeight() - 2, a, r, g, b)
-    -- -- elseif self.borderColor.a == 1 then
-    -- --     local rgb = math.min(self.borderColor.r + 0.2 * self.fade:fraction(), 1.0)
-    -- --     self:drawRectBorderStatic(0, 0, self.width, self.height, self.borderColor.a, rgb, rgb, rgb)
-    -- -- else -- setValid(false)
-    -- --     local r = math.min(self.borderColor.r + 0.2 * self.fade:fraction(), 1.0)
-    -- --     self:drawRectBorderStatic(0, 0, self.width, self.height, self.borderColor.a, r, self.borderColor.g,
-    -- --         self.borderColor.b)
-    -- -- end
-
-    -- if self:isMouseOver() and self.tooltip then
-    --     local text = self.tooltip
-    --     if not self.tooltipUI then
-    --         self.tooltipUI = ISToolTip:new()
-    --         self.tooltipUI:setOwner(self)
-    --         self.tooltipUI:setVisible(false)
-    --     end
-    --     if not self.tooltipUI:getIsVisible() then
-    --         if string.contains(self.tooltip, "\n") then
-    --             self.tooltipUI.maxLineWidth = 1000 -- don't wrap the lines
-    --         else
-    --             self.tooltipUI.maxLineWidth = 300
-    --         end
-    --         self.tooltipUI:addToUIManager()
-    --         self.tooltipUI:setVisible(true)
-    --         self.tooltipUI:setAlwaysOnTop(true)
-    --     end
-    --     self.tooltipUI.description = text
-    --     self.tooltipUI:setX(self:getMouseX() + 23)
-    --     self.tooltipUI:setY(self:getMouseY() + 23)
-    -- else
-    --     if self.tooltipUI and self.tooltipUI:getIsVisible() then
-    --         self.tooltipUI:setVisible(false)
-    --         self.tooltipUI:removeFromUIManager()
-    --     end
-    -- end
+    self:drawRect(0, 0, width, height, backgroundAlpha, input.r, input.g, input.b)
+    if width > 2 and height > 2 then
+        self:drawRectBorder(0, 0, width, height, 0.8, Palette.inputEdge.r, Palette.inputEdge.g, Palette.inputEdge.b)
+        self:drawRect(1, 1, width - 2, 1, 0.55, Palette.textEdge.r, Palette.textEdge.g, Palette.textEdge.b)
+        if ChatState.isFocused() then
+            self:drawRectBorder(1, 1, width - 2, height - 2, 0.8, Palette.accent.r, Palette.accent.g, Palette.accent.b)
+        end
+    end
 end
 
 function ChatUI.textEntry:instantiate()

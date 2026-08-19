@@ -1,4 +1,6 @@
 local ISTrpcRichTextPanel = require("trpc/client/ui/ISTrpcRichTextPanel")
+local ChatUI = require("trpc/client/ui/ChatUI")
+local Palette = ChatUI.palette
 
 local ChatText = ISTrpcRichTextPanel:derive("ChatText")
 
@@ -8,6 +10,31 @@ function ChatText:render()
     self.r = 1
     self.g = 1
     self.b = 1
+
+    local contentAlpha = self.contentTransparency or 1
+    self:drawRect(0, 0, self.width, self.height, 0.96 * contentAlpha, Palette.textSurface.r, Palette.textSurface.g, Palette.textSurface.b)
+    if self.width > 2 and self.height > 2 then
+        self:drawRect(
+            1,
+            1,
+            self.width - 2,
+            self.height - 2,
+            0.94 * contentAlpha,
+            Palette.textInset.r,
+            Palette.textInset.g,
+            Palette.textInset.b
+        )
+        self:drawRectBorder(
+            0,
+            0,
+            self.width,
+            self.height,
+            0.8 * contentAlpha,
+            Palette.textEdge.r,
+            Palette.textEdge.g,
+            Palette.textEdge.b
+        )
+    end
 
     if self.lines == nil then
         return
