@@ -133,13 +133,17 @@ $loginArgs += @(
 & $SteamCmdPath @loginArgs
 $exitCode = $LASTEXITCODE
 
-if (-not $KeepVdf) {
+# Keep the VDF on failure so the user can retry without regenerating it.
+if ($exitCode -eq 0 -and -not $KeepVdf) {
     Remove-Item -LiteralPath $vdfPath -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $scratch -Force -ErrorAction SilentlyContinue
 }
 
 if ($exitCode -ne 0) {
     Write-Error "SteamCMD exited with code $exitCode. Check the output above."
+    Write-Output "The generated VDF was kept at: $vdfPath"
+    Write-Output 'Retry by running this script again, or upload the VDF directly with:'
+    Write-Output "  & `"$SteamCmdPath`" +login <user> +workshop_build_item `"$vdfPath`" +quit"
     exit $exitCode
 }
 

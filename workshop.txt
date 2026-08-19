@@ -1,4 +1,4 @@
-id=0
+id=3786374380
 title=TotalRPChat
 description=A full rework of the chat and radio systems for Project Zomboid, built with roleplay servers in mind.
 
