@@ -66,7 +66,8 @@ Use this document for a manual TotalRPChat release. The current process is inten
 ## Steam Workshop publication
 
 - [ ] Prepare the publication texts (title, description, release notes) from `docs/workshop-publication.md`.
-- [ ] Upload the staged package manually through the established Workshop workflow.
+- [ ] Run `pwsh -File tools/upload-workshop.ps1` (first release: no `-PublishedFileId`, creates a new item; updates: pass the existing `-PublishedFileId`).
+- [ ] On a new item, note the `publishedfileid` reported by SteamCMD and update `tools/upload-workshop.ps1` (`-PublishedFileId`) and `workshop.txt` (`id=`) for future updates.
 - [ ] Set the Workshop title, description, supported game/build information, and release notes from the reviewed artifacts.
 - [ ] Verify the uploaded files and version in the Workshop item page.
 - [ ] Only after successful publication, update any external publication status or announcement.
