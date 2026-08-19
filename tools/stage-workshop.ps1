@@ -35,7 +35,16 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 if (-not $Destination) {
     $Destination = Join-Path $repoRoot 'dist/workshop'
 }
-$dest = (Resolve-Path (Join-Path $repoRoot $Destination) -ErrorAction SilentlyContinue) ?? (New-Item -ItemType Directory -Path (Join-Path $repoRoot $Destination) -Force)
+$destinationPath = if ([System.IO.Path]::IsPathRooted($Destination)) {
+    $Destination
+} else {
+    Join-Path $repoRoot $Destination
+}
+if (Test-Path -LiteralPath $destinationPath) {
+    $dest = (Resolve-Path -LiteralPath $destinationPath).Path
+} else {
+    $dest = (New-Item -ItemType Directory -Path $destinationPath -Force).FullName
+}
 
 $required = @(
     (Join-Path $repoRoot '42/mod.info'),
@@ -88,7 +97,7 @@ if ($PreviewImage) {
 $stagedRequired = @(
     (Join-Path $dest '42/mod.info'),
     (Join-Path $dest '42/media/lua/shared/trpc/shared/Version.lua'),
-    (Join-Path $dest 'common/media/ui/trpc/bubble/radio/bubble-center.png'),
+    (Join-Path $dest 'common/media/ui/trpc/indicator/white-rectangle.png'),
     (Join-Path $dest 'workshop.txt')
 )
 $stagedMissing = $stagedRequired | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) }
