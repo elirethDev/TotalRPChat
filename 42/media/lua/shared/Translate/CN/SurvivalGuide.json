@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/SurvivalGuide.schema.json",
+    "SurvivalGuide_TRPC"           : " <H1> TotalRPChat <BR> <TEXT> <SIZE:medium> <CENTRE> %1 <BR> <TEXT> <SIZE:small> <IMAGE:media/ui/RadioButtonCircle.png> 聊天处于焦点时显示当前频道的说话范围 <BR> <IMAGE:media/ui/RadioButtonCircle.png> 始终显示当前频道的说话范围 <BR> <IMAGE:media/ui/RadioButtonIndicator.png> 显示周围电台的收听范围 <BR>",
+    "SurvivalGuide_TRPC_Markdown"   : " 用 * 或 ** 包围的文字会以不同颜色显示（**文字**） <BR>",
+    "SurvivalGuide_TRPC_Whisper"   : " /whisper 或 /w 低声说话 <BR>",
+    "SurvivalGuide_TRPC_Low"       : " /low 或 /l 轻声说话 <BR>",
+    "SurvivalGuide_TRPC_Say"       : " /say 或 /s 以正常音量说话 <BR>",
+    "SurvivalGuide_TRPC_Yell"      : " /yell 或 /y 大喊 <BR>",
+    "SurvivalGuide_TRPC_Me"        : " /me 表达一个动作 <BR>",
+    "SurvivalGuide_TRPC_Do"        : " /do 表达与你的角色无关的事件（请谨慎使用） <BR>",
+    "SurvivalGuide_TRPC_Faction"   : " /faction 或 /f 在派系频道说话 <BR>",
+    "SurvivalGuide_TRPC_SafeHouse" : " /safehouse 或 /sh 在安全屋频道说话 <BR>",
+    "SurvivalGuide_TRPC_General"   : " /all 或 /g 在公共频道说话 <BR>",
+    "SurvivalGuide_TRPC_Ooc"       : " /ooc 或 /o 以角色外身份说话 <BR>",
+    "SurvivalGuide_TRPC_Pm"        : " /pm 用户名 或 /p 用户名 发送私信（/r 回复） <BR>",
+    "SurvivalGuide_TRPC_Admin"     : " /admin 或 /a 在管理员频道说话 <BR>",
+    "SurvivalGuide_TRPC_Color"     : " \"/color r,g,b\"，其中 r,g,b 为 0 到 255 的数字，或 /color #FFFFFF 更新玩家颜色，或直接 \"/color\" 查看当前颜色 <BR>",
+    "SurvivalGuide_TRPC_Roll"      : " \"/roll xdy\"，其中 x 和 y 为数字，x 为 1 到 20，用于掷骰子 <BR>",
+    "SurvivalGuide_TRPC_Languages" : " \"/language en\" 切换语言，其中 \"en\" 是你已学会的语言代码 <BR>",
+    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> 如何上传你的头像 <BR> <TEXT> <SIZE:small> 你可以上传自定义头像图片，说话时它会显示在玩家气泡中，而不是 3D 肖像。 <BR> 要做到这一点，需要将一张以你的用户名以及角色名和姓氏命名的 PNG 图片（'%1.png'）移动到以下 Windows 目录中： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  图片的宽度必须正好为 60，高度必须正好为 80。支持并鼓励使用透明背景。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 将图片移动到正确目录后，点击聊天窗口中的上传图标进行上传，以便管理员批准你的头像。",
+    "SurvivalGuide_TRPC_AvatarUploadPrompt" :  " <TEXT> <SIZE:small>是否要为这个头像发送批准请求？",
+    "SurvivalGuide_TRPC_AvatarSizeError"    :  " <TEXT> <SIZE:small> 发现无效尺寸的头像。你的头像尺寸必须为 %1x%2。"
+}

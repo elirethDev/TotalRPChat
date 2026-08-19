@@ -1,0 +1,77 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/Sandbox.schema.json",
+    "Sandbox_TRPC"                               : "TotalRPChat",
+    "Sandbox_TRPCChannels"                       : "TotalRPChat：频道",
+
+    "Sandbox_TRPC_ShowCharacterName"             : "在聊天中显示角色名称而不是用户名",
+
+    "Sandbox_TRPC_BoredomReduction"              : "听到消息时的无聊度降低",
+
+    "Sandbox_TRPC_Languages"                     : "启用角色扮演语言",
+
+    "Sandbox_TRPC_BubblePortrait"                : "在气泡左侧显示玩家头像（自定义放置在服务器上的 Zomboid/Lua/avatars/username.png）",
+    "Sandbox_TRPC_BubblePortrait_help"           : "在气泡左侧显示玩家头像。\n自定义头像放在服务器上的 Zomboid/Lua/avatars/username.png。\n如果找不到该用户名的图片，将使用默认头像。\n1 = 无\n2 = 默认\n 3 = Steam 头像\n4 = 自定义",
+    "Sandbox_TRPC_BubblePortrait_Values_option1" : "无",
+    "Sandbox_TRPC_BubblePortrait_Values_option2" : "自定义和默认",
+    "Sandbox_TRPC_BubblePortrait_Values_option3" : "Steam 头像",
+
+    "Sandbox_TRPC_BubbleTimerInSeconds"          : "气泡计时器（秒）",
+    "Sandbox_TRPC_BubbleOpacity"                 : "气泡不透明度",
+
+    "Sandbox_TRPC_VerbEnabled"                   : "在消息中添加动词前缀和引号",
+
+    "Sandbox_TRPC_Capitalize"                    : "自动将消息首字母大写并添加标点",
+
+    "Sandbox_TRPC_HideCallout"                   : "在聊天窗口中隐藏喊话（Q 连按）",
+
+    "Sandbox_TRPC_MarkdownOneAsteriskColor"      : "单星号 Markdown 颜色",
+    "Sandbox_TRPC_MarkdownTwoAsterisksColor"     : "双星号 Markdown 颜色",
+
+    "Sandbox_TRPC_GeneralDiscordEnabled"         : "启用与 /general 消息的 Discord 同步",
+    "Sandbox_TRPC_RadioDiscordEnabled"           : "启用与某个电台频道的 Discord 同步",
+    "Sandbox_TRPC_RadioDiscordFrequency"         : "设置与 Discord 同步的电台频率（100.000MHz 即 100000）",
+
+    "Sandbox_TRPC_RadioColor"                    : "设置脚本化电台消息的颜色",
+    "Sandbox_TRPC_RadioSoundMaxRange"            : "全音量电台可被听到的最大范围",
+
+    "Sandbox_TRPC_WhisperEnabled"                : "启用 /whisper 聊天",
+    "Sandbox_TRPC_LowEnabled"                    : "启用 /low 聊天",
+    "Sandbox_TRPC_SayEnabled"                    : "启用 /say 聊天",
+    "Sandbox_TRPC_YellEnabled"                   : "启用 /yell 聊天",
+    "Sandbox_TRPC_MeEnabled"                     : "启用 /me 聊天",
+    "Sandbox_TRPC_DoEnabled"                     : "启用 /do 聊天",
+    "Sandbox_TRPC_PrivateMessageEnabled"         : "启用 /pm（私信）聊天",
+    "Sandbox_TRPC_FactionMessageEnabled"         : "启用 /faction 聊天",
+    "Sandbox_TRPC_SafeHouseMessageEnabled"       : "启用 /safehouse 聊天",
+    "Sandbox_TRPC_GeneralMessageEnabled"         : "启用 /general 聊天",
+    "Sandbox_TRPC_AdminMessageEnabled"           : "启用 /admin 聊天",
+    "Sandbox_TRPC_OutOfCharacterMessageEnabled"  : "启用 /ooc（Out Of Character）聊天",
+
+    "Sandbox_TRPC_WhisperColor"                  : "设置 /whisper 颜色",
+    "Sandbox_TRPC_LowColor"                      : "设置 /low 颜色",
+    "Sandbox_TRPC_SayColor"                      : "设置 /say 颜色",
+    "Sandbox_TRPC_YellColor"                     : "设置 /yell 颜色",
+    "Sandbox_TRPC_MeColor"                       : "设置 /me 颜色",
+    "Sandbox_TRPC_DoColor"                       : "设置 /do 颜色",
+    "Sandbox_TRPC_PrivateMessageColor"           : "设置 /pm（私信）颜色",
+    "Sandbox_TRPC_FactionMessageColor"           : "设置 /faction 颜色",
+    "Sandbox_TRPC_SafeHouseMessageColor"         : "设置 /safehouse 颜色",
+    "Sandbox_TRPC_GeneralMessageColor"           : "设置 /general 颜色",
+    "Sandbox_TRPC_AdminMessageColor"             : "设置 /admin 颜色",
+    "Sandbox_TRPC_OutOfCharacterMessageColor"    : "设置 /ooc（Out Of Character）颜色",
+
+    "Sandbox_TRPC_WhisperRange"                  : "/whisper 聊天范围",
+    "Sandbox_TRPC_LowRange"                      : "/low 聊天范围",
+    "Sandbox_TRPC_SayRange"                      : "/say 聊天范围",
+    "Sandbox_TRPC_YellRange"                     : "/yell 聊天范围",
+    "Sandbox_TRPC_MeRange"                       : "/me 聊天范围",
+    "Sandbox_TRPC_DoRange"                       : "/do 聊天范围",
+    "Sandbox_TRPC_OutOfCharacterMessageRange"    : "/ooc（Out Of Character）聊天范围",
+
+    "Sandbox_TRPC_DoAdminOnly"                   : "/do 需要管理员权限",
+
+    "Sandbox_TRPC_WhisperZombieRange"            : "/whisper 聊天的僵尸范围",
+    "Sandbox_TRPC_LowZombieRange"                : "/low 聊天的僵尸范围",
+    "Sandbox_TRPC_SayZombieRange"                : "/say 聊天的僵尸范围",
+    "Sandbox_TRPC_YellZombieRange"               : "/yell 聊天的僵尸范围"
+}

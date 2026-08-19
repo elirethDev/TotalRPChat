@@ -1,0 +1,77 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/Sandbox.schema.json",
+    "Sandbox_TRPC"                               : "TotalRPChat",
+    "Sandbox_TRPCChannels"                       : "TotalRPChat: Canales",
+
+    "Sandbox_TRPC_ShowCharacterName"             : "Mostrar el nombre del personaje en el chat en lugar del nombre de usuario",
+
+    "Sandbox_TRPC_BoredomReduction"              : "Reducción de aburrimiento por mensaje escuchado",
+
+    "Sandbox_TRPC_Languages"                     : "Activar idiomas de rol",
+
+    "Sandbox_TRPC_BubblePortrait"                : "Mostrar el retrato del jugador a la izquierda de la burbuja (personalizado en: Zomboid/Lua/avatars/username.png en el servidor)",
+    "Sandbox_TRPC_BubblePortrait_help"           : "Mostrar el retrato del jugador a la izquierda de la burbuja.\nLos avatares personalizados van a: Zomboid/Lua/avatars/username.png en el servidor.\nSe usará el retrato estándar si no se encuentra ninguna imagen para el nombre de usuario.\n1 = Ninguno\n2 = Estándar\n 3 = Avatar de Steam\n4 = Personalizado",
+    "Sandbox_TRPC_BubblePortrait_Values_option1" : "Ninguno",
+    "Sandbox_TRPC_BubblePortrait_Values_option2" : "Personalizado y estándar",
+    "Sandbox_TRPC_BubblePortrait_Values_option3" : "Avatar de Steam",
+
+    "Sandbox_TRPC_BubbleTimerInSeconds"          : "Temporizador de burbuja (segundos)",
+    "Sandbox_TRPC_BubbleOpacity"                 : "Opacidad de la burbuja",
+
+    "Sandbox_TRPC_VerbEnabled"                   : "Añadir prefijo de verbo a los mensajes y comillas",
+
+    "Sandbox_TRPC_Capitalize"                    : "Poner en mayúscula automáticamente la primera letra de un mensaje y añadir puntuación",
+
+    "Sandbox_TRPC_HideCallout"                   : "Ocultar las llamadas en la ventana de chat (spam de Q)",
+
+    "Sandbox_TRPC_MarkdownOneAsteriskColor"      : "Color de markdown con un asterisco",
+    "Sandbox_TRPC_MarkdownTwoAsterisksColor"     : "Color de markdown con dos asteriscos",
+
+    "Sandbox_TRPC_GeneralDiscordEnabled"         : "Activar la sincronización con Discord en los mensajes /general",
+    "Sandbox_TRPC_RadioDiscordEnabled"           : "Activar la sincronización con Discord en un canal de radio",
+    "Sandbox_TRPC_RadioDiscordFrequency"         : "Establecer la frecuencia de radio para sincronizar con Discord (100.000MHz es 100000)",
+
+    "Sandbox_TRPC_RadioColor"                    : "Establecer el color de los mensajes de radio de script",
+    "Sandbox_TRPC_RadioSoundMaxRange"            : "Alcance máximo al que se puede oír una radio a volumen máximo",
+
+    "Sandbox_TRPC_WhisperEnabled"                : "Activar el chat /whisper",
+    "Sandbox_TRPC_LowEnabled"                    : "Activar el chat /low",
+    "Sandbox_TRPC_SayEnabled"                    : "Activar el chat /say",
+    "Sandbox_TRPC_YellEnabled"                   : "Activar el chat /yell",
+    "Sandbox_TRPC_MeEnabled"                     : "Activar el chat /me",
+    "Sandbox_TRPC_DoEnabled"                     : "Activar el chat /do",
+    "Sandbox_TRPC_PrivateMessageEnabled"         : "Activar el chat /pm (mensaje privado)",
+    "Sandbox_TRPC_FactionMessageEnabled"         : "Activar el chat /faction",
+    "Sandbox_TRPC_SafeHouseMessageEnabled"       : "Activar el chat /safehouse",
+    "Sandbox_TRPC_GeneralMessageEnabled"         : "Activar el chat /general",
+    "Sandbox_TRPC_AdminMessageEnabled"           : "Activar el chat /admin",
+    "Sandbox_TRPC_OutOfCharacterMessageEnabled"  : "Activar el chat /ooc (fuera de personaje)",
+
+    "Sandbox_TRPC_WhisperColor"                  : "Establecer el color de /whisper",
+    "Sandbox_TRPC_LowColor"                      : "Establecer el color de /low",
+    "Sandbox_TRPC_SayColor"                      : "Establecer el color de /say",
+    "Sandbox_TRPC_YellColor"                     : "Establecer el color de /yell",
+    "Sandbox_TRPC_MeColor"                       : "Establecer el color de /me",
+    "Sandbox_TRPC_DoColor"                       : "Establecer el color de /do",
+    "Sandbox_TRPC_PrivateMessageColor"           : "Establecer el color de /pm (mensaje privado)",
+    "Sandbox_TRPC_FactionMessageColor"           : "Establecer el color de /faction",
+    "Sandbox_TRPC_SafeHouseMessageColor"         : "Establecer el color de /safehouse",
+    "Sandbox_TRPC_GeneralMessageColor"           : "Establecer el color de /general",
+    "Sandbox_TRPC_AdminMessageColor"             : "Establecer el color de /admin",
+    "Sandbox_TRPC_OutOfCharacterMessageColor"    : "Establecer el color de /ooc (fuera de personaje)",
+
+    "Sandbox_TRPC_WhisperRange"                  : "Alcance del chat /whisper",
+    "Sandbox_TRPC_LowRange"                      : "Alcance del chat /low",
+    "Sandbox_TRPC_SayRange"                      : "Alcance del chat /say",
+    "Sandbox_TRPC_YellRange"                     : "Alcance del chat /yell",
+    "Sandbox_TRPC_MeRange"                       : "Alcance del chat /me",
+    "Sandbox_TRPC_DoRange"                       : "Alcance del chat /do",
+    "Sandbox_TRPC_OutOfCharacterMessageRange"    : "Alcance del chat /ooc (fuera de personaje)",
+
+    "Sandbox_TRPC_DoAdminOnly"                   : "/do requiere privilegios de administrador",
+
+    "Sandbox_TRPC_WhisperZombieRange"            : "Alcance del chat /whisper para zombis",
+    "Sandbox_TRPC_LowZombieRange"                : "Alcance del chat /low para zombis",
+    "Sandbox_TRPC_SayZombieRange"                : "Alcance del chat /say para zombis",
+    "Sandbox_TRPC_YellZombieRange"               : "Alcance del chat /yell para zombis"
+}

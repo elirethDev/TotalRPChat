@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/SurvivalGuide.schema.json",
+    "SurvivalGuide_TRPC"           : " <H1> TotalRPChat <BR> <TEXT> <SIZE:medium> <CENTRE> %1 <BR> <TEXT> <SIZE:small> <IMAGE:media/ui/RadioButtonCircle.png> チャットにフォーカスがあるとき、現在のチャンネルの発話範囲を表示する <BR> <IMAGE:media/ui/RadioButtonCircle.png> 現在のチャンネルの発話範囲を常に表示する <BR> <IMAGE:media/ui/RadioButtonIndicator.png> 周囲のラジオの受信範囲を表示する <BR>",
+    "SurvivalGuide_TRPC_Markdown"   : " * または ** で囲まれたテキストは別の色で表示されます（**テキスト**） <BR>",
+    "SurvivalGuide_TRPC_Whisper"   : " /whisper または /w でささやく <BR>",
+    "SurvivalGuide_TRPC_Low"       : " /low または /l で小さな声で話す <BR>",
+    "SurvivalGuide_TRPC_Say"       : " /say または /s で通常の音量で話す <BR>",
+    "SurvivalGuide_TRPC_Yell"      : " /yell または /y で叫ぶ <BR>",
+    "SurvivalGuide_TRPC_Me"        : " /me で行動を表現する <BR>",
+    "SurvivalGuide_TRPC_Do"        : " /do で自分のキャラクターと関係のない出来事を表現する（賢明に使用してください） <BR>",
+    "SurvivalGuide_TRPC_Faction"   : " /faction または /f で派閥チャンネルに話す <BR>",
+    "SurvivalGuide_TRPC_SafeHouse" : " /safehouse または /sh でセーフハウスチャンネルに話す <BR>",
+    "SurvivalGuide_TRPC_General"   : " /all または /g で一般チャンネルに話す <BR>",
+    "SurvivalGuide_TRPC_Ooc"       : " /ooc または /o でメタ発言をする <BR>",
+    "SurvivalGuide_TRPC_Pm"        : " /pm ユーザー名 または /p ユーザー名 でプライベートメッセージを送信する（/r で返信） <BR>",
+    "SurvivalGuide_TRPC_Admin"     : " /admin または /a で管理者チャンネルで話す <BR>",
+    "SurvivalGuide_TRPC_Color"     : " \"/color r,g,b\" でr,g,bを0から255の数値にするか、/color #FFFFFF でプレイヤーの色を更新するか、単に \"/color\" で現在の色を確認する <BR>",
+    "SurvivalGuide_TRPC_Roll"      : " \"/roll xdy\" でxとyを数値にし、xを1から20にしてサイコロを振る <BR>",
+    "SurvivalGuide_TRPC_Languages" : " \"/language en\" で言語を切り替える（\"en\" は習得済みの言語コード） <BR>",
+    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> アバターのアップロード方法 <BR> <TEXT> <SIZE:small> 話すときに3Dの肖像画の代わりにプレイヤーバブルに表示されるカスタムアバター画像をアップロードできます。 <BR> これを行うには、ユーザー名とキャラクターの名前と姓にちなんだPNG画像、'%1.png' を次のWindowsディレクトリに移動する必要があります： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  画像は幅が正確に60、高さが正確に80でなければなりません。透過はサポートされており推奨されます。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 画像を正しいディレクトリに移動したら、チャットウィンドウのアップロードアイコンをクリックしてアップロードし、管理者があなたのアバターを承認できるようにします。",
+    "SurvivalGuide_TRPC_AvatarUploadPrompt" :  " <TEXT> <SIZE:small>このアバターの承認リクエストを送信しますか？",
+    "SurvivalGuide_TRPC_AvatarSizeError"    :  " <TEXT> <SIZE:small> 無効なサイズのアバターが見つかりました。アバターのサイズは %1x%2 である必要があります。"
+}

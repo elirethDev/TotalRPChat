@@ -4,7 +4,7 @@ All notable changes to TotalRPChat are documented here. This changelog follows t
 
 ## [Unreleased]
 
-## [3.0.0] - Unreleased
+## [3.0.0] - 2026-08-19
 
 Validated changes since the previous published commit.
 

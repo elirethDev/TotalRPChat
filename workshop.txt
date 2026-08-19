@@ -1,0 +1,29 @@
+id=0
+title=TotalRPChat
+description=A full rework of the chat and radio systems for Project Zomboid, built with roleplay servers in mind.
+
+FEATURES
+
+- Complete chat UI replacement: range-based voice channels (whisper / low / say / yell), action channels (/me and /do), faction, safehouse, general, admin, OOC, private messages, and radio voice channels.
+- Chat bubbles over players with avatars and typing dots, plus markdown-ish *italic* and **bold** formatting with server-configurable colors.
+- Customizable filtered tabs: create your own tabs with a custom title, default input channel, and excluded channels. Tabs persist across sessions, support drag-to-reorder, unread blinking, and stream switching.
+- Full radio system: speak over two-way radios (hand, belt, square/world, vehicle) and relay to everyone on the same frequency, with radio bubbles, range indicators, device muting, and battery tracking.
+- Player avatar system: custom 60x80 PNG/JPEG avatars shown in chat bubbles, with server-side dimension validation and admin/mod approve/reject workflow.
+- Roleplay tools: /roll dice, per-player /color, optional boredom reduction, auto-capitalize, and an optional language system with 182 learnable languages.
+- Server features: authoritative message routing, per-channel permissions, persistent chat logs, optional Discord bridge for general chat and radio frequencies, and live sandbox settings sync.
+
+COMPATIBILITY
+
+- Project Zomboid B42 only (requires build 42.18.0 or newer).
+- Recommended for roleplay servers: enable the mod on the server and on clients.
+
+CONFIGURATION
+
+- All options are sandbox settings under the TRPC and TRPCChannels pages: per-channel ranges, colors, zombie noise, bubble behavior, markdown colors, Discord bridge, and more.
+- Type /color, /roll, or /language with no arguments to see current values.
+- Full command list is available in-game via the chat info button / Survival Guide.
+
+TRANSLATIONS
+
+- English, Spanish, German, Japanese, Chinese, Brazilian Portuguese, Russian, and Ukrainian UI, sandbox, and survival guide translations included.
+- Community translation help wanted: some languages (Japanese, Chinese, Brazilian Portuguese) were AI-assisted and may need native review. Pull requests and issues that improve translation quality are very welcome.

@@ -1,0 +1,77 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/Sandbox.schema.json",
+    "Sandbox_TRPC"                               : "TotalRPChat",
+    "Sandbox_TRPCChannels"                       : "TotalRPChat: チャンネル",
+
+    "Sandbox_TRPC_ShowCharacterName"             : "チャットでユーザー名の代わりにキャラクター名を表示する",
+
+    "Sandbox_TRPC_BoredomReduction"              : "メッセージを聞くことによる退屈度の減少",
+
+    "Sandbox_TRPC_Languages"                     : "ロールプレイ言語を有効にする",
+
+    "Sandbox_TRPC_BubblePortrait"                : "バブルの左にプレイヤーの肖像画を表示する（カスタムはサーバーのZomboid/Lua/avatars/username.pngに配置）",
+    "Sandbox_TRPC_BubblePortrait_help"           : "バブルの左にプレイヤーの肖像画を表示する。\nカスタムアバターはサーバーのZomboid/Lua/avatars/username.pngに配置する。\nユーザー名の画像が見つからない場合は標準の肖像画が使用される。\n1 = なし\n2 = 標準\n 3 = Steamアバター\n4 = カスタム",
+    "Sandbox_TRPC_BubblePortrait_Values_option1" : "なし",
+    "Sandbox_TRPC_BubblePortrait_Values_option2" : "カスタムと標準",
+    "Sandbox_TRPC_BubblePortrait_Values_option3" : "Steamアバター",
+
+    "Sandbox_TRPC_BubbleTimerInSeconds"          : "バブルの表示時間（秒）",
+    "Sandbox_TRPC_BubbleOpacity"                 : "バブルの不透明度",
+
+    "Sandbox_TRPC_VerbEnabled"                   : "メッセージに動詞の接頭辞と引用符を追加する",
+
+    "Sandbox_TRPC_Capitalize"                    : "メッセージの先頭文字を自動的に大文字にし、句読点を追加する",
+
+    "Sandbox_TRPC_HideCallout"                   : "チャットウィンドウでコールアウトを隠す（Q連打）",
+
+    "Sandbox_TRPC_MarkdownOneAsteriskColor"      : "マークダウン（アスタリスク1個）の色",
+    "Sandbox_TRPC_MarkdownTwoAsterisksColor"     : "マークダウン（アスタリスク2個）の色",
+
+    "Sandbox_TRPC_GeneralDiscordEnabled"         : "/generalメッセージとのDiscord同期を有効にする",
+    "Sandbox_TRPC_RadioDiscordEnabled"           : "ラジオチャンネルとのDiscord同期を有効にする",
+    "Sandbox_TRPC_RadioDiscordFrequency"         : "Discordと同期するラジオ周波数を設定する（100.000MHzは100000）",
+
+    "Sandbox_TRPC_RadioColor"                    : "スクリプト化されたラジオメッセージの色を設定する",
+    "Sandbox_TRPC_RadioSoundMaxRange"            : "音量最大のラジオが聞こえる最大距離",
+
+    "Sandbox_TRPC_WhisperEnabled"                : "/whisperチャットを有効にする",
+    "Sandbox_TRPC_LowEnabled"                    : "/lowチャットを有効にする",
+    "Sandbox_TRPC_SayEnabled"                    : "/sayチャットを有効にする",
+    "Sandbox_TRPC_YellEnabled"                   : "/yellチャットを有効にする",
+    "Sandbox_TRPC_MeEnabled"                     : "/meチャットを有効にする",
+    "Sandbox_TRPC_DoEnabled"                     : "/doチャットを有効にする",
+    "Sandbox_TRPC_PrivateMessageEnabled"         : "/pm（プライベートメッセージ）チャットを有効にする",
+    "Sandbox_TRPC_FactionMessageEnabled"         : "/factionチャットを有効にする",
+    "Sandbox_TRPC_SafeHouseMessageEnabled"       : "/safehouseチャットを有効にする",
+    "Sandbox_TRPC_GeneralMessageEnabled"         : "/generalチャットを有効にする",
+    "Sandbox_TRPC_AdminMessageEnabled"           : "/adminチャットを有効にする",
+    "Sandbox_TRPC_OutOfCharacterMessageEnabled"  : "/ooc（Out Of Character）チャットを有効にする",
+
+    "Sandbox_TRPC_WhisperColor"                  : "/whisperの色を設定する",
+    "Sandbox_TRPC_LowColor"                      : "/lowの色を設定する",
+    "Sandbox_TRPC_SayColor"                      : "/sayの色を設定する",
+    "Sandbox_TRPC_YellColor"                     : "/yellの色を設定する",
+    "Sandbox_TRPC_MeColor"                       : "/meの色を設定する",
+    "Sandbox_TRPC_DoColor"                       : "/doの色を設定する",
+    "Sandbox_TRPC_PrivateMessageColor"           : "/pm（プライベートメッセージ）の色を設定する",
+    "Sandbox_TRPC_FactionMessageColor"           : "/factionの色を設定する",
+    "Sandbox_TRPC_SafeHouseMessageColor"         : "/safehouseの色を設定する",
+    "Sandbox_TRPC_GeneralMessageColor"           : "/generalの色を設定する",
+    "Sandbox_TRPC_AdminMessageColor"             : "/adminの色を設定する",
+    "Sandbox_TRPC_OutOfCharacterMessageColor"    : "/ooc（Out Of Character）の色を設定する",
+
+    "Sandbox_TRPC_WhisperRange"                  : "/whisperチャットの範囲",
+    "Sandbox_TRPC_LowRange"                      : "/lowチャットの範囲",
+    "Sandbox_TRPC_SayRange"                      : "/sayチャットの範囲",
+    "Sandbox_TRPC_YellRange"                     : "/yellチャットの範囲",
+    "Sandbox_TRPC_MeRange"                       : "/meチャットの範囲",
+    "Sandbox_TRPC_DoRange"                       : "/doチャットの範囲",
+    "Sandbox_TRPC_OutOfCharacterMessageRange"    : "/ooc（Out Of Character）チャットの範囲",
+
+    "Sandbox_TRPC_DoAdminOnly"                   : "/doは管理者権限が必要です",
+
+    "Sandbox_TRPC_WhisperZombieRange"            : "/whisperチャットのゾンビ範囲",
+    "Sandbox_TRPC_LowZombieRange"                : "/lowチャットのゾンビ範囲",
+    "Sandbox_TRPC_SayZombieRange"                : "/sayチャットのゾンビ範囲",
+    "Sandbox_TRPC_YellZombieRange"               : "/yellチャットのゾンビ範囲"
+}

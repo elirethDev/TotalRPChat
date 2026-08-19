@@ -50,10 +50,10 @@ Use this document for a manual TotalRPChat release. The current process is inten
 
 ## Package hygiene
 
-- [ ] Build or stage the package from the repository contents without `.git`, local saves, logs, editor files, or temporary artifacts.
-- [ ] Confirm the B42 compatibility descriptor and the canonical runtime version are present in the package.
+- [ ] Run `pwsh -File tools/stage-workshop.ps1 -Destination dist/workshop` (optionally with `-PreviewImage`) to stage a clean package from the repository contents without `.git`, local saves, logs, editor files, or temporary artifacts.
+- [ ] Confirm the B42 compatibility descriptor and the canonical runtime version are present in the staged package.
 - [ ] Confirm no secrets, local configuration, debug artifacts, or unrelated files are included.
-- [ ] Inspect the final archive or Workshop upload contents before publishing.
+- [ ] Inspect the staged package contents before publishing.
 
 ## GitHub release
 
@@ -64,7 +64,8 @@ Use this document for a manual TotalRPChat release. The current process is inten
 
 ## Steam Workshop publication
 
-- [ ] Upload the reviewed package manually through the established Workshop workflow.
+- [ ] Prepare the publication texts (title, description, release notes) from `docs/workshop-publication.md`.
+- [ ] Upload the staged package manually through the established Workshop workflow.
 - [ ] Set the Workshop title, description, supported game/build information, and release notes from the reviewed artifacts.
 - [ ] Verify the uploaded files and version in the Workshop item page.
 - [ ] Only after successful publication, update any external publication status or announcement.

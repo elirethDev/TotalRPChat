@@ -1,0 +1,77 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/Sandbox.schema.json",
+    "Sandbox_TRPC"                               : "TotalRPChat",
+    "Sandbox_TRPCChannels"                       : "TotalRPChat: Kanäle",
+
+    "Sandbox_TRPC_ShowCharacterName"             : "Charakternamen im Chat statt Benutzernamen anzeigen",
+
+    "Sandbox_TRPC_BoredomReduction"              : "Langeweile-Reduktion durch gehörte Nachricht",
+
+    "Sandbox_TRPC_Languages"                     : "Rollensprachen aktivieren",
+
+    "Sandbox_TRPC_BubblePortrait"                : "Spielerporträt links von der Sprechblase anzeigen (benutzerdefiniert in: Zomboid/Lua/avatars/username.png auf dem Server)",
+    "Sandbox_TRPC_BubblePortrait_help"           : "Spielerporträt links von der Sprechblase anzeigen.\nBenutzerdefinierte Avatare kommen nach: Zomboid/Lua/avatars/username.png auf dem Server.\nDas Standard-Porträt wird verwendet, wenn kein Bild für den Benutzernamen gefunden wird.\n1 = Keins\n2 = Standard\n 3 = Steam-Avatar\n4 = Benutzerdefiniert",
+    "Sandbox_TRPC_BubblePortrait_Values_option1" : "Keins",
+    "Sandbox_TRPC_BubblePortrait_Values_option2" : "Benutzerdefiniert und Standard",
+    "Sandbox_TRPC_BubblePortrait_Values_option3" : "Steam-Avatar",
+
+    "Sandbox_TRPC_BubbleTimerInSeconds"          : "Sprechblasen-Timer (Sekunden)",
+    "Sandbox_TRPC_BubbleOpacity"                 : "Sprechblasen-Deckkraft",
+
+    "Sandbox_TRPC_VerbEnabled"                   : "Verb-Präfix und Anführungszeichen zu Nachrichten hinzufügen",
+
+    "Sandbox_TRPC_Capitalize"                    : "Ersten Buchstaben einer Nachricht automatisch großschreiben und Satzzeichen hinzufügen",
+
+    "Sandbox_TRPC_HideCallout"                   : "Meldungen im Chatfenster ausblenden (Q-Spam)",
+
+    "Sandbox_TRPC_MarkdownOneAsteriskColor"      : "Markdown-Farbe mit einem Stern",
+    "Sandbox_TRPC_MarkdownTwoAsterisksColor"     : "Markdown-Farbe mit zwei Sternen",
+
+    "Sandbox_TRPC_GeneralDiscordEnabled"         : "Discord-Sync mit /general-Nachrichten aktivieren",
+    "Sandbox_TRPC_RadioDiscordEnabled"           : "Discord-Sync mit einem Funkkanal aktivieren",
+    "Sandbox_TRPC_RadioDiscordFrequency"         : "Funkfrequenz für die Discord-Sync festlegen (100.000 MHz sind 100000)",
+
+    "Sandbox_TRPC_RadioColor"                    : "Farbe für skriptbasierte Funknachrichten festlegen",
+    "Sandbox_TRPC_RadioSoundMaxRange"            : "Maximale Reichweite, in der ein Radio mit voller Lautstärke gehört werden kann",
+
+    "Sandbox_TRPC_WhisperEnabled"                : "/whisper-Chat aktivieren",
+    "Sandbox_TRPC_LowEnabled"                    : "/low-Chat aktivieren",
+    "Sandbox_TRPC_SayEnabled"                    : "/say-Chat aktivieren",
+    "Sandbox_TRPC_YellEnabled"                   : "/yell-Chat aktivieren",
+    "Sandbox_TRPC_MeEnabled"                     : "/me-Chat aktivieren",
+    "Sandbox_TRPC_DoEnabled"                     : "/do-Chat aktivieren",
+    "Sandbox_TRPC_PrivateMessageEnabled"         : "/pm-Chat (private Nachricht) aktivieren",
+    "Sandbox_TRPC_FactionMessageEnabled"         : "/faction-Chat aktivieren",
+    "Sandbox_TRPC_SafeHouseMessageEnabled"       : "/safehouse-Chat aktivieren",
+    "Sandbox_TRPC_GeneralMessageEnabled"         : "/general-Chat aktivieren",
+    "Sandbox_TRPC_AdminMessageEnabled"           : "/admin-Chat aktivieren",
+    "Sandbox_TRPC_OutOfCharacterMessageEnabled"  : "/ooc-Chat (außerhalb des Charakters) aktivieren",
+
+    "Sandbox_TRPC_WhisperColor"                  : "Farbe von /whisper festlegen",
+    "Sandbox_TRPC_LowColor"                      : "Farbe von /low festlegen",
+    "Sandbox_TRPC_SayColor"                      : "Farbe von /say festlegen",
+    "Sandbox_TRPC_YellColor"                     : "Farbe von /yell festlegen",
+    "Sandbox_TRPC_MeColor"                       : "Farbe von /me festlegen",
+    "Sandbox_TRPC_DoColor"                       : "Farbe von /do festlegen",
+    "Sandbox_TRPC_PrivateMessageColor"           : "Farbe von /pm (private Nachricht) festlegen",
+    "Sandbox_TRPC_FactionMessageColor"           : "Farbe von /faction festlegen",
+    "Sandbox_TRPC_SafeHouseMessageColor"         : "Farbe von /safehouse festlegen",
+    "Sandbox_TRPC_GeneralMessageColor"           : "Farbe von /general festlegen",
+    "Sandbox_TRPC_AdminMessageColor"             : "Farbe von /admin festlegen",
+    "Sandbox_TRPC_OutOfCharacterMessageColor"    : "Farbe von /ooc (außerhalb des Charakters) festlegen",
+
+    "Sandbox_TRPC_WhisperRange"                  : "/whisper-Chatreichweite",
+    "Sandbox_TRPC_LowRange"                      : "/low-Chatreichweite",
+    "Sandbox_TRPC_SayRange"                      : "/say-Chatreichweite",
+    "Sandbox_TRPC_YellRange"                     : "/yell-Chatreichweite",
+    "Sandbox_TRPC_MeRange"                       : "/me-Chatreichweite",
+    "Sandbox_TRPC_DoRange"                       : "/do-Chatreichweite",
+    "Sandbox_TRPC_OutOfCharacterMessageRange"    : "/ooc-Chatreichweite (außerhalb des Charakters)",
+
+    "Sandbox_TRPC_DoAdminOnly"                   : "/do erfordert Administratorrechte",
+
+    "Sandbox_TRPC_WhisperZombieRange"            : "/whisper-Chatreichweite für Zombies",
+    "Sandbox_TRPC_LowZombieRange"                : "/low-Chatreichweite für Zombies",
+    "Sandbox_TRPC_SayZombieRange"                : "/say-Chatreichweite für Zombies",
+    "Sandbox_TRPC_YellZombieRange"               : "/yell-Chatreichweite für Zombies"
+}

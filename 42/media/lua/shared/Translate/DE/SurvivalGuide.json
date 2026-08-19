@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/pz-wiki-modding/pz-translation-data/refs/heads/main/PZ_Translation_Schemas/SurvivalGuide.schema.json",
+    "SurvivalGuide_TRPC"           : " <H1> TotalRPChat <BR> <TEXT> <SIZE:medium> <CENTRE> %1 <BR> <TEXT> <SIZE:small> <IMAGE:media/ui/RadioButtonCircle.png> Sprechreichweite des aktuellen Kanals anzeigen, wenn der Chat fokussiert ist <BR> <IMAGE:media/ui/RadioButtonCircle.png> Sprechreichweite des aktuellen Kanals immer anzeigen <BR> <IMAGE:media/ui/RadioButtonIndicator.png> Empfangsreichweite der umliegenden Radios anzeigen <BR>",
+    "SurvivalGuide_TRPC_Markdown"   : " Text zwischen * oder ** wird anders eingefärbt (**Text**) <BR>",
+    "SurvivalGuide_TRPC_Whisper"   : " /whisper oder /w zum Flüstern <BR>",
+    "SurvivalGuide_TRPC_Low"       : " /low oder /l zum leisen Sprechen <BR>",
+    "SurvivalGuide_TRPC_Say"       : " /say oder /s zum Sprechen in normaler Lautstärke <BR>",
+    "SurvivalGuide_TRPC_Yell"      : " /yell oder /y zum Schreien <BR>",
+    "SurvivalGuide_TRPC_Me"        : " /me zum Ausdrücken einer Aktion <BR>",
+    "SurvivalGuide_TRPC_Do"        : " /do zum Ausdrücken eines Ereignisses, das nichts mit deinem Charakter zu tun hat (nutze es mit Bedacht) <BR>",
+    "SurvivalGuide_TRPC_Faction"   : " /faction oder /f zum Sprechen im Fraktionskanal <BR>",
+    "SurvivalGuide_TRPC_SafeHouse" : " /safehouse oder /sh zum Sprechen im Unterschlupf-Kanal <BR>",
+    "SurvivalGuide_TRPC_General"   : " /all oder /g zum Sprechen im allgemeinen Kanal <BR>",
+    "SurvivalGuide_TRPC_Ooc"       : " /ooc oder /o zum Sprechen außerhalb des Charakters <BR>",
+    "SurvivalGuide_TRPC_Pm"        : " /pm benutzername oder /p benutzername zum Senden einer privaten Nachricht (/r zum Antworten) <BR>",
+    "SurvivalGuide_TRPC_Admin"     : " /admin oder /a zum Sprechen im Admin-Kanal <BR>",
+    "SurvivalGuide_TRPC_Color"     : " \"/color r,g,b\" mit r,g,b einer Zahl von 0 bis 255 oder /color #FFFFFF zum Aktualisieren der Spielerfarbe oder einfach \"/color\", um die aktuelle Farbe zu sehen <BR>",
+    "SurvivalGuide_TRPC_Roll"      : " \"/roll xdy\" mit x und y als Zahlen und x von 1 bis 20 zum Würfeln <BR>",
+    "SurvivalGuide_TRPC_Languages" : " \"/language en\" zum Wechseln der Sprache, wobei \"en\" ein Sprachcode ist, den du gelernt hast <BR>",
+    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> SO LÄDST DU DEINEN AVATAR HOCH <BR> <TEXT> <SIZE:small> Es ist möglich, ein benutzerdefiniertes Avatar-Bild hochzuladen, das beim Sprechen in der Sprechblase des Spielers statt eines 3D-Porträts angezeigt wird. <BR> Dafür muss ein PNG-Bild mit deinem Benutzernamen sowie Vor- und Nachname deines Charakters, '%1.png', in das folgende Windows-Verzeichnis verschoben werden: <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  Das Bild MUSS genau 60 breit und 80 hoch sein. Transparenz wird unterstützt und empfohlen. <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> Sobald das Bild in das richtige Verzeichnis verschoben wurde, klicke auf das Upload-Symbol im Chatfenster, um es hochzuladen, damit ein Admin deinen Avatar freigeben kann.",
+    "SurvivalGuide_TRPC_AvatarUploadPrompt" :  " <TEXT> <SIZE:small>Möchtest du eine Freigabe-Anfrage für diesen Avatar senden?",
+    "SurvivalGuide_TRPC_AvatarSizeError"    :  " <TEXT> <SIZE:small> Avatar mit ungültiger Größe gefunden. Deine Avatar-Größe muss %1x%2 sein."
+}
