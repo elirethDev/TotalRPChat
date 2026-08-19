@@ -180,7 +180,7 @@ function AvatarUploadWindow:drawHelp()
     local player = getPlayer()
     local username = player:getUsername()
     local firstName, lastName = Character.getFirstAndLastName(player)
-    local path = "%userprofile%\\Zomboid\\Lua\\avatars\\client\\" .. getServerIP() .. "\\" .. username .. "\\request\\"
+    local path = "Zomboid/Lua/avatars/client/" .. getServerIP() .. "/" .. username .. "/request/"
     local text =
         getText("SurvivalGuide_TRPC_AvatarUploadHelp", AvatarIO.createFileName(username, firstName, lastName), path)
     self.chatText.text = text

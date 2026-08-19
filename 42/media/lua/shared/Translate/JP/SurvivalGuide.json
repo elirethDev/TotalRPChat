@@ -17,7 +17,7 @@
     "SurvivalGuide_TRPC_Color"     : " \"/color r,g,b\" でr,g,bを0から255の数値にするか、/color #FFFFFF でプレイヤーの色を更新するか、単に \"/color\" で現在の色を確認する <BR>",
     "SurvivalGuide_TRPC_Roll"      : " \"/roll xdy\" でxとyを数値にし、xを1から20にしてサイコロを振る <BR>",
     "SurvivalGuide_TRPC_Languages" : " \"/language en\" で言語を切り替える（\"en\" は習得済みの言語コード） <BR>",
-    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> アバターのアップロード方法 <BR> <TEXT> <SIZE:small> 話すときに3Dの肖像画の代わりにプレイヤーバブルに表示されるカスタムアバター画像をアップロードできます。 <BR> これを行うには、ユーザー名とキャラクターの名前と姓にちなんだPNG画像、'%1.png' を次のWindowsディレクトリに移動する必要があります： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  画像は幅が正確に60、高さが正確に80でなければなりません。透過はサポートされており推奨されます。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 画像を正しいディレクトリに移動したら、チャットウィンドウのアップロードアイコンをクリックしてアップロードし、管理者があなたのアバターを承認できるようにします。",
+    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> アバターのアップロード方法 <BR> <TEXT> <SIZE:small> 話すときに3Dの肖像画の代わりにプレイヤーバブルに表示されるカスタムアバター画像をアップロードできます。 <BR> これを行うには、ユーザー名とキャラクターの名前と姓にちなんだPNG画像、'%1.png' をProject Zomboidのユーザーデータディレクトリ内にある次のパスへ移動する必要があります： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  画像は幅が正確に60、高さが正確に80でなければなりません。透過はサポートされており推奨されます。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 画像を正しいディレクトリに移動したら、チャットウィンドウのアップロードアイコンをクリックしてアップロードし、管理者があなたのアバターを承認できるようにします。",
     "SurvivalGuide_TRPC_AvatarUploadPrompt" :  " <TEXT> <SIZE:small>このアバターの承認リクエストを送信しますか？",
     "SurvivalGuide_TRPC_AvatarSizeError"    :  " <TEXT> <SIZE:small> 無効なサイズのアバターが見つかりました。アバターのサイズは %1x%2 である必要があります。"
 }

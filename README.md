@@ -42,7 +42,7 @@ A full rework of the chat and radio systems for Project Zomboid, built with role
 ### Avatar system
 
 - Custom player avatar shown in chat bubbles (60×80 PNG/JPEG, transparency supported).
-- Upload flow: drop a properly-named file into `%userprofile%\Zomboid\Lua\avatars\client\<serverIP>\<username>\request\`, then use the upload button.
+- Upload flow: drop a properly-named file into `Zomboid/Lua/avatars/client/<serverIP>/<username>/request/`, a path relative to the user's Project Zomboid data directory, then use the upload button.
 - Admin/Moderator validation window with approve/reject controls and a pending queue.
 - Server-side dimension validation (header parsing, no full image decode) before storing and before approving.
 

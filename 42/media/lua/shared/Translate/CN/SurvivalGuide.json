@@ -17,7 +17,7 @@
     "SurvivalGuide_TRPC_Color"     : " \"/color r,g,b\"，其中 r,g,b 为 0 到 255 的数字，或 /color #FFFFFF 更新玩家颜色，或直接 \"/color\" 查看当前颜色 <BR>",
     "SurvivalGuide_TRPC_Roll"      : " \"/roll xdy\"，其中 x 和 y 为数字，x 为 1 到 20，用于掷骰子 <BR>",
     "SurvivalGuide_TRPC_Languages" : " \"/language en\" 切换语言，其中 \"en\" 是你已学会的语言代码 <BR>",
-    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> 如何上传你的头像 <BR> <TEXT> <SIZE:small> 你可以上传自定义头像图片，说话时它会显示在玩家气泡中，而不是 3D 肖像。 <BR> 要做到这一点，需要将一张以你的用户名以及角色名和姓氏命名的 PNG 图片（'%1.png'）移动到以下 Windows 目录中： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  图片的宽度必须正好为 60，高度必须正好为 80。支持并鼓励使用透明背景。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 将图片移动到正确目录后，点击聊天窗口中的上传图标进行上传，以便管理员批准你的头像。",
+    "SurvivalGuide_TRPC_AvatarUploadHelp"   :  " <H1> 如何上传你的头像 <BR> <TEXT> <SIZE:small> 你可以上传自定义头像图片，说话时它会显示在玩家气泡中，而不是 3D 肖像。 <BR> 要做到这一点，需要将一张以你的用户名以及角色名和姓氏命名的 PNG 图片（'%1.png'）移动到 Project Zomboid 用户数据目录中的以下路径： <BR> <CENTRE> %2 <BR> <TEXT> <SIZE:small>  图片的宽度必须正好为 60，高度必须正好为 80。支持并鼓励使用透明背景。 <BR> <IMAGE:media/ui/inventoryPanes/Button_GuideN.png> 将图片移动到正确目录后，点击聊天窗口中的上传图标进行上传，以便管理员批准你的头像。",
     "SurvivalGuide_TRPC_AvatarUploadPrompt" :  " <TEXT> <SIZE:small>是否要为这个头像发送批准请求？",
     "SurvivalGuide_TRPC_AvatarSizeError"    :  " <TEXT> <SIZE:small> 发现无效尺寸的头像。你的头像尺寸必须为 %1x%2。"
 }
