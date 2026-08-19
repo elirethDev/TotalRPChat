@@ -6,3 +6,6 @@ dist/
 # Private publication/support documents (keep out of the public repo)
 docs/ko-fi-terms.md
 docs/workshop-publication.md
+
+# SteamCMD upload scratch (generated VDF)
+.workshop-upload/
