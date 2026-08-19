@@ -35,6 +35,8 @@ local historyRebuilder
 local activePersistenceSuspended = 0
 local ReconcileDisplayOrder
 local PersistActiveTab
+local IsRuntimeReady
+local ActivatePersistedTab
 
 local DEFAULT_FILTERS = {
     [2] = { channels = { "ooc" }, includeSystem = false },
@@ -549,6 +551,7 @@ local function RestoreCustomTabs(definitions)
     persistedStatus = status
     persistedActiveApplied = false
 
+    activePersistenceSuspended = activePersistenceSuspended + 1
     local expected = {}
     for _, tabID in ipairs(normalized.order) do
         local definition = normalized.tabs[tabID]
@@ -577,6 +580,10 @@ local function RestoreCustomTabs(definitions)
 
     persistedTabsRegistered = true
     ReconcileDisplayOrder()
+    activePersistenceSuspended = activePersistenceSuspended - 1
+    if IsRuntimeReady() then
+        ActivatePersistedTab()
+    end
     return true, status
 end
 
@@ -617,7 +624,7 @@ local function ActivateTab(tabID)
     return true
 end
 
-local function IsRuntimeReady()
+IsRuntimeReady = function()
     return ISChat ~= nil and ISChat.instance ~= nil and ChatState.getTabs()[1] ~= nil
 end
 
@@ -645,7 +652,7 @@ local function ActivateRequestedTab(persistedTabID)
     return false, "active-unavailable"
 end
 
-local function ActivatePersistedTab()
+ActivatePersistedTab = function()
     if persistedDefinitions == nil then
         return false
     end
@@ -739,6 +746,7 @@ local function ApplyCustomTabState(state)
 
     local tabs = ChatState.getTabs()
     local messageStore = ChatState.getMessageStore()
+    activePersistenceSuspended = activePersistenceSuspended + 1
     local expected = {}
     for tabID in pairs(savedState.tabs) do
         expected[tabID] = true
@@ -785,7 +793,6 @@ local function ApplyCustomTabState(state)
         activeStatus = "active-fallback"
     end
 
-    activePersistenceSuspended = activePersistenceSuspended + 1
     local activated = ActivateTab(runtimeActiveID)
     if not activated and runtimeActiveID ~= 1 then
         activated = ActivateTab(1)
@@ -1035,6 +1042,117 @@ local function RebuildTab(tabID)
     return historyRebuilder(ToRuntimeTabID(tabID))
 end
 
+local function ClearRuntimeTab(tabID)
+    local tab = ChatState.getTabs()[tabID]
+    if tab == nil then
+        return false
+    end
+    tab.chatTextRawLines = {}
+    tab.chatTextLines = {}
+    tab.chatMessages = {}
+    tab.log = {}
+    tab.logIndex = 0
+    tab.text = ""
+    tab.textDirty = true
+    if tab.paginate ~= nil then
+        tab:paginate()
+    end
+    return true
+end
+
+local function ClearTabHistory(tabID)
+    local runtimeTabID = ToRuntimeTabID(tabID)
+    if not ChatState.getMessageStore():clearView(runtimeTabID) then
+        return false, "missing"
+    end
+    ClearRuntimeTab(runtimeTabID)
+    return true
+end
+
+local function DuplicateCustomTab(tabID)
+    if not TabDefinitions.isCustomID(tabID) then
+        return nil, "invalid"
+    end
+    local state = EnsurePersistedDefinitions()
+    local source = state and state.tabs[tabID]
+    if source == nil then
+        return nil, "missing"
+    end
+
+    local duplicateID, nextState, allocationStatus = TabDefinitions.allocateCustomID(state)
+    if duplicateID == nil then
+        return nil, allocationStatus
+    end
+    nextState.tabs[duplicateID] = {
+        title = source.title .. " Copy",
+        inputChannel = source.inputChannel,
+        filters = source.filters,
+    }
+    local nextOrder = {}
+    for _, existingID in ipairs(nextState.order) do
+        table.insert(nextOrder, existingID)
+        if existingID == tabID then
+            table.insert(nextOrder, duplicateID)
+        end
+    end
+    nextState.order = nextOrder
+    nextState = TabDefinitions.normalize(nextState)
+
+    local saved, saveStatus = SavePersistedDefinitions(nextState)
+    if not saved then
+        return nil, saveStatus
+    end
+    if persistedTabsRegistered or IsRuntimeReady() then
+        local definition = persistedDefinitions.tabs[duplicateID]
+        AddTab(definition.title, duplicateID, definition.filters, definition.inputChannel)
+        ReconcileDisplayOrder()
+    end
+    return duplicateID, persistedDefinitions.tabs[duplicateID], saveStatus
+end
+
+local function RestoreDefaultTabs()
+    local state = TabDefinitions.newState()
+    local saved, saveStatus = SavePersistedDefinitions(state)
+    if not saved then
+        return false, saveStatus
+    end
+
+    activePersistenceSuspended = activePersistenceSuspended + 1
+    local staleIDs = {}
+    for tabID in pairs(ChatState.getTabs()) do
+        if TabDefinitions.isCustomID(tabID) then
+            table.insert(staleIDs, tabID)
+        end
+    end
+    for _, tabID in ipairs(staleIDs) do
+        RemoveRuntimeCustomTab(tabID)
+    end
+    ReconcileDisplayOrder()
+    local activated = not IsRuntimeReady() or ActivateTab(1)
+    activePersistenceSuspended = activePersistenceSuspended - 1
+    if not activated then
+        return false, "active-unavailable"
+    end
+    persistedDefinitions.activeTabID = TabDefinitions.BUILTIN_GENERAL_ID
+    persistedActiveApplied = true
+    return true, persistedDefinitions, saveStatus
+end
+
+local function PersistRuntimeCustomOrder()
+    local panel = ISChat and ISChat.instance and ISChat.instance.panel
+    if panel == nil or type(panel.viewList) ~= "table" then
+        return false, "unavailable"
+    end
+    local orderedIDs = {}
+    for _, view in ipairs(panel.viewList) do
+        local tabID = GetTabIdFromView(view)
+        if tabID ~= nil then
+            table.insert(orderedIDs, tabID)
+        end
+    end
+    return ReorderCustomTabs(orderedIDs)
+end
+
 local function GetInputChannel(tabID)
     local runtimeTabID = ToRuntimeTabID(tabID)
     if persistedDefinitions ~= nil and persistedDefinitions.tabs[runtimeTabID] ~= nil then
@@ -1067,6 +1185,10 @@ Tabs.reorderCustomTabs = ReorderCustomTabs
 Tabs.restoreCustomTabs = RestoreCustomTabs
 Tabs.reconcileDisplayOrder = ReconcileDisplayOrder
 Tabs.rebuildTab = RebuildTab
+Tabs.clearTabHistory = ClearTabHistory
+Tabs.duplicateCustomTab = DuplicateCustomTab
+Tabs.restoreDefaultTabs = RestoreDefaultTabs
+Tabs.persistRuntimeCustomOrder = PersistRuntimeCustomOrder
 Tabs.getInputChannel = GetInputChannel
 Tabs.applyCustomTabState = ApplyCustomTabState
 Tabs.getPersistedDefinitions = function()

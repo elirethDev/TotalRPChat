@@ -200,7 +200,7 @@ function TabEditorWindow:createChildren()
         rightX,
         contentY + 154,
         rightWidth,
-        math.max(1, self.height - contentY - 253)
+        math.max(1, self.height - contentY - 275)
     )
     self.excludedChannelList:initialise()
     self:addChild(self.excludedChannelList)
@@ -229,10 +229,35 @@ function TabEditorWindow:createChildren()
     self.clearExcludedChannelButton:initialise()
     self:addChild(self.clearExcludedChannelButton)
 
+    self.clearTabButton = ISButton:new(
+        rightX,
+        self.height - 116,
+        actionWidth,
+        BUTTON_HEIGHT,
+        Text("UI_TRPC_chat_tab_clear_history", "Clear tab"),
+        self,
+        self.clearSelectedHistory
+    )
+    self.clearTabButton:initialise()
+    self:addChild(self.clearTabButton)
+
+    self.restoreDefaultsButton = ISButton:new(
+        rightX + actionWidth + 6,
+        self.height - 116,
+        actionWidth,
+        BUTTON_HEIGHT,
+        Text("UI_TRPC_chat_tab_restore_defaults", "Restore defaults"),
+        self,
+        self.restoreDefaults
+    )
+    self.restoreDefaultsButton:initialise()
+    self:addChild(self.restoreDefaultsButton)
+
+    local tabActionWidth = math.max(1, math.floor((listWidth - 6) / 2))
     self.newButton = ISButton:new(
         PADDING,
         self.height - 62,
-        listWidth,
+        tabActionWidth,
         BUTTON_HEIGHT,
         Text("UI_TRPC_chat_tab_new", "New"),
         self,
@@ -240,6 +265,18 @@ function TabEditorWindow:createChildren()
     )
     self.newButton:initialise()
     self:addChild(self.newButton)
+
+    self.duplicateButton = ISButton:new(
+        PADDING + tabActionWidth + 6,
+        self.height - 62,
+        tabActionWidth,
+        BUTTON_HEIGHT,
+        Text("UI_TRPC_chat_tab_duplicate", "Duplicate"),
+        self,
+        self.duplicateSelected
+    )
+    self.duplicateButton:initialise()
+    self:addChild(self.duplicateButton)
 
     self.deleteButton = ISButton:new(
         PADDING,
@@ -283,6 +320,7 @@ function TabEditorWindow:createChildren()
     self.draftState = nil
     self.selectedID = nil
     self.statusMessage = nil
+    self.restoreConfirmPending = false
     self:refreshTabs()
 end
 
@@ -430,6 +468,72 @@ function TabEditorWindow:beginNewTab()
     self:setStatus(Text("UI_TRPC_chat_tab_new_hint", "Create a new custom tab."))
 end
 
+function TabEditorWindow:duplicateSelected()
+    if self.draftState == nil or self.selectedID == nil then
+        return
+    end
+    local source = self.draftState.tabs[self.selectedID]
+    if source == nil then
+        return
+    end
+    local duplicateID, nextState = TabDefinitions.allocateCustomID(self.draftState)
+    if duplicateID == nil then
+        self:setStatus(Text("UI_TRPC_chat_tab_duplicate_failed", "Unable to duplicate chat tab."), true)
+        return
+    end
+    nextState.tabs[duplicateID] = {
+        title = source.title .. " Copy",
+        inputChannel = source.inputChannel,
+        filters = DeepCopy(source.filters),
+    }
+    local nextOrder = {}
+    for _, tabID in ipairs(nextState.order) do
+        table.insert(nextOrder, tabID)
+        if tabID == self.selectedID then
+            table.insert(nextOrder, duplicateID)
+        end
+    end
+    nextState.order = nextOrder
+    self.draftState = TabDefinitions.normalize(nextState)
+    self.selectedID = duplicateID
+    self:refreshDraftList(duplicateID)
+    self:setStatus(Text("UI_TRPC_chat_tab_duplicate_hint", "Duplicated tab. Save to apply."))
+end
+
+function TabEditorWindow:clearSelectedHistory()
+    if self.selectedID == nil then
+        return
+    end
+    local cleared, status = Tabs.clearTabHistory(self.selectedID)
+    if not cleared then
+        self:setStatus(
+            Text("UI_TRPC_chat_tab_clear_failed", "Unable to clear this tab.") .. " (" .. tostring(status) .. ")",
+            true
+        )
+        return
+    end
+    self:setStatus(Text("UI_TRPC_chat_tab_cleared", "Tab history cleared."))
+end
+
+function TabEditorWindow:restoreDefaults()
+    if not self.restoreConfirmPending then
+        self.restoreConfirmPending = true
+        self:setStatus(Text("UI_TRPC_chat_tab_restore_confirm", "Click Restore defaults again to confirm."), true)
+        return
+    end
+    self.restoreConfirmPending = false
+    local restored, _, status = Tabs.restoreDefaultTabs()
+    if not restored then
+        self:setStatus(
+            Text("UI_TRPC_chat_tab_restore_failed", "Unable to restore default tabs.") .. " (" .. tostring(status) .. ")",
+            true
+        )
+        return
+    end
+    self:refreshTabs()
+    self:setStatus(Text("UI_TRPC_chat_tab_restored", "Default tabs restored."))
+end
+
 function TabEditorWindow:addExcludedChannel()
     local channel = self.excludedChannelCombo:getSelectedData()
     if channel == nil then
@@ -570,6 +674,7 @@ function TabEditorWindow:open()
         ISLayoutManager.RegisterWindow("trpc_chat_tab_editor", ISCollapsableWindow, self)
     end
     self:setVisible(true)
+    self.restoreConfirmPending = false
     self:bringToTop()
     self:refreshTabs(self.selectedID)
 end
@@ -591,6 +696,7 @@ function TabEditorWindow:new()
     o.draftState = nil
     o.selectedID = nil
     o.statusMessage = nil
+    o.restoreConfirmPending = false
     return o
 end
 

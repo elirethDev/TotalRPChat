@@ -168,12 +168,14 @@ function MessageStore:clearMessages()
 end
 
 function MessageStore:registerView(tabID, filter)
+    local existing = self.views[tabID]
     if self.views[tabID] == nil then
         table.insert(self.viewOrder, tabID)
     end
     local normalizedFilter = TabFilters.normalize(filter)
     self.views[tabID] = {
         filter = normalizedFilter,
+        clearedAt = existing and existing.clearedAt or 0,
     }
     return normalizedFilter
 end
@@ -203,6 +205,15 @@ end
 function MessageStore:getViewFilter(tabID)
     local view = self.views[tabID]
     return view and view.filter or nil
+end
+
+function MessageStore:clearView(tabID)
+    local view = self.views[tabID]
+    if view == nil then
+        return false
+    end
+    view.clearedAt = self.nextID
+    return true
 end
 
 function MessageStore:getViewIDs()
@@ -291,7 +302,7 @@ function MessageStore:getMessagesForView(tabID)
 
     local messages = {}
     for _, record in ipairs(self.messages) do
-        if MatchesView(record, tabID, view.filter) then
+        if record.id > (view.clearedAt or 0) and MatchesView(record, tabID, view.filter) then
             table.insert(messages, record)
         end
     end

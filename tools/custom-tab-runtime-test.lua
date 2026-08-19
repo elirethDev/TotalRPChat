@@ -244,6 +244,9 @@ AssertEqual(record.id, 1, "runtime message store assigns a sequence")
 AssertEqual(viewIDs[1], 1, "General receives the projected message")
 AssertEqual(viewIDs[2], "trpc-custom-1", "custom view receives the projected message")
 AssertEqual(#ChatState.getMessageStore():getMessagesForView("trpc-custom-1"), 1, "custom history is queryable")
+assert(Tabs.clearTabHistory("trpc-custom-1"), "clear custom tab history succeeds")
+AssertEqual(#ChatState.getMessageStore():getMessagesForView("trpc-custom-1"), 0, "clear removes only the selected view history")
+AssertEqual(#ChatState.getMessageStore():getMessagesForView(1), 1, "clear preserves General history")
 
 assert(Tabs.activatePersistedTab(), "persisted active tab is restored")
 AssertEqual(ChatState.getCurrentTabID(), "trpc-custom-1", "persisted active ID maps to runtime")
@@ -388,5 +391,27 @@ assert(not unavailableApplied, "unavailable persistence is rejected")
 AssertEqual(unavailableStatus, TabDefinitions.STATUS_UNAVAILABLE, "unavailable persistence reports its status")
 AssertEqual(saveCalls, unavailableSaveStart, "unavailable persistence does not partially persist")
 ModData = availableModData
+
+local duplicateID, duplicateDefinition = Tabs.duplicateCustomTab(applyID)
+assert(duplicateID ~= nil, "runtime duplicate allocates a new custom ID")
+AssertEqual(duplicateDefinition.inputChannel, "pm", "runtime duplicate preserves input channel")
+AssertEqual(duplicateDefinition.title, "Applied New Copy", "runtime duplicate gets a safe title")
+local duplicateIndex
+for index, tabID in ipairs(Tabs.getPersistedDefinitions().order) do
+    if tabID == duplicateID then
+        duplicateIndex = index
+    end
+end
+assert(duplicateIndex ~= nil, "runtime duplicate is inserted into custom order")
+
+local reorderIDs = { duplicateID, applyID }
+local reordered = Tabs.reorderCustomTabs(reorderIDs)
+assert(reordered, "runtime custom reorder persists")
+AssertEqual(Tabs.getPersistedDefinitions().order[1], duplicateID, "runtime custom reorder keeps requested first ID")
+
+local restoredDefaults = Tabs.restoreDefaultTabs()
+assert(restoredDefaults, "runtime default restoration succeeds")
+AssertEqual(#Tabs.getPersistedDefinitions().order, 0, "default restoration removes custom definitions")
+AssertEqual(ChatState.getCurrentTabID(), 1, "default restoration activates General")
 
 print("custom tab runtime tests passed")

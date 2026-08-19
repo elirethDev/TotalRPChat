@@ -59,6 +59,16 @@ function RadioRangeIndicator:reconcileRadios(desiredRadios)
         info.indicator:unsubscribe()
         self.indicators[object] = nil
         self.radios[object] = nil
+        if self.statusHandler ~= nil then
+            local status = "unavailable"
+            local radioData = info.radio and info.radio:getDeviceData()
+            if radioData ~= nil and not radioData:getIsTurnedOn() then
+                status = "inactive"
+            elseif info.object ~= nil and World.distanceManhatten(info.object, self.player) > self.range then
+                status = "out-of-range"
+            end
+            self.statusHandler(info, status)
+        end
     end
 
     for object, info in pairs(desiredRadios) do
@@ -126,6 +136,10 @@ function RadioRangeIndicator:updateIcons()
     self.radioStatusIcons.enabled = false
 end
 
+function RadioRangeIndicator:setStatusHandler(handler)
+    self.statusHandler = type(handler) == "function" and handler or nil
+end
+
 function RadioRangeIndicator:subscribe()
     self:subscribeIndicators()
     if self.event then
@@ -180,6 +194,7 @@ function RadioRangeIndicator:new(discoveringRange, radioMaxRange, showIcon)
     o.radios = {}
     o.previousTime = 0
     o.radioStatusIcons = RadioStatusIcons:new(o.player)
+    o.statusHandler = nil
     return o
 end
 

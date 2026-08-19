@@ -1,5 +1,10 @@
 local Character = require("trpc/shared/utils/Character")
 local TrpcClientSendCommands = require("trpc/client/network/ClientSend")
+local Radio = require("trpc/client/Radio")
+
+local function ReportDevice(action, device)
+    Radio.reportDeviceStatus(device, action)
+end
 
 -- mute was not sync at all with the server so we do it there
 function ISRadioAction:performMuteMicrophone()
@@ -11,6 +16,7 @@ function ISRadioAction:performMuteMicrophone()
         else
             TrpcClientSendCommands.sendMuteRadio(self.device, self.secondaryItem)
         end
+        ReportDevice("Microphone state changed", self.device)
     end
 end
 
@@ -21,6 +27,7 @@ function ISRadioAction:performToggleOnOff()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio power changed", self.device)
 end
 
 local defaultPerformSetVolume = ISRadioAction.performSetVolume
@@ -29,6 +36,7 @@ function ISRadioAction:performSetVolume()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio volume changed", self.device)
 end
 
 local defaultPerformRemoveHeadphones = ISRadioAction.performRemoveHeadphones
@@ -37,6 +45,7 @@ function ISRadioAction:performRemoveHeadphones()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio headphones removed", self.device)
 end
 
 local defaultPerformAddHeadphones = ISRadioAction.performAddHeadphones
@@ -45,6 +54,7 @@ function ISRadioAction:performAddHeadphones()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio headphones added", self.device)
 end
 
 local defaultPerformRemoveBattery = ISRadioAction.performRemoveBattery
@@ -57,6 +67,7 @@ function ISRadioAction:performRemoveBattery()
         end
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio battery removed", self.device)
 end
 
 local defaultPerformAddBattery = ISRadioAction.performAddBattery
@@ -65,6 +76,7 @@ function ISRadioAction:performAddBattery()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio battery added", self.device)
 end
 
 local defaultPerformSetChannel = ISRadioAction.performSetChannel
@@ -73,4 +85,5 @@ function ISRadioAction:performSetChannel()
     if Character.isItemOnBeltAndNotInHand(getPlayer(), self.device) then
         TrpcClientSendCommands.sendGiveRadioState(self.device)
     end
+    ReportDevice("Radio frequency changed", self.device)
 end

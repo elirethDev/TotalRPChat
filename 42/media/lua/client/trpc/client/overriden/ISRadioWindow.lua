@@ -1,5 +1,6 @@
 local Character = require("trpc/shared/utils/Character")
 local TrpcClientSendCommands = require("trpc/client/network/ClientSend")
+local Radio = require("trpc/client/Radio")
 
 local DefaultISRadioWindowActivate = ISRadioWindow.activate
 
@@ -10,7 +11,9 @@ function ISRadioWindow.activate(_player, _deviceObject)
     else
         TrpcClientSendCommands.sendAskRadioState(_deviceObject)
     end
-    return DefaultISRadioWindowActivate(_player, _deviceObject)
+    local window = DefaultISRadioWindowActivate(_player, _deviceObject)
+    Radio.reportDeviceStatus(_deviceObject, "Radio device selected")
+    return window
 end
 
 local DefaultISRadioWindowUpdate = ISRadioWindow.update

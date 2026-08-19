@@ -35,6 +35,9 @@ A full rework of the chat and radio systems for Project Zomboid, built with role
 - Muting devices and state sync (frequency, volume, battery, headphone, two-way, transmit range) for in-hand, square, and belt radios.
 - Belt radios simulated with a fake radio object; battery drain tracked every game minute.
 - Radio noise attracts zombies per channel's zombie range.
+- Local radio presets and receive-frequency mute settings persist per player through `LocalPreferences` and never alter server routing.
+- Radio status feedback reports the observed device, frequency, volume, effective local range, and device changes through the existing chat surface.
+- No-listener and server-side out-of-range acknowledgements are not available in the protocol; local feedback reports only observed device and indicator-range changes and never claims delivery failure.
 
 ### Avatar system
 

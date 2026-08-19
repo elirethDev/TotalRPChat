@@ -26,6 +26,8 @@ local Streams = require("trpc/client/chat/Streams")
 local MessageStore = require("trpc/client/chat/MessageStore")
 local Commands = require("trpc/client/chat/Commands")
 local PlayerData = require("trpc/client/PlayerData")
+local LocalPreferences = require("trpc/client/LocalPreferences")
+local Radio = require("trpc/client/Radio")
 local Formatting = require("trpc/client/chat/Formatting")
 local BubbleFactory = require("trpc/client/ui/bubble/Factory")
 local Tabs = require("trpc/client/ui/Tabs")
@@ -34,6 +36,28 @@ local ChatState = require("trpc/client/ui/ChatState")
 local BubbleState = require("trpc/client/ui/bubble/BubbleState")
 local EventBus = require("trpc/core/EventBus")
 local Logger = require("trpc/core/Logger")
+local ChannelRegistry = require("trpc/shared/ChannelRegistry")
+
+local function LocalText(key, fallback)
+    if type(getText) == "function" then
+        local translated = getText(key)
+        if translated ~= nil and translated ~= key then
+            return translated
+        end
+    end
+    return fallback
+end
+
+Radio.setStatusHandler(function(message)
+    if
+        ISChat ~= nil
+        and ISChat.instance ~= nil
+        and ISChat.sendInfoToCurrentTab ~= nil
+        and ChatState.getTabs()[1] ~= nil
+    then
+        ISChat.sendInfoToCurrentTab(message)
+    end
+end)
 
 ISChat.allChatStreams = Streams.allChatStreams
 ISChat.chatStreamsByName = Streams.chatStreamsByName
@@ -198,6 +222,7 @@ ISChat.initChat = function()
     instance.lastDiscordMessages = {}
 
     PlayerData.InitGlobalModData()
+    LocalPreferences.load()
     Tabs.loadPersistedDefinitions()
     Tabs.addTab("General", 1)
     AvatarManager:createRequestDirectory()
@@ -608,6 +633,9 @@ function ISChat.onMessagePacket(
     isFromDiscord,
     disableVerb
 )
+    if LocalPreferences.shouldSuppress({ author = author, channel = type }) then
+        return
+    end
     if author ~= getPlayer():getUsername() then
         ReduceBoredom()
     end
@@ -687,6 +715,9 @@ function BuildServerMessage(fontSize, showTimestamp, showTitle, rawMessage, time
 end
 
 function ISChat.onServerMessage(message)
+    if LocalPreferences.isChannelMuted("server") then
+        return
+    end
     local color = (TrpcServerSettings and TrpcServerSettings["server"]["color"]) or { 255, 86, 64 }
     local time = Calendar.getInstance():getTimeInMillis()
     local stream = GetStreamFromType("general")
@@ -843,6 +874,14 @@ function ISChat.onRadioEmittingPacket(type, author, characterName, message, lang
         Logger.error("ISChat", "TRPC error: onRadioEmittingPacket: stream not found")
         return
     end
+    if LocalPreferences.shouldSuppress({
+        author = author,
+        channel = stream["name"],
+        radioFrequency = frequency,
+        kind = "radio",
+    }) then
+        return
+    end
     local name = characterName
     if TrpcServerSettings and not TrpcServerSettings["options"]["showCharacterName"] then
         name = author
@@ -884,10 +923,12 @@ function ISChat.onRadioPacket(type, author, characterName, message, language, co
         return
     end
 
-    local playerName = getPlayer():getUsername()
-    if author ~= playerName then
-        ReduceBoredom()
+    if LocalPreferences.isIgnoredPlayer(author) or LocalPreferences.isChannelMuted(stream["name"]) then
+        return
     end
+
+    local playerName = getPlayer():getUsername()
+    local acceptedFrequency = false
     local name = characterName
     if TrpcServerSettings and not TrpcServerSettings["options"]["showCharacterName"] then
         name = author
@@ -898,41 +939,47 @@ function ISChat.onRadioPacket(type, author, characterName, message, language, co
     end
     local showLanguage = TrpcServerSettings and TrpcServerSettings["options"]["languages"]
     for frequency, radios in pairs(radiosInfo) do
-        if showLanguage and not LanguageManager:isKnown(language) then
-            updatedMessage = LanguageManager:getRandomMessage(updatedMessage)
-        end
-        local messageColor = Formatting.buildColorFromMessageType(type)
-        CreateSquaresRadiosBubbles(updatedMessage, messageColor, radios["squares"])
-        CreatePlayersRadiosBubbles(updatedMessage, messageColor, radios["players"])
-        CreateVehiclesRadiosBubbles(updatedMessage, messageColor, radios["vehicles"])
+        if not LocalPreferences.isRadioFrequencyMuted(frequency) then
+            acceptedFrequency = true
+            if showLanguage and not LanguageManager:isKnown(language) then
+                updatedMessage = LanguageManager:getRandomMessage(updatedMessage)
+            end
+            local messageColor = Formatting.buildColorFromMessageType(type)
+            CreateSquaresRadiosBubbles(updatedMessage, messageColor, radios["squares"])
+            CreatePlayersRadiosBubbles(updatedMessage, messageColor, radios["players"])
+            CreateVehiclesRadiosBubbles(updatedMessage, messageColor, radios["vehicles"])
 
-        local formattedMessage, parsedMessages =
-            Formatting.buildMessageFromPacket(type, updatedMessage, name, color, frequency, disableVerb)
-        local line = Formatting.buildChatMessage(
-            ISChat.instance.chatFont,
-            ISChat.instance.showTimestamp,
-            ISChat.instance.showTitle,
-            showLanguage,
-            language,
-            formattedMessage,
-            time,
-            type
-        )
-        -- a special packet is making sure the author always has a radio feedback in the chat
-        -- useful in case the listening range and emitting range of the radio differs
-        -- this is to avoid any confusion from players thinking the radios mights not work
-        if author ~= playerName then
-            AddMessageToTab(stream["tabID"], language, time, formattedMessage, line, stream["name"], {
-                type = type,
-                channel = stream["name"],
-                author = author,
-                characterName = characterName,
-                direction = GetMessageDirection(author),
-                source = "radio",
-                kind = "radio",
-                radioFrequency = frequency,
-            })
+            local formattedMessage, parsedMessages =
+                Formatting.buildMessageFromPacket(type, updatedMessage, name, color, frequency, disableVerb)
+            local line = Formatting.buildChatMessage(
+                ISChat.instance.chatFont,
+                ISChat.instance.showTimestamp,
+                ISChat.instance.showTitle,
+                showLanguage,
+                language,
+                formattedMessage,
+                time,
+                type
+            )
+            -- a special packet is making sure the author always has a radio feedback in the chat
+            -- useful in case the listening range and emitting range of the radio differs
+            -- this is to avoid any confusion from players thinking the radios mights not work
+            if author ~= playerName then
+                AddMessageToTab(stream["tabID"], language, time, formattedMessage, line, stream["name"], {
+                    type = type,
+                    channel = stream["name"],
+                    author = author,
+                    characterName = characterName,
+                    direction = GetMessageDirection(author),
+                    source = "radio",
+                    kind = "radio",
+                    radioFrequency = frequency,
+                })
+            end
         end
+    end
+    if acceptedFrequency and author ~= playerName then
+        ReduceBoredom()
     end
 end
 
@@ -1070,6 +1117,12 @@ ISChat.addLineInChat = function(message, tabID)
     if message:getAuthor() == "Server" then
         ISChat.sendInfoToCurrentTab(line)
     elseif message:getRadioChannel() ~= -1 then -- scripted radio message
+        if LocalPreferences.shouldSuppress({
+            channel = "scriptedRadio",
+            radioFrequency = message:getRadioChannel(),
+        }) then
+            return
+        end
         local messageWithoutColorPrefix = line:gsub("*%d+,%d+,%d+*", "")
         message:setText(messageWithoutColorPrefix)
         local color = (TrpcServerSettings and TrpcServerSettings["scriptedRadio"]["color"])
@@ -1414,6 +1467,25 @@ local function HasAtLeastOneChanelEnabled(tabId)
     return false
 end
 
+local function OnRadioSourceStatus(info, status)
+    local frequency = "unknown"
+    local radioData = info and info.radio and info.radio:getDeviceData()
+    if radioData ~= nil then
+        frequency = tostring(radioData:getChannel())
+    end
+    if status == "out-of-range" then
+        Radio.reportStatus(
+            "Radio source on frequency "
+                .. frequency
+                .. " left the local indicator range; listener availability cannot be confirmed."
+        )
+    elseif status == "inactive" then
+        Radio.reportStatus("Radio source on frequency " .. frequency .. " is no longer active locally.")
+    else
+        Radio.reportStatus("Radio source on frequency " .. frequency .. " is no longer observable locally.")
+    end
+end
+
 ISChat.onRecvSandboxVars = function(messageTypeSettings)
     if TrpcServerSettings == nil then
         Events.OnPostRender.Remove(AskServerData)
@@ -1455,6 +1527,7 @@ ISChat.onRecvSandboxVars = function(messageTypeSettings)
         ISChat.instance.radioRangeIndicator:unsubscribe()
     end
     ISChat.instance.radioRangeIndicator = RadioRangeIndicator:new(25, radioMaxRange, ISChat.instance.isRadioIconEnabled)
+    ISChat.instance.radioRangeIndicator:setStatusHandler(OnRadioSourceStatus)
     if ISChat.instance.radioButtonState == true then
         ISChat.instance.radioRangeIndicator:subscribe()
     end
@@ -1886,7 +1959,11 @@ ISChat.onMouseUp = function(target, x, y)
         return ISChat.focused
     end
     if target:getUIName() == ISChat.tabPanelName then
+        local wasDraggingTab = target.draggingTab ~= nil
         ISTabPanel.onMouseUp(ISChat.instance.panel, x, y)
+        if wasDraggingTab then
+            Tabs.persistRuntimeCustomOrder()
+        end
         return ISChat.focused
     end
     if target:getUIName() == ISChat.textEntryName then
@@ -1962,6 +2039,69 @@ function ISChat:openTabEditor()
     self.tabEditorWindow:open()
 end
 
+function ISChat:toggleIgnoredPlayer(username)
+    LocalPreferences.setIgnoredPlayer(username, not LocalPreferences.isIgnoredPlayer(username))
+end
+
+function ISChat:toggleMutedChannel(channel)
+    LocalPreferences.setChannelMuted(channel, not LocalPreferences.isChannelMuted(channel))
+end
+
+function ISChat:toggleMutedRadioFrequency(frequency)
+    local muted = not LocalPreferences.isRadioFrequencyMuted(frequency)
+    local saved = LocalPreferences.setRadioFrequencyMuted(frequency, muted)
+    if saved then
+        Radio.reportStatus(
+            (muted and "Locally muted radio frequency " or "Locally unmuted radio frequency ") .. tostring(frequency) .. "."
+        )
+    end
+end
+
+function ISChat:applyRadioPreset(frequency)
+    local radio = Radio.getActiveDevice()
+    if radio == nil then
+        ISChat.sendErrorToCurrentTab("No active radio detected.")
+        return
+    end
+    local applied, status = Radio.setFrequency(radio, frequency)
+    if not applied then
+        ISChat.sendErrorToCurrentTab("Unable to apply radio preset (" .. tostring(status) .. ").")
+        return
+    end
+    Radio.reportStatus("Radio preset applied: " .. Radio.formatStatus(status), status)
+end
+
+function ISChat:saveCurrentRadioPreset()
+    local _, radioData = Radio.getActiveDevice()
+    if radioData == nil then
+        ISChat.sendErrorToCurrentTab("No active radio detected.")
+        return
+    end
+    local frequency = radioData:getChannel()
+    local saved = LocalPreferences.setRadioPreset(frequency, nil, true)
+    if saved then
+        Radio.reportStatus("Saved radio preset for frequency " .. tostring(frequency) .. ".")
+    else
+        ISChat.sendErrorToCurrentTab("Unable to save radio preset.")
+    end
+end
+
+function ISChat:removeRadioPreset(frequency)
+    local removed = LocalPreferences.setRadioPreset(frequency, nil, false)
+    if removed then
+        Radio.reportStatus("Removed radio preset for frequency " .. tostring(frequency) .. ".")
+    end
+end
+
+local function SortFrequencies(left, right)
+    local leftNumber = tonumber(left)
+    local rightNumber = tonumber(right)
+    if leftNumber ~= nil and rightNumber ~= nil then
+        return leftNumber < rightNumber
+    end
+    return tostring(left) < tostring(right)
+end
+
 function ISChat:onGearButtonClick()
     local context =
         ISContextMenu.get(0, self:getAbsoluteX() + self:getWidth() / 2, self:getAbsoluteY() + self.gearButton:getY())
@@ -1975,6 +2115,133 @@ function ISChat:onGearButtonClick()
         manageTabsLabel = "Manage chat tabs"
     end
     context:addOption(manageTabsLabel, ISChat.instance, ISChat.openTabEditor)
+
+    local radioPresetOption = context:addOption(LocalText("UI_TRPC_radio_presets", "Radio presets"), ISChat.instance)
+    local radioPresetMenu = context:getNew(context)
+    context:addSubMenu(radioPresetOption, radioPresetMenu)
+    local activeRadio, activeRadioData = Radio.getActiveDevice()
+    if activeRadioData ~= nil then
+        local activeStatus = Radio.getStatus(activeRadio, activeRadioData, Radio.getConfiguredMaxRange())
+        radioPresetMenu:addOption("Active radio: " .. Radio.formatStatus(activeStatus), ISChat.instance)
+        radioPresetMenu:addOption(
+            "Save current frequency (" .. tostring(activeRadioData:getChannel()) .. ")",
+            ISChat.instance,
+            ISChat.saveCurrentRadioPreset
+        )
+    else
+        radioPresetMenu:addOption("No active radio detected.", ISChat.instance)
+    end
+
+    local presetFrequencies = {}
+    local radioPresets = LocalPreferences.getRadioPresets()
+    for frequency in pairs(radioPresets) do
+        table.insert(presetFrequencies, frequency)
+    end
+    table.sort(presetFrequencies, SortFrequencies)
+    if #presetFrequencies == 0 then
+        radioPresetMenu:addOption("No saved radio presets.", ISChat.instance)
+    else
+        for _, frequency in ipairs(presetFrequencies) do
+            local label = radioPresets[frequency]
+            radioPresetMenu:addOption(
+                "Apply " .. tostring(label) .. " (" .. tostring(frequency) .. ")",
+                ISChat.instance,
+                ISChat.applyRadioPreset,
+                frequency
+            )
+            radioPresetMenu:addOption(
+                "Remove " .. tostring(label) .. " (" .. tostring(frequency) .. ")",
+                ISChat.instance,
+                ISChat.removeRadioPreset,
+                frequency
+            )
+        end
+    end
+
+    local localFiltersOption = context:addOption(LocalText("UI_TRPC_local_chat_filters", "Local chat filters"), ISChat.instance)
+    local localFiltersMenu = context:getNew(context)
+    context:addSubMenu(localFiltersOption, localFiltersMenu)
+
+    local channelOption = localFiltersMenu:addOption(LocalText("UI_TRPC_muted_channels", "Muted channels"), ISChat.instance)
+    local channelMenu = context:getNew(context)
+    localFiltersMenu:addSubMenu(channelOption, channelMenu)
+    local seenChannels = {}
+    for _, entry in ipairs(ChannelRegistry.getAll()) do
+        if not seenChannels[entry.name] then
+            seenChannels[entry.name] = true
+            local muted = LocalPreferences.isChannelMuted(entry.name)
+            channelMenu:addOption(
+                (muted and "Unmute " or "Mute ") .. entry.name,
+                ISChat.instance,
+                ISChat.toggleMutedChannel,
+                entry.name
+            )
+        end
+    end
+    for _, channel in ipairs({ "server", "radio", "system", "error" }) do
+        if not seenChannels[channel] then
+            local muted = LocalPreferences.isChannelMuted(channel)
+            channelMenu:addOption(
+                (muted and "Unmute " or "Mute ") .. channel,
+                ISChat.instance,
+                ISChat.toggleMutedChannel,
+                channel
+            )
+        end
+    end
+
+    local playerOption = localFiltersMenu:addOption(LocalText("UI_TRPC_ignored_players", "Ignored players"), ISChat.instance)
+    local playerMenu = context:getNew(context)
+    localFiltersMenu:addSubMenu(playerOption, playerMenu)
+    local onlinePlayers = getOnlinePlayers()
+    if onlinePlayers ~= nil then
+        for index = 0, onlinePlayers:size() - 1 do
+            local player = onlinePlayers:get(index)
+            local username = player and player:getUsername()
+            if username ~= nil and username ~= getPlayer():getUsername() then
+                local ignored = LocalPreferences.isIgnoredPlayer(username)
+                playerMenu:addOption(
+                    (ignored and "Unignore " or "Ignore ") .. username,
+                    ISChat.instance,
+                    ISChat.toggleIgnoredPlayer,
+                    username
+                )
+            end
+        end
+    end
+
+    local frequencyOption = localFiltersMenu:addOption(
+        LocalText("UI_TRPC_muted_radio_frequencies", "Muted radio frequencies"),
+        ISChat.instance
+    )
+    local frequencyMenu = context:getNew(context)
+    localFiltersMenu:addSubMenu(frequencyOption, frequencyMenu)
+    local frequencies = {}
+    if TrpcServerSettings and TrpcServerSettings.options and TrpcServerSettings.options.radio then
+        local configuredFrequency = TrpcServerSettings.options.radio.frequency
+        if configuredFrequency ~= nil then
+            frequencies[configuredFrequency] = true
+        end
+    end
+    local radio = Character.getFirstHandOrBeltItemByGroup(getPlayer(), "Radio")
+    local radioData = radio and radio:getDeviceData() or nil
+    if radioData ~= nil then
+        frequencies[radioData:getChannel()] = true
+    end
+    for frequency in pairs(LocalPreferences.getRadioPresets()) do
+        frequencies[frequency] = true
+    end
+    for frequency in pairs(frequencies) do
+        if frequency ~= nil then
+            local muted = LocalPreferences.isRadioFrequencyMuted(frequency)
+            frequencyMenu:addOption(
+                (muted and "Unmute " or "Mute ") .. tostring(frequency),
+                ISChat.instance,
+                ISChat.toggleMutedRadioFrequency,
+                frequency
+            )
+        end
+    end
 
     local timestampOptionName = getText("UI_chat_context_enable_timestamp")
     if self.showTimestamp then
