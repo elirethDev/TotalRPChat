@@ -16,11 +16,13 @@
 --   ChatState.addBubble("player", author, myBubble)
 
 local BubbleState = require("trpc/client/ui/bubble/BubbleState")
+local MessageStore = require("trpc/client/chat/MessageStore")
 local ChatState = {}
 
 local state = {
     tabs = {},
     bubbles = BubbleState,
+    messageStore = MessageStore.new(),
     typingDots = {},
     currentTabID = 0,
     focused = false,
@@ -32,6 +34,18 @@ end
 
 function ChatState.setTabs(value)
     state.tabs = value
+end
+
+function ChatState.getMessageStore()
+    return state.messageStore
+end
+
+function ChatState.setMessageStore(value)
+    state.messageStore = value
+end
+
+function ChatState.resetMessageStore()
+    state.messageStore:reset()
 end
 
 function ChatState.getBubbles()

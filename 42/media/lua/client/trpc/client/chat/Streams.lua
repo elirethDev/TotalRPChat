@@ -76,6 +76,25 @@ Streams.lastTabStream[2] = Streams.defaultTabStream[2]
 Streams.lastTabStream[3] = Streams.defaultTabStream[3]
 Streams.lastTabStream[4] = Streams.defaultTabStream[4]
 
+local function IsStreamEnabled(streamName, allowBeforeSettings)
+    if TrpcServerSettings == nil then
+        return allowBeforeSettings == true
+    end
+    return TrpcServerSettings[streamName] ~= nil and TrpcServerSettings[streamName].enabled == true
+end
+
+local function GetFallbackInputStream()
+    return Streams.defaultTabStream[1] or Streams.allChatStreams[1]
+end
+
+local function ResolveInputChannel(inputChannel, allowBeforeSettings)
+    local stream = Streams.chatStreamsByName[inputChannel]
+    if stream ~= nil and stream.command ~= nil and IsStreamEnabled(stream.name, allowBeforeSettings == true) then
+        return stream
+    end
+    return GetFallbackInputStream()
+end
+
 local function IsOnlySpacesOrEmpty(command)
     local commandWithoutSpaces = command:gsub("%s+", "")
     return #commandWithoutSpaces == 0
@@ -84,6 +103,7 @@ end
 local function GetCommandFromMessage(command)
     if not luautils.stringStarts(command, "/") then
         local defaultStream = ISChat.defaultTabStream[ChatState.getCurrentTabID()]
+            or ISChat.defaultTabStream[1]
         return defaultStream, "", false
     end
     if IsOnlySpacesOrEmpty(command) then
@@ -116,28 +136,85 @@ local function GetTrpcCommandFromMessage(command)
     return nil
 end
 
-local function UpdateTabStreams(newTab, tabID)
+local function UpdateTabStreams(newTab, tabID, inputChannel)
     newTab.chatStreams = {}
-    for _, stream in pairs(ISChat.allChatStreams) do
-        local name = stream["name"]
-        if
-            stream["tabID"] == tabID
-            and TrpcServerSettings
-            and TrpcServerSettings[name]
-            and TrpcServerSettings[name]["enabled"]
-        then
+    Streams.defaultTabStream[tabID] = nil
+    Streams.lastTabStream[tabID] = nil
+
+    if inputChannel ~= nil then
+        local stream = ResolveInputChannel(inputChannel, true)
+        if stream ~= nil then
             table.insert(newTab.chatStreams, stream)
+            Streams.defaultTabStream[tabID] = stream
+            Streams.lastTabStream[tabID] = stream
+        end
+    else
+        for _, stream in ipairs(Streams.allChatStreams) do
+            local name = stream["name"]
+            if stream["tabID"] == tabID and IsStreamEnabled(name, false) then
+                table.insert(newTab.chatStreams, stream)
+            end
+        end
+        if tabID == 1 and #newTab.chatStreams == 0 then
+            local stream = GetFallbackInputStream()
+            if stream ~= nil then
+                table.insert(newTab.chatStreams, stream)
+                Streams.defaultTabStream[tabID] = stream
+                Streams.lastTabStream[tabID] = stream
+            end
+        end
+        if #newTab.chatStreams >= 1 then
+            Streams.defaultTabStream[tabID] = newTab.chatStreams[1]
+            Streams.lastTabStream[tabID] = Streams.lastTabStream[tabID] or newTab.chatStreams[1]
         end
     end
+
     if #newTab.chatStreams >= 1 then
-        ISChat.defaultTabStream[tabID] = newTab.chatStreams[1]
         newTab.lastChatCommand = newTab.chatStreams[1].command
+    else
+        newTab.lastChatCommand = nil
     end
+end
+
+local function RemoveTabStreams(tabID)
+    Streams.defaultTabStream[tabID] = nil
+    Streams.lastTabStream[tabID] = nil
+end
+
+local function ResetTabStreams()
+    for tabID in pairs(Streams.defaultTabStream) do
+        Streams.defaultTabStream[tabID] = nil
+    end
+    for tabID in pairs(Streams.lastTabStream) do
+        Streams.lastTabStream[tabID] = nil
+    end
+
+    Streams.defaultTabStream[1] = Streams.allChatStreams[1]
+    Streams.defaultTabStream[2] = Streams.allChatStreams[9]
+    Streams.defaultTabStream[3] = Streams.allChatStreams[10]
+    Streams.defaultTabStream[4] = Streams.allChatStreams[11]
+    Streams.lastTabStream[1] = Streams.defaultTabStream[1]
+    Streams.lastTabStream[2] = Streams.defaultTabStream[2]
+    Streams.lastTabStream[3] = Streams.defaultTabStream[3]
+    Streams.lastTabStream[4] = Streams.defaultTabStream[4]
+end
+
+local function IsStreamForTab(tabID, stream)
+    if stream == nil then
+        return false
+    end
+    local tabStream = Streams.lastTabStream[tabID] or Streams.defaultTabStream[tabID]
+    return tabStream == stream
 end
 
 Streams.IsOnlySpacesOrEmpty = IsOnlySpacesOrEmpty
 Streams.GetCommandFromMessage = GetCommandFromMessage
 Streams.GetTrpcCommandFromMessage = GetTrpcCommandFromMessage
+Streams.resolveInputChannel = ResolveInputChannel
+Streams.getFallbackInputStream = GetFallbackInputStream
 Streams.UpdateTabStreams = UpdateTabStreams
+Streams.removeTabStreams = RemoveTabStreams
+Streams.resetTabStreams = ResetTabStreams
+Streams.isStreamForTab = IsStreamForTab
 
 return Streams
