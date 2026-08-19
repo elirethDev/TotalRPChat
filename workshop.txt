@@ -27,3 +27,18 @@ TRANSLATIONS
 
 - English, Spanish, German, Japanese, Chinese, Brazilian Portuguese, Russian, and Ukrainian UI, sandbox, and survival guide translations included.
 - Community translation help wanted: some languages (Japanese, Chinese, Brazilian Portuguese) were AI-assisted and may need native review. Pull requests and issues that improve translation quality are very welcome.
+
+CREDITS
+
+TotalRPChat is based on TICS: Total Immersive Chat System by Johngood, available at https://steamcommunity.com/sharedfiles/filedetails/?id=3366438318
+
+The original idea, chat and radio systems come from TICS. TotalRPChat has been extensively modified and improved for Project Zomboid B42, but the foundation belongs to its original creator. Go show some love to Johngood and the TICS project!
+
+SUPPORT AND COMMISSIONS
+
+I keep giving continuous support to all my mods, and I accept custom commissions and personalized support through a Ko-fi subscription.
+
+Join my Discord server to get community help, mod news, and tier-based support: https://discord.gg/JbQ8nmYQFY
+
+If you want to support my work, you can donate at:
+<a href='https://ko-fi.com/V5K425D4ZH' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>

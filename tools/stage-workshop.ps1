@@ -71,12 +71,17 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot 'CHANGELOG.md')) {
 
 # Optional preview image for the Workshop item.
 if ($PreviewImage) {
-    $preview = Join-Path $repoRoot $PreviewImage
+    # Accept both absolute paths and paths relative to the repository root.
+    $preview = if ([System.IO.Path]::IsPathRooted($PreviewImage)) {
+        $PreviewImage
+    } else {
+        Join-Path $repoRoot $PreviewImage
+    }
     if (-not (Test-Path -LiteralPath $preview -PathType Leaf)) {
         Write-Error -Message "Preview image not found: $preview"
         exit 1
     }
-    Copy-Item -LiteralPath $preview -Destination $dest -Force
+    Copy-Item -LiteralPath $preview -Destination (Join-Path $dest 'preview.png') -Force
 }
 
 # Verify the staged package layout.

@@ -51,6 +51,7 @@ Use this document for a manual TotalRPChat release. The current process is inten
 ## Package hygiene
 
 - [ ] Run `pwsh -File tools/stage-workshop.ps1 -Destination dist/workshop` (optionally with `-PreviewImage`) to stage a clean package from the repository contents without `.git`, local saves, logs, editor files, or temporary artifacts.
+- [ ] The preview image is copied into the staged package as `preview.png` (Steam Workshop convention).
 - [ ] Confirm the B42 compatibility descriptor and the canonical runtime version are present in the staged package.
 - [ ] Confirm no secrets, local configuration, debug artifacts, or unrelated files are included.
 - [ ] Inspect the staged package contents before publishing.
