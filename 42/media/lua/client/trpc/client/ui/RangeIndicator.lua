@@ -142,7 +142,9 @@ function RangeIndicator:new(object, range, color)
     o.keepOnScreen = false
     o:instantiate()
 
-    -- TODO: try to use of the non documented events with missleading names to do that
+    -- Keep OnPostFloorLayerDraw in subscribe(): no documented B42 event preserves
+    -- the world-space coordinates, per-floor-layer ordering, and draw cadence used
+    -- by render().
     PreLoadTextures()
     return o
 end
